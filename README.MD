@@ -129,4 +129,10 @@ Proyecto personal en desarrollo — Estudiante de Informática, UNLP.
 
 ---
 
+## Licencia
+
+Este proyecto está bajo la licencia MIT. Podés consultar el texto completo en [LICENSE](./LICENSE).
+
+---
+
 > *"Flare" por llamarada solar. "Field" por campo agrícola y campo electromagnético.*
