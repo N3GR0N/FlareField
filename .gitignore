@@ -23,7 +23,13 @@
 
 # misc
 .DS_Store
+Thumbs.db
+Desktop.ini
 *.pem
+
+# project docs kept local only
+/DESIGN.md
+/PROJECT_STRUCTURE.md
 
 # debug
 npm-debug.log*
