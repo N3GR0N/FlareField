@@ -1,53 +1,110 @@
-'use client'; 
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import TopNav from "@/components/layout/TopNav";
+import Sidebar from "@/components/layout/Sidebar";
+import Card from "@/components/ui/Card";
+import StatusChip from "@/components/ui/StatusChip";
+import Button from "@/components/ui/Button";
 
-export default function Home() {
-  // Estado para guardar la respuesta de tu API
-  const [datosSolar, setDatosSolar] = useState<any>(null);
+type SolarEvent = {
+  id: string;
+  date: string;
+  type: string;
+  message: string;
+};
+
+type SolarResponse = {
+  actual_state: string;
+  events: SolarEvent[];
+};
+
+function mapTone(state: string): "calm" | "watch" | "alert" | "critical" {
+  const v = state.toLowerCase();
+  if (v.includes("cr")) return "critical";
+  if (v.includes("alerta")) return "alert";
+  if (v.includes("moder")) return "watch";
+  return "calm";
+}
+
+export default function DashboardPage() {
+  const [data, setData] = useState<SolarResponse | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Llamamos a tu ruta /api/solar
-    fetch('/api/solar')
+    fetch("/api/solar")
       .then((res) => res.json())
-      .then((data) => {
-        setDatosSolar(data);
-      });
+      .then((json: SolarResponse) => setData(json))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24 bg-[#0a0a0a] text-[#ececec]">
-      <h1 className="text-4xl font-serif mb-4 text-[#f5f5f0]">FlareField</h1>
-      
-      <div className="max-w-md w-full p-8 border border-stone-800 bg-stone-900/30 rounded-sm">
-        <h2 className="text-sm font-mono uppercase tracking-widest text-stone-500 mb-6">
-          Estado del Clima Espacial
-        </h2>
+    <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text)]">
+      <TopNav />
 
-        {datosSolar ? (
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
-              </span>
-              {/* Ajustado a 'actual_state' como pusiste en el route.ts */}
-              <p className="text-xl font-sans">{datosSolar.actual_state}</p>
+      <div className="mx-auto flex max-w-6xl">
+        <Sidebar />
+
+        <main className="flex-1 p-4 md:p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl">Panorama Solar</h1>
+              <p className="mt-1 text-sm text-[var(--color-text-muted)]">
+                Monitoreo editorial de actividad y eventos recientes.
+              </p>
             </div>
-            
-            <p className="text-stone-400 font-serif italic border-l border-stone-700 pl-4">
-              {/* Ajustado a 'events' y 'message' */}
-              "{datosSolar.events[0]?.message || 'Sin eventos recientes registrados.'}"
-            </p>
+            <Button variant="secondary">Actualizar</Button>
           </div>
-        ) : (
-          <p className="animate-pulse font-mono text-stone-600">Sincronizando con DONKI...</p>
-        )}
-      </div>
 
-      <p className="mt-12 text-xs font-mono text-stone-600 uppercase tracking-tighter">
-        Datos provistos por NASA DONKI & NOAA
-      </p>
-    </main>
+          {loading ? (
+            <p className="text-sm text-[var(--color-text-muted)] [font-family:var(--font-mono)]">
+              Sincronizando con DONKI...
+            </p>
+          ) : (
+            <section className="grid gap-4 md:grid-cols-2">
+              <Card className="p-4">
+                <p className="mb-2 text-xs uppercase tracking-[0.08em] text-[var(--color-text-muted)] [font-family:var(--font-label)]">
+                  Estado Actual
+                </p>
+                <div className="flex items-center gap-3">
+                  <StatusChip
+                    label={data?.actual_state ?? "Sin datos"}
+                    tone={mapTone(data?.actual_state ?? "")}
+                  />
+                </div>
+              </Card>
+
+              <Card className="p-4">
+                <p className="mb-2 text-xs uppercase tracking-[0.08em] text-[var(--color-text-muted)] [font-family:var(--font-label)]">
+                  Próximo Módulo
+                </p>
+                <p className="text-sm text-[var(--color-text-muted)]">
+                  Forecast 7 días y mapa solar se integran en el siguiente bloque.
+                </p>
+              </Card>
+
+              <Card className="p-4 md:col-span-2">
+                <p className="mb-3 text-xs uppercase tracking-[0.08em] text-[var(--color-text-muted)] [font-family:var(--font-label)]">
+                  Eventos Recientes
+                </p>
+                <div className="space-y-2">
+                  {(data?.events ?? []).slice(0, 4).map((event) => (
+                    <div
+                      key={event.id}
+                      className="rounded-[0.5rem] border border-[var(--color-border)] bg-[var(--color-surface-low)] p-3"
+                    >
+                      <p className="text-sm">{event.message}</p>
+                      <p className="mt-1 text-xs text-[var(--color-text-muted)] [font-family:var(--font-mono)]">
+                        {new Date(event.date).toLocaleString("es-AR")}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </section>
+          )}
+        </main>
+      </div>
+    </div>
   );
 }
