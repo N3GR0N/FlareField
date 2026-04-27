@@ -30,6 +30,14 @@ Desktop.ini
 # project docs kept local only
 /DESIGN.md
 /PROJECT_STRUCTURE.md
+/designmd
+/desingmd
+/DESING.md
+/DESINGMD
+
+# local generated design exports/artifacts
+/stitch_design/
+/stitch_*.zip
 
 # debug
 npm-debug.log*

@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import {
-  Newsreader,
+  Cormorant_Garamond,
   Work_Sans,
   DM_Mono,
   Space_Grotesk,
 } from "next/font/google";
 import "./globals.css";
 
-const newsreader = Newsreader({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
   variable: "--font-display",
 });
 
@@ -45,14 +46,20 @@ export default function RootLayout({
     <html
       lang="es"
       className={[
-        newsreader.variable,
+        cormorant.variable,
         workSans.variable,
         dmMono.variable,
         spaceGrotesk.variable,
         "h-full antialiased",
       ].join(" ")}
     >
-      <body className="min-h-full bg-[var(--color-background)] text-[var(--color-text)]">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0"
+        />
+      </head>
+      <body className="relative min-h-full overflow-x-hidden bg-[var(--color-background)] text-[var(--color-text)]">
         {children}
       </body>
     </html>

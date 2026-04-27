@@ -11,15 +11,15 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-[var(--color-primary)] text-[#fff6f1] border border-[var(--color-primary)] hover:brightness-95",
+    "bg-[var(--primary-container)] text-[var(--on-primary)] border border-[var(--primary-container)] hover:bg-[var(--primary)]",
   secondary:
-    "bg-[var(--color-secondary)] text-[#2b211d] border border-[var(--color-secondary)] hover:brightness-98",
+    "bg-[var(--surface-container-low)] text-[var(--color-text)] border border-[var(--border-card)] hover:border-[var(--primary)]",
   inverted:
-    "bg-[var(--color-text)] text-[var(--color-surface-low)] border border-[var(--color-text)] hover:opacity-95",
+    "bg-[var(--inverse-surface)] text-[var(--inverse-on-surface)] border border-[var(--inverse-surface)] hover:opacity-90",
   outlined:
-    "bg-transparent text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-surface-low)]",
+    "bg-transparent text-[var(--color-text)] border border-[var(--outline)] hover:text-[var(--primary)] hover:border-[var(--primary)]",
   ghost:
-    "bg-transparent text-[var(--color-text-muted)] border border-transparent hover:bg-[var(--color-surface-low)]",
+    "bg-transparent text-[var(--color-text-muted)] border border-[var(--outline-variant)] hover:border-[var(--primary)] hover:text-[var(--primary)]",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -38,9 +38,9 @@ export default function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center rounded-[var(--radius-btn)] transition-colors",
+        "inline-flex items-center justify-center gap-2 rounded-[var(--radius-btn)] transition-colors duration-200",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "[font-family:var(--font-label)] tracking-[0.01em]",
+        "[font-family:var(--font-label)] tracking-[0.03em] uppercase",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]",
         variantClasses[variant],
         sizeClasses[size],

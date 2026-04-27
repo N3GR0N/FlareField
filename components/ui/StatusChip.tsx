@@ -9,10 +9,10 @@ type StatusChipProps = {
 };
 
 const toneClasses: Record<StatusTone, string> = {
-  calm: "text-[#0d6178] bg-[#0088ab1a] border-[#0088ab55]",
-  watch: "text-[#7b4d2e] bg-[#d4956a2b] border-[#d4956a66]",
-  alert: "text-[#8a3f16] bg-[#c4612a24] border-[#c4612a66]",
-  critical: "text-[#8f1f1f] bg-[#c728281c] border-[#c7282860]",
+  calm: "text-[var(--tertiary)] bg-[color-mix(in_srgb,var(--tertiary)_10%,white)] border border-[color-mix(in_srgb,var(--tertiary)_35%,white)]",
+  watch: "text-[var(--secondary)] bg-[color-mix(in_srgb,var(--secondary)_10%,white)] border border-[color-mix(in_srgb,var(--secondary)_35%,white)]",
+  alert: "text-[var(--primary-container)] bg-[color-mix(in_srgb,var(--primary-container)_10%,white)] border border-[color-mix(in_srgb,var(--primary-container)_35%,white)]",
+  critical: "text-[var(--error)] bg-[color-mix(in_srgb,var(--error)_10%,white)] border border-[color-mix(in_srgb,var(--error)_35%,white)]",
 };
 
 export default function StatusChip({
@@ -24,7 +24,8 @@ export default function StatusChip({
     <span
       className={cn(
         "inline-flex items-center rounded-[var(--radius-chip)] border px-2.5 py-1 text-xs",
-        "[font-family:var(--font-label)] uppercase tracking-[0.08em]",
+        "[font-family:var(--font-label)] uppercase tracking-[0.08em] font-medium",
+        "transition-colors duration-200",
         toneClasses[tone],
         className
       )}
