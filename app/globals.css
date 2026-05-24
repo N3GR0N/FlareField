@@ -1,26 +1,246 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f0f4f8;
+  --surface: rgba(255,255,255,0.6);
+  --surface-dark: rgba(200,215,230,0.4);
+  --border: rgba(255,255,255,0.8);
+  --primary: #0066cc;
+  --secondary: #00a8e8;
+  --alert-green: #00c896;
+  --alert-yellow: #f5a623;
+  --alert-orange: #ff6b35;
+  --alert-red: #e8334a;
+  --text: #1a2332;
+  --text-muted: #5a7a99;
 }
 
-@theme inline {
+@theme {
+  /* Colors */
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground: var(--text);
+  --color-surface: var(--surface);
+  --color-surface-dark: var(--surface-dark);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-alert-green: var(--alert-green);
+  --color-alert-yellow: var(--alert-yellow);
+  --color-alert-orange: var(--alert-orange);
+  --color-alert-red: var(--alert-red);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+
+  /* Fonts */
+  --font-display: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --font-body: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --font-mono: "DM Mono", monospace;
+  --font-label: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+
+  /* Border radius */
+  --radius-glass: 1.25rem;
+  --radius-btn: 0.5rem;
+  --radius-chip: 9999px;
+
+  /* Utilities */
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-pulse-slow: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Claude-inspired palette + smooth UI motion tokens */
+:root {
+  --claude-canvas-1: #0f1724;
+  --claude-canvas-2: #0b1220;
+  --claude-accent-1: #7dd3fc; /* soft cyan */
+  --claude-accent-2: #c7b8ff; /* soft lavender */
+  --claude-warm: #ffd6a5;
+}
+
+@keyframes subtle-tilt {
+  0% { transform: translateY(0) rotateX(0deg); }
+  50% { transform: translateY(-2px) rotateX(-1deg); }
+  100% { transform: translateY(0) rotateX(0deg); }
+}
+
+@keyframes slow-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes pulse-soft {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+.map-3d-root {
+  perspective: 1400px;
+  -webkit-perspective: 1400px;
+}
+
+.map-3d-wrap {
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(0.16,1,0.3,1);
+  will-change: transform;
+  animation: subtle-tilt 6s ease-in-out infinite;
+  pointer-events: auto;
+}
+
+.map-3d-tilt {
+  transform: translateZ(0) rotateX(50deg) rotateZ(-18deg) translateY(-4%);
+  pointer-events: auto;
+}
+
+.map-floor {
+  display: none; /* removed to avoid visible bottom band */
+}
+
+/* Ensure leaflet container allows panning in all directions on touch */
+.leaflet-container {
+  touch-action: pan-x pan-y;
+  -ms-touch-action: pan-x pan-y;
+}
+
+.maplibre-dark-shell {
+  background: radial-gradient(circle at 20% 10%, rgba(45, 74, 130, 0.22), transparent 40%), linear-gradient(180deg, #050816 0%, #090d1a 60%, #070b14 100%);
+}
+
+.maplibre-dark-shell .maplibregl-map {
+  font-family: var(--font-body);
+}
+
+.maplibre-dark-shell .maplibregl-ctrl-group,
+.maplibre-dark-shell .maplibregl-ctrl button {
+  background: rgba(8, 12, 24, 0.62);
+  color: #e5eefc;
+  border-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px) saturate(160%);
+}
+
+.maplibre-dark-shell .maplibregl-ctrl button:hover,
+.maplibre-dark-shell .maplibregl-ctrl button:focus {
+  background: rgba(16, 22, 40, 0.82);
+}
+
+.maplibre-dark-shell .maplibregl-popup-content {
+  font-family: var(--font-body);
+  background: rgba(9, 13, 24, 0.88);
+  color: #eef4ff;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.maplibre-dark-shell .maplibregl-popup-tip {
+  border-top-color: rgba(9, 13, 24, 0.88);
+  border-bottom-color: rgba(9, 13, 24, 0.88);
+}
+
+.maplibre-dark-shell .maplibregl-ctrl-attrib,
+.maplibre-dark-shell .maplibregl-ctrl-attrib a {
+  font-family: var(--font-label);
+  color: rgba(230, 238, 255, 0.72);
+}
+
+.claude-canvas {
+  background: linear-gradient(120deg, var(--claude-canvas-1), var(--claude-canvas-2));
+  background-size: 200% 200%;
+  animation: slow-gradient 18s ease-in-out infinite;
+}
+
+.soft-glow {
+  box-shadow: 0 10px 40px rgba(11,18,34,0.35), inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.pulse-3d {
+  animation: pulse-soft 1500ms cubic-bezier(0.2,0.8,0.2,1) infinite;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --surface: rgba(15,23,42,0.6);
+    --surface-dark: rgba(30,41,59,0.4);
+    --border: rgba(255,255,255,0.2);
+    --primary: #3b82f6;
+    --secondary: #06b6d4;
+    --alert-green: #10b981;
+    --alert-yellow: #fbbf24;
+    --alert-orange: #f97316;
+    --alert-red: #ef4444;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
   }
+}
+
+.glass-morphism {
+  @apply backdrop-blur-[20px] backdrop-saturate-[180%] bg-[var(--surface)] border-[1px] border-[var(--border)] shadow-[0_8px_32px_rgba(0,60,120,0.08)] rounded-[var(--glass)];
+}
+
+.glass-morphism-dark {
+  @apply backdrop-blur-[20px] backdrop-saturate-[180%] bg-[var(--surface-dark)] border-[1px] border-[var(--border)] shadow-[0_8px_32px_rgba(0,60,120,0.08)] rounded-[var(--glass)];
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
 }
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* TopNav custom styling for tighter, more blurred centered bar */
+.topnav-custom {
+  background: rgba(255,255,255,0.62);
+  -webkit-backdrop-filter: blur(36px) saturate(260%);
+  backdrop-filter: blur(36px) saturate(260%);
+  border: 1px solid rgba(8,12,20,0.06);
+  box-shadow: 0 10px 40px rgba(6,10,20,0.10);
+  border-radius: 18px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  backface-visibility: hidden;
+}
+
+.topnav-title {
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  font-family: var(--font-label);
+  border-radius: 6px;
+  color: #071124; /* slightly darker */
+}
+
+.topnav-text, .topnav-link {
+  font-family: var(--font-label);
+  font-weight: 600;
+  color: #071124; /* consistent darker text */
+}
+
+.topnav-small {
+  height: 48px;
+}
+
+/* Panel style to match navbar: stronger blur, rounded, darker text */
+.panel-custom {
+  background: rgba(255,255,255,0.60);
+  -webkit-backdrop-filter: blur(34px) saturate(240%);
+  backdrop-filter: blur(34px) saturate(240%);
+  border: 1px solid rgba(8,12,20,0.06);
+  box-shadow: 0 8px 28px rgba(6,10,20,0.06);
+  border-radius: 14px;
+  color: #071124;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  backface-visibility: hidden;
+}
+
+.panel-content { color: #071124; }
