@@ -13,48 +13,9 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // Simulate geolocation detection
-    const detectLocation = async () => {
-      try {
-        // In a real app, we would use navigator.geolocation
-        // For now, we'll use a fixed location for Argentina (La Pampa)
-        // and then try to get a real location if permissions allow
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const lat = position.coords.latitude;
-              const lng = position.coords.longitude;
-              // Reverse geocode to get region name
-              fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-                .then((res) => res.json())
-                .then((data) => {
-                  const name = data.address?.state || data.address?.city || "Tu zona";
-                  setUserLocation({ lat, lng, name });
-                })
-                .catch(() => {
-                  setUserLocation({ lat, lng, name: "Tu zona" });
-                });
-            },
-            (error) => {
-              console.error("Geolocation error:", error);
-              setLocationError("No se pudo acceder a la ubicación");
-              // Fallback to center of Argentina (La Pampa)
-              setUserLocation({ lat: -38.0, lng: -64.0, name: "La Pampa" });
-            }
-          );
-        } else {
-          setLocationError("La geolocalización no está disponible en este navegador");
-          // Fallback to center of Argentina (La Pampa)
-          setUserLocation({ lat: -38.0, lng: -64.0, name: "La Pampa" });
-        }
-      } catch (err) {
-        console.error("Error detecting location:", err);
-        setLocationError("Error al detectar la ubicación");
-        setUserLocation({ lat: -38.0, lng: -64.0, name: "La Pampa" });
-      }
-    };
-
-    detectLocation();
+    // Start with La Pampa, Argentina as the default location
+    // No automatic geolocation detection - user can explore the map freely
+    setUserLocation({ lat: -38.0, lng: -64.0, name: "La Pampa" });
   }, []);
 
   if (locationError) {
@@ -63,35 +24,36 @@ export default function Home() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background claude-canvas">
+    <>
+      {/* TopNav */}
       <TopNav />
-      {/* Map container - will be 3D later */}
-      <div className="absolute inset-0" style={{ willChange: 'transform, opacity' }}>
+      
+      {/* Map - full viewport */}
+      <div className="fixed inset-0 z-0" style={{ top: '4.5rem', bottom: 0 }}>
         <SolarMap userLocation={userLocation} />
       </div>
 
-      {/* Left Panel (Zone) — moved to bottom edge for balance */}
+      {/* Left Panel (Zone) — bottom left corner */}
       <div
         className="fixed left-6 bottom-8 w-72 md:w-80 max-w-[340px] z-20"
         style={{
-          transition: 'transform 180ms cubic-bezier(0.23,1,0.32,1), opacity 160ms cubic-bezier(0.77,0,0.175,1)',
-          willChange: 'transform, opacity'
+          transition: 'transform 180ms cubic-bezier(0.23,1,0.32,1), opacity 160ms cubic-bezier(0.77,0,0.175,1)'
         }}
       >
         <ZonePanel userLocation={userLocation} />
       </div>
 
-      {/* Right Panel (Active Event) — aligned to same bottom edge */}
-      <div className="fixed right-6 bottom-8 w-60 md:w-64 z-20" style={{ transition: 'transform 180ms cubic-bezier(0.23,1,0.32,1)', willChange: 'transform' }}>
+      {/* Right Panel (Active Event) — bottom right corner */}
+      <div className="fixed right-6 bottom-8 w-60 md:w-64 z-20" style={{ transition: 'transform 180ms cubic-bezier(0.23,1,0.32,1)' }}>
         <ActiveEventCard />
       </div>
 
       {/* Discrete centered footer */}
-      <div className="fixed bottom-3 left-1/2 transform -translate-x-1/2 z-20">
-        <span className="text-xs topnav-text" style={{ opacity: 0.6 }}>
-          © 2026 FlareField — Derechos Juan Pedro Suñer
+      <div className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10">
+        <span className="text-[10px] topnav-text" style={{ opacity: 0.4 }}>
+          © 2026 FlareField
         </span>
       </div>
-    </div>
+    </>
   );
 }

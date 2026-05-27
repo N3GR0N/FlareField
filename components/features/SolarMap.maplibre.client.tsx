@@ -12,6 +12,20 @@ const ARGENTINA_ZONES: Zone[] = [
   { id: "chaco", name: "Chaco", lat: -27.5, lng: -59.0, severity: "green", affectedTech: ["Drones", "WiFi Sat", "Escuela", "Radio"] },
 ];
 
+const DEFAULT_CENTER = { lat: -38.0, lng: -64.0 };
+
+function getCameraPreset() {
+  if (typeof window === "undefined") {
+    return { zoom: 6.1, pitch: 38, bearing: 0, exaggeration: 0.92 };
+  }
+
+  const isWideViewport = window.matchMedia("(min-width: 1280px)").matches;
+
+  return isWideViewport
+    ? { zoom: 6.15, pitch: 40, bearing: 0, exaggeration: 0.96 }
+    : { zoom: 5.8, pitch: 34, bearing: 0, exaggeration: 0.9 };
+}
+
 export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
@@ -26,29 +40,37 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         // Dynamically import maplibre (and CSS) at runtime so build won't fail if package missing
         const [mod] = await Promise.all([
           import('maplibre-gl'),
-          // CSS import might fail in some bundlers; ignore errors
-          import('maplibre-gl/dist/maplibre-gl.css').catch(() => null)
         ]);
         if (cancelled) return;
         const maplibregl = (mod as any).default || mod;
 
-        const styleUrl = process.env.NEXT_PUBLIC_MAP_STYLE || `https://api.maptiler.com/maps/streets-v2-dark/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY || ''}`;
+        const styleUrl = process.env.NEXT_PUBLIC_MAP_STYLE || 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+        const camera = getCameraPreset();
 
         const map = new maplibregl.Map({
           container: containerRef.current,
           style: styleUrl,
-          center: [userLocation?.lng ?? -64.0, userLocation?.lat ?? -38.0],
-          zoom: 5.25,
-          pitch: 68,
-          bearing: -28,
-          antialias: true
+          center: [userLocation?.lng ?? DEFAULT_CENTER.lng, userLocation?.lat ?? DEFAULT_CENTER.lat],
+          zoom: camera.zoom,
+          pitch: camera.pitch,
+          bearing: camera.bearing,
+          antialias: true,
+          maxPitch: 80,
+          minZoom: 2,
+          maxZoom: 18
         });
 
         map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
-        map.dragRotate.enable();
-        map.touchZoomRotate.enable();
 
         map.on('load', () => {
+          // Force resize after a small delay to ensure dimensions are correct
+          setTimeout(() => {
+            map.resize();
+          }, 100);
+          
+          // Enable interactions
+          if (!map.dragRotate.isEnabled()) map.dragRotate.enable();
+          if (!map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
           map.dragPan.enable();
           map.scrollZoom.enable();
           map.doubleClickZoom.enable();
@@ -66,19 +88,28 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
                     `https://api.maptiler.com/tiles/terrain-rgb/{z}/{x}/{y}.png?key=${mapTilerKey}`
                   ],
                   tileSize: 512,
-                  maxzoom: 14
+                  minzoom: 0,
+                  maxzoom: 12
                 });
 
-                // set terrain with gentle exaggeration
+                // set terrain with gentle exaggeration - only if zoom allows it
                 try {
-                  map.setTerrain({ source: demSourceId, exaggeration: 1.45 });
+                  const currentZoom = map.getZoom();
+                  if (currentZoom <= 12) {
+                    map.setTerrain({ source: demSourceId, exaggeration: camera.exaggeration });
+                  }
                 } catch (e) {
                   // some styles or versions may not support setTerrain -> ignore
                 }
 
-                // optional: soft fog to enhance depth
+                // atmospheric fog to keep the 3D scene readable and cinematic
                 try {
-                  map.setFog && map.setFog({ 'range': [-1, 2], 'color': 'rgba(3, 8, 20, 0.16)', 'horizon-blend': 0.08 });
+                  map.setFog && map.setFog({
+                    range: [-0.15, 0.95],
+                    color: 'rgba(8, 14, 28, 0.04)',
+                    'horizon-blend': 0.02,
+                    'space-color': 'rgba(5, 9, 24, 0.44)'
+                  });
                 } catch (e) {}
               }
             } catch (err) {
@@ -97,7 +128,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             }
           }
 
-          // If we didn't find a building layer, attempt to add an extrusion layer referencing a common vector source name
+          // If the style exposes building data, attempt an extrusion layer; otherwise skip it.
           const tryAddExtrusion = () => {
             try {
               // find a vector source that likely contains buildings
@@ -146,16 +177,13 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             }
           };
 
-          if (!buildingLayerFound) {
+          if (buildingLayerFound) {
             tryAddExtrusion();
           }
 
           ARGENTINA_ZONES.forEach((zone: any) => {
             const el = document.createElement('div');
-            el.className = 'rounded-full';
-            el.style.width = '18px';
-            el.style.height = '18px';
-            el.style.boxShadow = '0 4px 12px rgba(2,6,23,0.35)';
+            el.className = 'maplibre-zone-marker';
             el.style.background = zone.severity === 'red' ? '#e8334a' : zone.severity === 'orange' ? '#ff6b35' : zone.severity === 'yellow' ? '#f5a623' : '#00c896';
 
             new maplibregl.Marker({ element: el })
@@ -166,11 +194,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
 
           if (userLocation) {
             const uel = document.createElement('div');
-            uel.style.width = '16px';
-            uel.style.height = '16px';
-            uel.style.borderRadius = '9999px';
-            uel.style.background = 'var(--primary)';
-            uel.style.boxShadow = '0 6px 18px rgba(0,102,204,0.45)';
+            uel.className = 'maplibre-user-marker';
 
             new maplibregl.Marker({ element: uel })
               .setLngLat([userLocation.lng, userLocation.lat])
@@ -195,5 +219,31 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
     };
   }, [containerRef, userLocation]);
 
-  return <div ref={containerRef} className="w-full h-[calc(100vh-4rem)] rounded-lg maplibre-dark-shell" />;
+  const locationLabel = userLocation?.name || "La Pampa";
+
+  return (
+    <div className="relative w-full h-full overflow-hidden maplibre-dark-shell">
+      <div 
+        ref={containerRef} 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%'
+        }} 
+      />
+      
+      <div className="pointer-events-none absolute left-5 top-5 z-10 flex max-w-[240px] flex-col gap-2 maplibre-hud">
+        <div className="maplibre-hud-pill">Terreno 3D activo</div>
+        <div className="maplibre-hud-card">
+          <p className="maplibre-hud-kicker">Explorador de Argentina</p>
+          <p className="maplibre-hud-title">{locationLabel}</p>
+          <p className="maplibre-hud-body">Navega libremente • Relieve 3D en tiempo real</p>
+        </div>
+      </div>
+    </div>
+  );
 }
