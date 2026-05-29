@@ -60,32 +60,32 @@ export default function ActiveEventCard() {
   };
 
   return (
-    <div className="panel-custom p-4 space-y-3 topnav-text panel-content">
-      <div className="space-y-2">
-        <div className="flex items-center space-x-2 text-xs topnav-text">
-          <RadarIcon className="h-4 w-4 text-black/60" />
-          <span>:: EVENTO ACTIVO</span>
+    <div className="panel-custom p-5 space-y-4 panel-content">
+      <div className="space-y-2.5">
+        <div className="flex items-center space-x-2 text-xs uppercase" style={{color: 'rgba(255, 255, 255, 0.75)', letterSpacing: '0.5px', fontWeight: 600}}>
+          <RadarIcon className="h-4 w-4 text-cyan-300/70" />
+          <span>:: Evento Activo</span>
         </div>
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <span className="font-mono text-xs topnav-text">{event.type}</span>
-            <span className="px-2 py-0.5 rounded text-xs font-mono" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', color: '#071124' }}>
+        <div className="space-y-2">
+          <div className="flex items-center space-x-2.5">
+            <span className="font-600 text-base" style={{color: 'rgba(255, 255, 255, 0.96)'}}>{event.type}</span>
+            <span className="px-3 py-1 rounded-lg text-xs font-mono font-700" style={{backgroundColor: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.3)', color: 'rgba(129, 215, 255, 0.9)', letterSpacing: '0.2px'}}>
               Clase {event.class}
             </span>
           </div>
-          <div className="text-xs topnav-text">
-            {new Date(event.timestamp).toLocaleString('en-US', {year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'})}
+          <div className="text-xs" style={{color: 'rgba(255, 255, 255, 0.65)', fontWeight: 500}}>
+            {new Date(event.timestamp).toLocaleString('es-AR', {year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'})}
           </div>
         </div>
       </div>
 
-      <div className="border-t border-border/20 pt-3">
-        <div className="flex items-center space-x-2 text-xs topnav-text">
-          <ClipboardIcon className="h-4 w-4 text-black/60" />
-          <span>Fuente:</span>
-          <span className="font-mono text-xs topnav-text">{event.source}</span>
+      <div className="border-t border-white/10 pt-4">
+        <div className="flex items-center space-x-2 text-xs" style={{color: 'rgba(255, 255, 255, 0.75)'}}>
+          <ClipboardIcon className="h-4 w-4 text-cyan-300/70" />
+          <span className="font-600">Fuente:</span>
+          <span className="font-mono text-xs" style={{color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500}}>{event.source}</span>
         </div>
-        <div className="mt-2">
+        <div className="mt-4">
           <AlertChip variant={event.severity === "green" ? "stable" : event.severity === "yellow" ? "elevated" : event.severity === "orange" ? "active" : "critical"}>
             {event.severity === "green" ? "SEÑAL ESTABLE" :
              event.severity === "yellow" ? "KP ELEVADO" :

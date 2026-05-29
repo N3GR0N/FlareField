@@ -13,9 +13,50 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // Start with La Pampa, Argentina as the default location
-    // No automatic geolocation detection - user can explore the map freely
-    setUserLocation({ lat: -38.0, lng: -64.0, name: "La Pampa" });
+    let cancelled = false;
+
+    if (!("geolocation" in navigator)) {
+      setLocationError("Geolocalización no disponible.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        if (cancelled) return;
+        const { latitude, longitude } = position.coords;
+        let locationName = "Tu ubicación";
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
+            { headers: { "Accept-Language": "es" } }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            locationName =
+              data?.address?.city ||
+              data?.address?.town ||
+              data?.address?.village ||
+              data?.address?.state ||
+              data?.display_name?.split(",")?.[0] ||
+              locationName;
+          }
+        } catch {
+          // Keep fallback name
+        }
+
+        setUserLocation({ lat: latitude, lng: longitude, name: locationName });
+      },
+      (error) => {
+        if (cancelled) return;
+        setLocationError(error.message || "No se pudo obtener la ubicación.");
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+    );
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (locationError) {
@@ -23,15 +64,19 @@ export default function Home() {
     console.warn(locationError);
   }
 
+  const locationLabel = locationError
+    ? "Ubicación no disponible"
+    : userLocation?.name ?? "Detectando...";
+
   return (
     <>
-      {/* TopNav */}
-      <TopNav />
-      
       {/* Map - full viewport */}
-      <div className="fixed inset-0 z-0" style={{ top: '4.5rem', bottom: 0 }}>
+      <div className="fixed inset-0 z-0">
         <SolarMap userLocation={userLocation} />
       </div>
+
+      {/* TopNav - overlay on map */}
+      <TopNav locationName={locationLabel} />
 
       {/* Left Panel (Zone) — bottom left corner */}
       <div
