@@ -5,26 +5,36 @@ import MetricCard from "@/components/ui/MetricCard";
 import AlertChip from "@/components/ui/AlertChip";
 import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon, ClipboardIcon, BoltIcon } from "@/components/ui/Icons";
 
+type SolarCondition = "SEÑAL ESTABLE" | "KP ELEVADO" | "TORMENTA ACTIVA";
+
 export default function ZonePanel({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
-  const [solarData, setSolarData] = useState({
-    condition: "SEÑAL ESTABLE" as const,
+  const [solarData, setSolarData] = useState<{
+    condition: SolarCondition;
+    kpIndex: number;
+    lastUpdated: string;
+    affectedTech: string[];
+  }>({
+    condition: "SEÑAL ESTABLE",
     kpIndex: 0,
     lastUpdated: new Date().toISOString(),
-    affectedTech: ["Drones de fumigación", "WiFi satelital", "Internet en escuelas rurales", "Comunicaciones de radio"] as const,
+    affectedTech: ["Drones de fumigación", "WiFi satelital", "Internet en escuelas rurales", "Comunicaciones de radio"],
   });
+  const locationName = userLocation?.name ?? "tu zona";
 
   // Fetch solar data (mock for now, will connect to API later)
   useEffect(() => {
     const fetchSolarData = async () => {
       try {
         // Mock data - in real app, this would come from NASA DONKI and NOAA
-        const mockCondition = Math.random() > 0.7 ? (Math.random() > 0.5 ? "TORMENTA ACTIVA" : "KP ELEVADO") : "SEÑAL ESTABLE";
+        const mockCondition: SolarCondition = Math.random() > 0.7
+          ? (Math.random() > 0.5 ? "TORMENTA ACTIVA" : "KP ELEVADO")
+          : "SEÑAL ESTABLE";
         const mockKp = mockCondition === "SEÑAL ESTABLE" ? Math.floor(Math.random() * 3) :
                       mockCondition === "KP ELEVADO" ? 4 + Math.floor(Math.random() * 2) :
                       6 + Math.floor(Math.random() * 3);
 
         setSolarData({
-          condition: mockCondition as typeof solarData.condition,
+          condition: mockCondition,
           kpIndex: mockKp,
           lastUpdated: new Date().toISOString(),
           affectedTech: [
@@ -44,15 +54,6 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
     return () => clearInterval(interval);
   }, []);
 
-  const getConditionClass = () => {
-    switch (solarData.condition) {
-      case "SEÑAL ESTABLE": return "border-alert-green/20 bg-alert-green/5 text-alert-green";
-      case "KP ELEVADO": return "border-alert-yellow/20 bg-alert-yellow/5 text-alert-yellow";
-      case "TORMENTA ACTIVA": return "border-alert-orange/20 bg-alert-orange/5 text-alert-orange";
-      default: return "border-alert-green/20 bg-alert-green/5 text-alert-green";
-    }
-  };
-
   return (
     <div className="panel-custom p-6 space-y-5 panel-content">
       <div className="space-y-2.5">
@@ -61,7 +62,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
           <h2 className="text-lg font-600 tracking-tight" style={{color: 'rgba(255, 255, 255, 0.98)'}}>FlareField</h2>
         </div>
         <p className="text-xs uppercase" style={{color: 'rgba(255, 255, 255, 0.7)', letterSpacing: '0.4px', fontWeight: 500}}>
-          Estado del espacio en tu zona
+          Estado del espacio en {locationName}
         </p>
       </div>
 

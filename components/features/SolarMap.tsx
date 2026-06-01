@@ -1,5 +1,4 @@
 import dynamic from 'next/dynamic';
-import React from 'react';
 
 const useMapLibre = process.env.NEXT_PUBLIC_USE_MAPLIBRE === '1';
 
@@ -11,15 +10,17 @@ const loadingShell = (
   </div>
 );
 
-const SolarMapClient = dynamic(() => import('./SolarMap.client'), { ssr: false, loading: () => loadingShell });
-const SolarMapMapLibre = dynamic(() => import('./SolarMap.maplibre.client'), { ssr: false, loading: () => loadingShell });
+type SolarMapProps = {
+  userLocation: { lat: number; lng: number; name: string } | null;
+};
 
-export default function SolarMap(props: any) {
+const SolarMapClient = dynamic<SolarMapProps>(() => import('./SolarMap.client'), { ssr: false, loading: () => loadingShell });
+const SolarMapMapLibre = dynamic<SolarMapProps>(() => import('./SolarMap.maplibre.client'), { ssr: false, loading: () => loadingShell });
+
+export default function SolarMap(props: SolarMapProps) {
   if (useMapLibre) {
-    // @ts-ignore
     return <SolarMapMapLibre {...props} />;
   }
 
-  // @ts-ignore
   return <SolarMapClient {...props} />;
 }

@@ -1,6 +1,23 @@
 import { NextResponse } from "next/server";
 import { SolarData } from "@/types/solar";
 
+type FlareApi = {
+  flareID?: string;
+  classType?: string;
+  maxTime?: string;
+};
+
+type StormApi = {
+  gstID?: string;
+  gstType?: string;
+  onsetTime?: string;
+};
+
+type KpIndexEntry = {
+  kp_index?: string | number;
+  time_tag?: string;
+};
+
 export async function GET(request: Request) {
   try {
     // Get query parameters for date range (default to last 7 days)
@@ -24,22 +41,26 @@ export async function GET(request: Request) {
     const stormsData = await stormsResponse.json();
     const kpData = await kpResponse.json();
 
+    const flares = Array.isArray(flaresData) ? (flaresData as FlareApi[]) : [];
+    const storms = Array.isArray(stormsData) ? (stormsData as StormApi[]) : [];
+    const kpEntries = Array.isArray(kpData) ? (kpData as KpIndexEntry[]) : [];
+
     // Process and format the data
     const solarData: SolarData = {
       zones: [], // Will be populated by the map component based on user location
-      flares: flaresData.map((flare: any) => ({
+      flares: flares.map((flare) => ({
         id: flare.flareID || Math.random().toString(36).substr(2, 9),
         class: flare.classType || "Unknown",
         peakTime: flare.maxTime || new Date().toISOString(),
         source: "NASA DONKI API"
       })),
-      storms: stormsData.map((storm: any) => ({
+      storms: storms.map((storm) => ({
         id: storm.gstID || Math.random().toString(36).substr(2, 9),
         class: storm.gstType || "Unknown",
         onsetTime: storm.onsetTime || new Date().toISOString(),
         source: "NASA DONKI API"
       })),
-      kpIndex: processKpIndex(kpData),
+      kpIndex: processKpIndex(kpEntries),
       lastUpdated: new Date().toISOString()
     };
 
@@ -52,7 +73,7 @@ export async function GET(request: Request) {
 }
 
 // Helper function to process Kp index data
-function processKpIndex(kpData: any[]): { kp: number; time_tag: string; severity: "green" | "yellow" | "orange" | "red" } | null {
+function processKpIndex(kpData: KpIndexEntry[]): { kp: number; time_tag: string; severity: "green" | "yellow" | "orange" | "red" } | null {
   if (!kpData || kpData.length === 0) return null;
 
   // Get the most recent Kp index reading

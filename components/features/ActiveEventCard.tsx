@@ -18,7 +18,6 @@ export default function ActiveEventCard() {
     const fetchActiveEvent = async () => {
       try {
         // Mock data - in real app, this would come from NASA DONKI API
-        const eventTypes = ["Tormenta Solar", "Tormenta Geomagnética"];
         const flareClasses = ["C1.2", "M3.5", "X1.2", "X2.0", "X5.3"];
         const stormClasses = ["G1", "G2", "G3", "G4", "G5"];
         const isFlare = Math.random() > 0.5;
@@ -48,16 +47,6 @@ export default function ActiveEventCard() {
     const interval = setInterval(fetchActiveEvent, 10 * 60 * 1000); // Update every 10 minutes
     return () => clearInterval(interval);
   }, []);
-
-  const getSeverityClass = () => {
-    switch (event.severity) {
-      case "green": return "border-alert-green/20 bg-alert-green/5 text-alert-green";
-      case "yellow": return "border-alert-yellow/20 bg-alert-yellow/5 text-alert-yellow";
-      case "orange": return "border-alert-orange/20 bg-alert-orange/5 text-alert-orange";
-      case "red": return "border-alert-red/20 bg-alert-red/5 text-alert-red";
-      default: return "border-alert-green/20 bg-alert-green/5 text-alert-green";
-    }
-  };
 
   return (
     <div className="panel-custom p-5 space-y-4 panel-content">

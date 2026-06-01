@@ -5,18 +5,19 @@ import TopNav from "@/components/layout/TopNav";
 import SolarMap from "@/components/features/SolarMap";
 import ZonePanel from "@/components/features/ZonePanel";
 import ActiveEventCard from "@/components/features/ActiveEventCard";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; name: string } | null>(null);
-  const [locationError, setLocationError] = useState<string | null>(null);
-  const router = useRouter();
+  const [locationError, setLocationError] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    if (!("geolocation" in navigator)) return "Geolocalización no disponible.";
+    return null;
+  });
 
   useEffect(() => {
     let cancelled = false;
 
     if (!("geolocation" in navigator)) {
-      setLocationError("Geolocalización no disponible.");
       return;
     }
 

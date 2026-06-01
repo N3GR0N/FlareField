@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
-import { useSpring, animated } from "@react-spring/web";
 import { Zone } from "@/types/solar";
-import { PulseMarker } from "@/components/ui/PulseMarker";
 import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon } from "@/components/ui/Icons";
 
 // Custom icon for zone markers
@@ -49,9 +47,8 @@ const ARGENTINA_ZONES: Zone[] = [
 ];
 
 export default function SolarMapClient({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
-  const [zones, setZones] = useState<Zone[]>(ARGENTINA_ZONES);
-  const mapRef = useRef<any>(null);
-  const [mapZoom, setMapZoom] = useState(5);
+  const mapRef = useRef<L.Map | null>(null);
+  const mapZoom = 5;
 
   // Ensure map is removed on unmount to avoid Leaflet reusing container
   useEffect(() => {
@@ -59,7 +56,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
       if (mapRef.current && typeof mapRef.current.remove === 'function') {
         try {
           mapRef.current.remove();
-        } catch (e) {
+        } catch {
           // ignore
         }
         mapRef.current = null;
@@ -67,11 +64,10 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
     };
   }, []);
 
-  // Update zone severity based on user location proximity and mock solar activity
-  useEffect(() => {
-    if (!userLocation) return;
+  const zones = useMemo(() => {
+    if (!userLocation) return ARGENTINA_ZONES;
 
-    const updatedZones = zones.map(zone => {
+    return ARGENTINA_ZONES.map(zone => {
       const distance = Math.sqrt(
         Math.pow(zone.lat - userLocation.lat, 2) +
         Math.pow(zone.lng - userLocation.lng, 2)
@@ -84,18 +80,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
 
       return { ...zone, severity: newSeverity };
     });
-
-    setZones(updatedZones);
   }, [userLocation]);
-
-  const getPulseAnimation = (severity: Zone['severity']) => {
-    switch (severity) {
-      case "red": return "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite";
-      case "orange": return "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite";
-      case "yellow": return "pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite";
-      default: return "none";
-    }
-  };
 
   return (
     <div className="relative h-[calc(100vh-4rem)] w-full map-3d-root claude-canvas soft-glow">

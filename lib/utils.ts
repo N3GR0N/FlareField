@@ -55,7 +55,7 @@ export function formatCoordinates(lat: number, lng: number): string {
 /**
  * Debounce function for limiting rate of function calls
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => ReturnType<T> {
