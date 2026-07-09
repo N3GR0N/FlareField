@@ -10,16 +10,16 @@ export default function MetricCard({
   unit = "",
 }: MetricCardProps) {
   return (
-    <div className="text-center space-y-2">
-      <div className="text-label font-label text-xs uppercase topnav-text" style={{ opacity: 0.8 }}>
+    <div className="space-y-2 text-center">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--text-muted)]/88">
         {label}
       </div>
-      <div className="flex items-baseline justify-center gap-1">
-        <span className="font-mono text-3xl leading-none tracking-tight">
+      <div className="flex items-baseline justify-center gap-1 text-[var(--text)]">
+        <span className="font-mono text-3xl font-bold leading-none tabular-nums tracking-[-0.04em]">
           {value}
         </span>
         {unit && (
-          <span className="font-label text-xs uppercase topnav-text" style={{ opacity: 0.7 }}>
+          <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[var(--text-muted)]/80">
             {unit}
           </span>
         )}

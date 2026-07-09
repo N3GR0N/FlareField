@@ -55,47 +55,47 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
   }, []);
 
   return (
-    <div className="panel-custom p-6 space-y-5 panel-content">
-      <div className="space-y-2.5">
+    <div className="panel-custom space-y-6 rounded-[24px] p-7 panel-content">
+      <div className="space-y-3">
         <div className="flex items-center space-x-3">
-          <BoltIcon className="h-5 w-5 text-cyan-300/80" />
-          <h2 className="text-lg font-600 tracking-tight" style={{color: 'rgba(255, 255, 255, 0.98)'}}>FlareField</h2>
+          <BoltIcon className="h-5 w-5 text-[var(--primary)]/90" />
+          <h2 className="font-display text-2xl tracking-[-0.03em] text-[var(--text)]">FlareField</h2>
         </div>
-        <p className="text-xs uppercase" style={{color: 'rgba(255, 255, 255, 0.7)', letterSpacing: '0.4px', fontWeight: 500}}>
+        <p className="text-[0.7rem] uppercase tracking-[0.28em] text-[var(--text-muted)]/85">
           Estado del espacio en {locationName}
         </p>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         <div className="border-t border-white/10 pt-4">
-          <h3 className="text-xs uppercase mb-3" style={{color: 'rgba(255, 255, 255, 0.75)', letterSpacing: '0.5px', fontWeight: 600}}>
-            :: CONDICIÓN SOLAR
+          <h3 className="mb-3 topnav-small-text">
+            :: Condición solar
           </h3>
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <AlertChip variant={solarData.condition.toLowerCase() as "stable" | "elevated" | "active" | "critical"}>
               {solarData.condition}
             </AlertChip>
-            <div className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.65)', fontWeight: 500 }}>
+            <div className="text-xs text-[var(--text-muted)]/75">
               Actualizado {new Date(solarData.lastUpdated).toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})}
             </div>
           </div>
         </div>
 
         <div className="border-t border-white/10 pt-4">
-          <h3 className="text-xs uppercase mb-3" style={{color: 'rgba(255, 255, 255, 0.75)', letterSpacing: '0.5px', fontWeight: 600}}>
-            :: IMPACTO ESTIMADO
+          <h3 className="mb-3 topnav-small-text">
+            :: Impacto estimado
           </h3>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-5">
             <MetricCard label="Kp Index" value={solarData.kpIndex.toString()} unit="" />
-            <MetricCard label="Próximas horas" value="Próximas" unit="h" />
+            <MetricCard label="PRÓXIMAS HORAS" value="+3h" unit="" />
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center space-x-2 text-xs" style={{color: 'rgba(255, 255, 255, 0.8)'}}>  
-              <ClipboardIcon className="h-4 w-4 text-cyan-300/70" />
-              <span style={{fontWeight: 500}}>Tecnologías afectadas:</span>
+            <div className="flex items-center space-x-2 text-xs text-[var(--text-muted)]/85">
+              <ClipboardIcon className="h-4 w-4 text-[var(--primary)]/75" />
+              <span className="font-medium">Tecnologías afectadas:</span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5">
               {solarData.affectedTech.map((tech, index) => {
                 let Icon = DroneIcon;
                 if (tech.toLowerCase().includes('wifi')) Icon = SatelliteIcon;
@@ -103,8 +103,8 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
                 if (tech.toLowerCase().includes('radio')) Icon = RadioIcon;
 
                 return (
-                  <span key={index} className="px-2.5 py-1.5 rounded-lg text-xs transition-all duration-200" style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.12)', display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(255, 255, 255, 0.92)', fontWeight: 500 }}>
-                    <Icon className="h-3.5 w-3.5 text-cyan-300/60" />
+                  <span key={index} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-[var(--text)]/90 transition-all duration-200 hover:border-[rgba(201,162,39,0.18)] hover:bg-white/[0.06]">
+                    <Icon className="h-3.5 w-3.5 text-[var(--primary)]/60" />
                     <span>{tech}</span>
                   </span>
                 );
@@ -116,27 +116,10 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
 
       <div className="mt-5 pt-2">
         <button
-          className="w-full flex h-10 items-center justify-center gap-2 rounded-lg border transition-all duration-200 active:scale-95"
-          style={{
-            backgroundColor: 'rgba(59, 130, 246, 0.12)',
-            borderColor: 'rgba(59, 130, 246, 0.3)',
-            color: 'rgba(255, 255, 255, 0.92)',
-            fontWeight: 600,
-            fontSize: '0.8125rem',
-            letterSpacing: '0.3px',
-            textTransform: 'uppercase'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-            e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.12)';
-            e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.3)';
-          }}
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-[rgba(201,162,39,0.22)] bg-[rgba(201,162,39,0.08)] text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-[var(--text)]/92 transition-all duration-200 hover:border-[rgba(201,162,39,0.34)] hover:bg-[rgba(201,162,39,0.14)] hover:scale-[1.01] hover:shadow-[0_10px_28px_rgba(201,162,39,0.12)] active:scale-[0.98]"
         >
           VER ALERTA COMPLETA
-          <span className="ml-2"><svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M14 3h7v7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M10 14L21 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 21H3V3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" /></svg></span>
+          <span className="ml-2"><svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M14 3h7v7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M10 14L21 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 21H3V3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" /></svg></span>
         </button>
       </div>
     </div>

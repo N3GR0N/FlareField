@@ -2,7 +2,9 @@
 
 import React, { useEffect, useRef } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
+import { createRoot, type Root as ReactRoot } from "react-dom/client";
 import { Zone } from "@/types/solar";
+import ZoneMarker from "@/components/ui/ZoneMarker";
 
 type Severity = Zone["severity"];
 type MapLibreModule = typeof import("maplibre-gl");
@@ -180,29 +182,17 @@ const getBlobEllipses = (width: number, height: number, seed: string): BlobEllip
   const baseRx = width * 0.42;
   const baseRy = height * 0.28;
 
-  return [
-    {
-      cx: width * (0.44 + (rand() - 0.5) * 0.12),
-      cy: height * (0.5 + (rand() - 0.5) * 0.12),
-      rx: baseRx * (0.92 + rand() * 0.12),
-      ry: baseRy * (0.92 + rand() * 0.12),
-      opacity: 0.24
-    },
-    {
-      cx: width * (0.62 + (rand() - 0.5) * 0.12),
-      cy: height * (0.44 + (rand() - 0.5) * 0.12),
-      rx: width * 0.32 * (0.9 + rand() * 0.15),
-      ry: height * 0.24 * (0.9 + rand() * 0.15),
-      opacity: 0.2
-    },
-    {
-      cx: width * (0.36 + (rand() - 0.5) * 0.12),
-      cy: height * (0.6 + (rand() - 0.5) * 0.12),
-      rx: width * 0.28 * (0.9 + rand() * 0.15),
-      ry: height * 0.22 * (0.9 + rand() * 0.15),
-      opacity: 0.16
-    }
-  ];
+  const ellipses: BlobEllipse[] = [];
+  for (let i = 0; i < 5; i += 1) { // Generate more ellipses
+    ellipses.push({
+      cx: width * (0.4 + (rand() - 0.5) * 0.3), // More varied positions
+      cy: height * (0.5 + (rand() - 0.5) * 0.3),
+      rx: baseRx * (0.7 + rand() * 0.5), // More varied sizes
+      ry: baseRy * (0.7 + rand() * 0.5),
+      opacity: 0.1 + rand() * 0.2 // Varied opacity
+    });
+  }
+  return ellipses;
 };
 
 const getFlowPaths = (width: number, height: number): FlowPath[] => {
@@ -291,6 +281,7 @@ function getCameraPreset() {
 export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
+  const markerRootsRef = useRef<ReactRoot[]>([]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -311,6 +302,9 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         const styleUrl = process.env.NEXT_PUBLIC_MAP_STYLE || 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
         const camera = getCameraPreset();
 
+        markerRootsRef.current.forEach((root) => root.unmount());
+        markerRootsRef.current = [];
+
         const map = new maplibregl.Map({
           container,
           style: styleUrl,
@@ -325,14 +319,20 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           renderWorldCopies: true
         });
 
-        map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
+        map.addControl(new maplibregl.NavigationControl({ showCompass: false, showZoom: false }), 'top-right');
 
         map.on('load', () => {
           // Force resize after a small delay to ensure dimensions are correct
           setTimeout(() => {
             map.resize();
-          }, 100);
-          
+            // Sync overlay after resize to fix alignment
+            requestAnimationFrame(() => {
+              if (mapRef.current) {
+                // Trigger position update after map stabilization
+              }
+            });
+          }, 150);
+
           // Enable interactions
           if (!map.dragRotate.isEnabled()) map.dragRotate.enable();
           if (!map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
@@ -351,47 +351,24 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           // Clear any existing markers
           overlay.innerHTML = '';
 
-          const colorMap: Record<Zone["severity"], string> = {
-            'red': '#e8334a',
-            'orange': '#ff6b35',
-            'yellow': '#f5a623',
-            'green': '#00c896'
-          };
-          const severityLabels: Record<Zone["severity"], string> = {
-            red: "TORNADO SOLAR",
-            orange: "TORMENTA ACTIVA",
-            yellow: "KP ELEVADO",
-            green: "SEÑAL ESTABLE"
-          };
-
-          const toRgb = (hex: string) => {
-            const cleaned = hex.replace('#', '');
-            const value = cleaned.length === 3
-              ? cleaned.split('').map((ch) => ch + ch).join('')
-              : cleaned;
-            const num = parseInt(value, 16);
-            const r = (num >> 16) & 255;
-            const g = (num >> 8) & 255;
-            const b = num & 255;
-            return `${r} ${g} ${b}`;
-          };
-
           // Create zone markers
           WORLD_ZONES.forEach((zone) => {
             const markerEl = document.createElement('div');
-            markerEl.className = 'maplibre-storm-zone';
+            markerEl.className = 'maplibre-ripple-zone';
             markerEl.setAttribute('data-zone', zone.name);
             markerEl.setAttribute('data-severity', zone.severity);
             markerEl.setAttribute('data-lng', String(zone.lng));
             markerEl.setAttribute('data-lat', String(zone.lat));
             markerEl.setAttribute('data-hover', 'false');
-
-            const color = colorMap[zone.severity] || '#00c896';
+            const markerSeverity = zone.severity === "orange" || zone.severity === "red" ? "alta" : "media";
+            const severityLabel = zone.severity === "red"
+              ? "TORNADO SOLAR"
+              : zone.severity === "orange"
+                ? "TORMENTA ACTIVA"
+                : zone.severity === "yellow"
+                  ? "KP ELEVADO"
+                  : "SEÑAL ESTABLE";
             const regionMeta = REGION_META[zone.id];
-            const width = Math.round(regionMeta?.width ?? 180);
-            const height = Math.round(regionMeta?.height ?? 140);
-            const ellipses = getBlobEllipses(width, height, zone.id);
-            const flows = getFlowPaths(width, height);
             const countryNames = regionMeta?.countryNames ?? [];
             const countryPreview = countryNames.slice(0, 3).join(", ");
             const remainingCount = Math.max(countryNames.length - 3, 0);
@@ -399,105 +376,29 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
               ? `${countryPreview}${remainingCount > 0 ? ` +${remainingCount}` : ""}`
               : "Cobertura regional";
             const techPreview = zone.affectedTech.slice(0, 2).join(" • ");
-            markerEl.style.setProperty('--storm-color', toRgb(color));
-            markerEl.style.width = `${width}px`;
-            markerEl.style.height = `${height}px`;
-
-            markerEl.innerHTML = `
-              <svg class="maplibre-zone-shape" viewBox="0 0 ${width} ${height}" fill="none" preserveAspectRatio="none">
-                <defs>
-                  <radialGradient id="storm-core-${zone.id}" cx="38%" cy="32%">
-                    <stop offset="0%" style="stop-color:rgb(var(--storm-color));stop-opacity:0.28" />
-                    <stop offset="68%" style="stop-color:rgb(var(--storm-color));stop-opacity:0" />
-                  </radialGradient>
-                  <linearGradient id="flow-gradient-${zone.id}" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="${color}" stop-opacity="0" />
-                    <stop offset="35%" stop-color="${color}" stop-opacity="0.88" />
-                    <stop offset="70%" stop-color="${color}" stop-opacity="0.62" />
-                    <stop offset="100%" stop-color="${color}" stop-opacity="0" />
-                  </linearGradient>
-                  <marker id="arrow-${zone.id}" markerWidth="12" markerHeight="10" refX="8" refY="3.5" orient="auto" markerUnits="strokeWidth">
-                    <path d="M0,0 L8,3.5 L0,7 L2,3.5 Z" fill="${color}" />
-                  </marker>
-                </defs>
-
-                <g class="maplibre-zone-blob">
-                  ${ellipses.map((ellipse) => `
-                    <ellipse
-                      cx="${ellipse.cx}"
-                      cy="${ellipse.cy}"
-                      rx="${ellipse.rx}"
-                      ry="${ellipse.ry}"
-                      fill="url(#storm-core-${zone.id})"
-                      opacity="${ellipse.opacity}"
-                    />
-                  `).join("")}
-                </g>
-
-                ${flows.map((flow) => `
-                  <path
-                    class="maplibre-flow-glow ${flow.className}"
-                    d="${flow.d}"
-                    stroke="url(#flow-gradient-${zone.id})"
-                    stroke-width="${flow.strokeWidth + 2.2}"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    marker-end="url(#arrow-${zone.id})"
-                    opacity="${flow.opacity * 0.35}"
-                  />
-                  <path
-                    class="maplibre-flow-path ${flow.className}"
-                    d="${flow.d}"
-                    stroke="url(#flow-gradient-${zone.id})"
-                    stroke-width="${flow.strokeWidth}"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    marker-end="url(#arrow-${zone.id})"
-                    opacity="${flow.opacity}"
-                  />
-                `).join("")}
-              </svg>
-              <div class="maplibre-zone-hover">
-                <div class="maplibre-zone-hover-top">
-                  <div class="maplibre-zone-title">${zone.name}</div>
-                  <div class="maplibre-zone-badge maplibre-zone-badge-${zone.severity}">
-                    ${severityLabels[zone.severity] ?? "ALERTA"}
-                  </div>
-                </div>
-                <div class="maplibre-zone-info">
-                  <div class="maplibre-zone-subtitle"><span class="maplibre-zone-label">Cobertura</span> ${coverageLine}</div>
-                  <div class="maplibre-zone-tech"><span class="maplibre-zone-label">Sistemas</span> ${techPreview}</div>
-                </div>
-              </div>
-            `;
 
             markerEl.style.position = 'absolute';
             markerEl.style.left = '0';
             markerEl.style.top = '0';
-            markerEl.style.transform = 'translate(-50%, -50%)';
+            markerEl.style.transform = 'translate(-50%, -100%)';
+            markerEl.style.width = '24px';
+            markerEl.style.height = '24px';
+            markerEl.style.overflow = 'visible';
             markerEl.style.cursor = 'pointer';
             markerEl.style.zIndex = '10';
             markerEl.style.pointerEvents = 'auto';
 
-            const hoverCard = markerEl.querySelector<HTMLElement>('.maplibre-zone-hover');
-            const setHoverState = (isHovering: boolean) => {
-              markerEl.setAttribute('data-hover', isHovering ? 'true' : 'false');
-              if (hoverCard) {
-                hoverCard.style.opacity = isHovering ? '1' : '0';
-                hoverCard.style.visibility = isHovering ? 'visible' : 'hidden';
-                hoverCard.style.transform = isHovering
-                  ? 'translate(-50%, 0) scale(1) perspective(900px) rotateX(0deg)'
-                  : 'translate(-50%, 12px) scale(0.93) perspective(900px) rotateX(8deg)';
-              }
-            };
-
-            setHoverState(false);
-            markerEl.addEventListener('mouseenter', () => {
-              setHoverState(true);
-            });
-            markerEl.addEventListener('mouseleave', () => {
-              setHoverState(false);
-            });
+            const root = createRoot(markerEl);
+            root.render(
+              <ZoneMarker
+                severity={markerSeverity}
+                zoneName={zone.name}
+                severityLabel={severityLabel}
+                coverageLine={coverageLine}
+                techPreview={techPreview}
+              />
+            );
+            markerRootsRef.current.push(root);
 
             overlay.appendChild(markerEl);
           });
@@ -535,7 +436,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
               const lat = parseFloat(latAttr);
               if (Number.isNaN(lng) || Number.isNaN(lat)) return;
               
-              // Project lat/lng to pixel coordinates
+              // Project lng/lat to pixel coordinates (correct order for MapLibre)
               const pixel = map.project([lng, lat]);
               
               // Update marker position
@@ -551,6 +452,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           map.on('move', updateMarkerPositions);
           map.on('zoom', updateMarkerPositions);
           map.on('rotate', updateMarkerPositions);
+          map.on('render', updateMarkerPositions);
         };
 
         // Wait for map to be ready then add markers
@@ -568,6 +470,16 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
 
     return () => {
       cancelled = true;
+      if (mapRef.current) {
+        const overlay = document.querySelector('.maplibre-markers-overlay');
+        overlay?.replaceChildren();
+      }
+      markerRootsRef.current.forEach((root) => {
+        queueMicrotask(() => {
+          root.unmount();
+        });
+      });
+      markerRootsRef.current = [];
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -591,6 +503,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
       />
       
       {/* Markers overlay container */}
+      <div className="maplibre-dot-grid pointer-events-none absolute inset-0 z-[1]" />
       <div 
         className="maplibre-markers-overlay pointer-events-none"
         style={{
@@ -605,12 +518,12 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         }}
       />
       
-      <div className="pointer-events-none absolute left-5 top-5 z-10 flex max-w-[240px] flex-col gap-2 maplibre-hud">
-        <div className="maplibre-hud-pill">Impacto Global en Vivo</div>
-        <div className="maplibre-hud-card">
-          <p className="maplibre-hud-kicker">Monitor de Tormentas</p>
-          <p className="maplibre-hud-title">Eventos Solares</p>
-          <p className="maplibre-hud-body">Flujos en tiempo real • {WORLD_ZONES.length} zonas activas</p>
+      <div className="pointer-events-none absolute right-6 top-20 z-10 flex max-w-[260px] flex-col gap-2">
+        <div className="maplibre-hud-pill">Impacto Global</div>
+        <div className="maplibre-hud-card bg-black/20 backdrop-blur-md border border-white/10 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
+          <p className="maplibre-hud-kicker nrg-hud-kicker">Monitor de Tormentas</p>
+          <p className="maplibre-hud-title nrg-hud-title">Eventos Solares</p>
+          <p className="maplibre-hud-body text-[0.78rem] text-[var(--text-muted)]/75">Flujos • {WORLD_ZONES.length} zonas</p>
         </div>
       </div>
     </div>

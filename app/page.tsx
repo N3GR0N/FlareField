@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import TopNav from "@/components/layout/TopNav";
 import SolarMap from "@/components/features/SolarMap";
 import ZonePanel from "@/components/features/ZonePanel";
@@ -70,36 +71,54 @@ export default function Home() {
     : userLocation?.name ?? "Detectando...";
 
   return (
-    <>
-      {/* Map - full viewport */}
+    <div className="page-shell min-h-screen overflow-hidden text-[var(--text)]">
       <div className="fixed inset-0 z-0">
         <SolarMap userLocation={userLocation} />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(11,13,15,0.78)_0%,rgba(11,13,15,0.58)_16%,rgba(11,13,15,0.34)_34%,rgba(11,13,15,0.16)_52%,rgba(11,13,15,0)_68%),linear-gradient(180deg,rgba(11,13,15,0.16),rgba(11,13,15,0.44))]" />
       </div>
 
-      {/* TopNav - overlay on map */}
       <TopNav locationName={locationLabel} />
 
-      {/* Left Panel (Zone) — bottom left corner */}
-      <div
-        className="fixed left-6 bottom-8 w-72 md:w-80 max-w-[340px] z-20"
-        style={{
-          transition: 'transform 180ms cubic-bezier(0.23,1,0.32,1), opacity 160ms cubic-bezier(0.77,0,0.175,1)'
-        }}
+      <motion.section
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+        className="pointer-events-none fixed left-6 top-6 z-20 max-w-2xl"
+      >
+        <p className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.48em] text-[var(--primary)]/90 drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
+          Institutional solar intelligence
+        </p>
+        <h1 className="max-w-xl font-display text-5xl leading-[1.04] tracking-[-0.05em] text-[var(--text)] drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)] md:text-7xl">
+          FlareField
+        </h1>
+        <p className="mt-3 max-w-lg text-sm leading-7 text-[var(--text-muted)] drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)] md:text-base">
+          Monitoreo espacial para operaciones críticas con una lectura limpia, sobria y premium.
+        </p>
+      </motion.section>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+        className="fixed bottom-12 left-8 z-20 w-72 max-w-[340px] md:w-80"
       >
         <ZonePanel userLocation={userLocation} />
-      </div>
+      </motion.div>
 
-      {/* Right Panel (Active Event) — bottom right corner */}
-      <div className="fixed right-6 bottom-8 w-60 md:w-64 z-20" style={{ transition: 'transform 180ms cubic-bezier(0.23,1,0.32,1)' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.14 }}
+        className="fixed bottom-12 left-[372px] z-20 w-60 md:w-64"
+      >
         <ActiveEventCard />
-      </div>
+      </motion.div>
 
-      {/* Discrete centered footer */}
-      <div className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-10">
-        <span className="text-[10px] topnav-text" style={{ opacity: 0.4 }}>
+      <footer className="fixed bottom-4 left-1/2 z-10 -translate-x-1/2">
+        <span className="text-[10px] uppercase tracking-[0.34em] text-[var(--text-muted)]/70">
           © 2026 FlareField
         </span>
-      </div>
-    </>
+      </footer>
+    </div>
   );
 }

@@ -19,23 +19,36 @@ export default {
     },
     extend: {
       colors: {
-        background: '#f0f4f8',
-        surface: 'rgba(255,255,255,0.6)',
-        surfaceDark: 'rgba(200,215,230,0.4)',
-        border: 'rgba(255,255,255,0.8)',
-        primary: '#0066cc',
-        secondary: '#00a8e8',
-        'alert-green': '#00c896',
-        'alert-yellow': '#f5a623',
-        'alert-orange': '#ff6b35',
-        'alert-red': '#e8334a',
-        text: '#1a2332',
-        'text-muted': '#5a7a99',
+        background: '#0B0D0F',
+        surface: 'rgba(18,20,24,0.72)',
+        surfaceDark: 'rgba(10,12,14,0.88)',
+        border: 'rgba(242,240,234,0.10)',
+        primary: '#C9A227',
+        secondary: '#B8A58A',
+        'alert-green': '#86B48C',
+        'alert-yellow': '#C9A227',
+        'alert-orange': '#B77A43',
+        'alert-red': '#A85F4A',
+        text: '#F2F0EA',
+        'text-muted': '#B8B1A5',
+      },
+      fontFamily: {
+        display: ['var(--font-serif)', 'Georgia', 'serif'],
+        body: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
+        label: ['var(--font-sans)', 'Inter', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         glass: '1.25rem',
         btn: '0.5rem',
         chip: '9999px',
+      },
+      scale: {
+        101: '1.01',
+      },
+      transitionTimingFunction: {
+        'ease-emil': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        premium: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         pulse: {

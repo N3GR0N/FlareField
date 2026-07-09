@@ -49,30 +49,30 @@ export default function ActiveEventCard() {
   }, []);
 
   return (
-    <div className="panel-custom p-5 space-y-4 panel-content">
-      <div className="space-y-2.5">
-        <div className="flex items-center space-x-2 text-xs uppercase" style={{color: 'rgba(255, 255, 255, 0.75)', letterSpacing: '0.5px', fontWeight: 600}}>
-          <RadarIcon className="h-4 w-4 text-cyan-300/70" />
+    <div className="panel-custom space-y-5 rounded-[24px] p-6 panel-content">
+      <div className="space-y-3">
+        <div className="flex items-center space-x-2 text-[0.7rem] uppercase tracking-[0.28em] text-[var(--text-muted)]/85">
+          <RadarIcon className="h-4 w-4 text-[var(--primary)]/75" />
           <span>:: Evento Activo</span>
         </div>
         <div className="space-y-2">
           <div className="flex items-center space-x-2.5">
-            <span className="font-600 text-base" style={{color: 'rgba(255, 255, 255, 0.96)'}}>{event.type}</span>
-            <span className="px-3 py-1 rounded-lg text-xs font-mono font-700" style={{backgroundColor: 'rgba(59, 130, 246, 0.12)', border: '1px solid rgba(59, 130, 246, 0.3)', color: 'rgba(129, 215, 255, 0.9)', letterSpacing: '0.2px'}}>
+            <span className="text-base font-semibold text-[var(--text)]">{event.type}</span>
+            <span className="rounded-full border border-[rgba(201,162,39,0.22)] bg-[rgba(201,162,39,0.08)] px-3 py-1 font-mono text-xs font-semibold tracking-[0.14em] text-[var(--primary)]/92">
               Clase {event.class}
             </span>
           </div>
-          <div className="text-xs" style={{color: 'rgba(255, 255, 255, 0.65)', fontWeight: 500}}>
+          <div className="text-xs text-[var(--text-muted)]/75">
             {new Date(event.timestamp).toLocaleString('es-AR', {year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'})}
           </div>
         </div>
       </div>
 
       <div className="border-t border-white/10 pt-4">
-        <div className="flex items-center space-x-2 text-xs" style={{color: 'rgba(255, 255, 255, 0.75)'}}>
-          <ClipboardIcon className="h-4 w-4 text-cyan-300/70" />
-          <span className="font-600">Fuente:</span>
-          <span className="font-mono text-xs" style={{color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500}}>{event.source}</span>
+        <div className="flex items-center space-x-2 text-xs text-[var(--text-muted)]/80">
+          <ClipboardIcon className="h-4 w-4 text-[var(--primary)]/75" />
+          <span className="font-semibold">Fuente:</span>
+          <span className="font-mono text-xs text-[var(--text)]/85">{event.source}</span>
         </div>
         <div className="mt-4">
           <AlertChip variant={event.severity === "green" ? "stable" : event.severity === "yellow" ? "elevated" : event.severity === "orange" ? "active" : "critical"}>

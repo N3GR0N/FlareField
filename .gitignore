@@ -51,3 +51,33 @@ dev.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# local env
+.env
+.env.*
+!.env.example
+
+# next.js
+.next/
+out/
+
+# package managers / caches
+node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.turbo/
+.parcel-cache/
+dist/
+coverage/
+
+# windows / os junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+._*

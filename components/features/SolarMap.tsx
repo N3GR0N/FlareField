@@ -3,9 +3,9 @@ import dynamic from 'next/dynamic';
 const useMapLibre = process.env.NEXT_PUBLIC_USE_MAPLIBRE === '1';
 
 const loadingShell = (
-  <div className="flex h-[calc(100vh-4rem)] w-full items-end rounded-[28px] border border-white/8 maplibre-dark-shell p-5">
-    <div className="max-w-xs rounded-2xl border border-white/8 bg-black/30 px-4 py-3 text-sm text-white/80 backdrop-blur-xl">
-      Cargando mapa 3D...
+  <div className="flex h-[calc(100vh-4rem)] w-full items-end rounded-[28px] border border-white/10 nrg-map-base p-5">
+    <div className="max-w-xs rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white/80 backdrop-blur-xl nrg-hud">
+      Cargando mapa...
     </div>
   </div>
 );

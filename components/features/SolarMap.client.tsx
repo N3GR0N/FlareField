@@ -83,9 +83,9 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
   }, [userLocation]);
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] w-full map-3d-root claude-canvas soft-glow">
+    <div className="relative h-[calc(100vh-4rem)] w-full nrg-map-base">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="map-3d-wrap map-3d-tilt relative h-full w-full overflow-hidden" style={{ transformOrigin: 'bottom' }}>
+        <div className="relative h-full w-full overflow-hidden">
           <MapContainer
             center={[userLocation?.lat ?? -38.0, userLocation?.lng ?? -64.0]}
             zoom={mapZoom}
@@ -150,11 +150,21 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             <div className="absolute inset-0 pointer-events-none">
               {zones.slice(0,3).map((zone,index) => {
                 const nextZone = zones[(index+1)%zones.length];
-                const angle = Math.atan2(nextZone.lat - zone.lat, nextZone.lng - zone.lng) * 180 / Math.PI;
-                const width = Math.abs((zone.lat - nextZone.lat) * 2);
-                const height = Math.abs((zone.lng - nextZone.lng) * 2);
+                // Simple line without problematic transform calculations
+                const isNearby = Math.abs(zone.lat - (-38.0)) < 5 && Math.abs(zone.lng - (-64.0)) < 5;
 
-                return <div key={`line-${index}`} className={`absolute pointer-events-none`} style={{ left: `${zone.lng * 2 + 100}%`, top: `${zone.lat * -2 + 50}%`, width: `${width}px`, height: `${height}px`, backgroundColor: `var(--alert-${zone.severity})`, opacity: 0.12, transform: `rotate(${angle}deg)` }} />
+                return isNearby ? (
+                  <div key={`line-${index}`} className="absolute pointer-events-none -translate-x-1/2 -translate-y-1/2"
+                       style={{
+                         left: `calc(${(zone.lng + 75) * 2}%)`,
+                         top: `calc(${(90 - zone.lat) * 2}%)`,
+                         width: '4px',
+                         height: '4px',
+                         backgroundColor: `var(--alert-${zone.severity})`,
+                         opacity: 0.25,
+                         borderRadius: '2px'
+                       }} />
+                ) : null;
               })}
             </div>
           </MapContainer>
