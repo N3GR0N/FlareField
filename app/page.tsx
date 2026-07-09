@@ -85,13 +85,13 @@ export default function Home() {
         transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
         className="pointer-events-none fixed left-6 top-6 z-20 max-w-2xl"
       >
-        <p className="mb-3 text-[0.7rem] font-semibold uppercase tracking-[0.48em] text-[var(--primary)]/90 drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.48em] text-[var(--primary)]/90 drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
           Institutional solar intelligence
         </p>
-        <h1 className="max-w-xl font-display text-5xl leading-[1.04] tracking-[-0.05em] text-[var(--text)] drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)] md:text-7xl">
+        <h1 className="max-w-xl font-sans text-7xl font-extrabold leading-[0.92] tracking-[-0.06em] text-[var(--text)] drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)] md:text-8xl lg:text-9xl">
           FlareField
         </h1>
-        <p className="mt-3 max-w-lg text-sm leading-7 text-[var(--text-muted)] drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)] md:text-base">
+        <p className="mt-4 max-w-lg text-sm leading-7 text-[var(--text-muted)]/70 drop-shadow-[0_2px_18px_rgba(0,0,0,0.55)]">
           Monitoreo espacial para operaciones críticas con una lectura limpia, sobria y premium.
         </p>
       </motion.section>
@@ -100,7 +100,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
-        className="fixed bottom-12 left-8 z-20 w-72 max-w-[340px] md:w-80"
+        className="fixed bottom-12 right-8 z-20 w-72 max-w-[340px] md:w-80"
       >
         <ZonePanel userLocation={userLocation} />
       </motion.div>
@@ -109,7 +109,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.14 }}
-        className="fixed bottom-12 left-[372px] z-20 w-60 md:w-64"
+        className="fixed bottom-12 left-8 z-20 w-60 md:w-64"
       >
         <ActiveEventCard />
       </motion.div>

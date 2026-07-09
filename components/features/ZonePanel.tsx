@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import MetricCard from "@/components/ui/MetricCard";
 import AlertChip from "@/components/ui/AlertChip";
 import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon, ClipboardIcon, BoltIcon } from "@/components/ui/Icons";
@@ -55,73 +56,142 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
   }, []);
 
   return (
-    <div className="panel-custom space-y-6 rounded-[24px] p-7 panel-content">
-      <div className="space-y-3">
-        <div className="flex items-center space-x-3">
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      className="space-y-4 p-0"
+    >
+      {/* Header - burbuja separada */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.05 }}
+        className="rounded-2xl border border-white/8 bg-[#14161A]/90 px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+      >
+        <div className="flex items-center gap-3">
           <BoltIcon className="h-5 w-5 text-[var(--primary)]/90" />
-          <h2 className="font-display text-2xl tracking-[-0.03em] text-[var(--text)]">FlareField</h2>
+          <div>
+            <h2 className="font-sans text-xl font-bold tracking-tight text-[var(--text)]">FlareField</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.32em] text-[var(--text-muted)]/70">
+              {locationName}
+            </p>
+          </div>
         </div>
-        <p className="text-[0.7rem] uppercase tracking-[0.28em] text-[var(--text-muted)]/85">
-          Estado del espacio en {locationName}
-        </p>
-      </div>
+      </motion.div>
 
-      <div className="space-y-6">
-        <div className="border-t border-white/10 pt-4">
-          <h3 className="mb-3 topnav-small-text">
-            :: Condición solar
-          </h3>
-          <div className="flex items-center space-x-3">
-            <AlertChip variant={solarData.condition.toLowerCase() as "stable" | "elevated" | "active" | "critical"}>
+      {/* KP Index - protagonista visual gigante */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.1 }}
+        className="rounded-2xl border border-white/8 bg-[#14161A]/90 px-6 py-5 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+      >
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.32em] text-[var(--text-muted)]/70">
+              Kp Index
+            </p>
+            <motion.div
+              key={solarData.kpIndex}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="font-mono-stat text-7xl font-extrabold leading-none tracking-tight text-[var(--text)]"
+            >
+              {solarData.kpIndex}
+            </motion.div>
+          </div>
+          <motion.div
+            whileHover={{ scale: 1.03 }}
+            transition={{ duration: 0.15 }}
+            className="rounded-full"
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: 'var(--background)'
+            }}
+          >
+            <span className="block px-5 py-2.5 text-sm font-bold uppercase tracking-[0.22em] text-center">
               {solarData.condition}
-            </AlertChip>
-            <div className="text-xs text-[var(--text-muted)]/75">
-              Actualizado {new Date(solarData.lastUpdated).toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'})}
-            </div>
-          </div>
+            </span>
+          </motion.div>
         </div>
+      </motion.div>
 
-        <div className="border-t border-white/10 pt-4">
-          <h3 className="mb-3 topnav-small-text">
-            :: Impacto estimado
-          </h3>
-          <div className="grid grid-cols-2 gap-4 mb-5">
-            <MetricCard label="Kp Index" value={solarData.kpIndex.toString()} unit="" />
-            <MetricCard label="PRÓXIMAS HORAS" value="+3h" unit="" />
+      {/* Fila secundaria comprimida: Próximas horas + Tecnologías */}
+      <div className="space-y-3">
+        {/* Próximas horas - compacto */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.15 }}
+          className="rounded-2xl border border-white/8 bg-[#14161A]/90 px-5 py-3 shadow-[0_4px_20px_rgba(0,0,0,0.3)]"
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-xs font-bold uppercase tracking-[0.32em] text-[var(--text-muted)]/70">
+              PRÓXIMAS HORAS
+            </p>
+            <span className="font-mono-stat text-lg font-bold tracking-tight text-[var(--text)]">
+              +3h
+            </span>
           </div>
+        </motion.div>
 
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2 text-xs text-[var(--text-muted)]/85">
-              <ClipboardIcon className="h-4 w-4 text-[var(--primary)]/75" />
-              <span className="font-medium">Tecnologías afectadas:</span>
-            </div>
-            <div className="flex flex-wrap gap-2.5">
-              {solarData.affectedTech.map((tech, index) => {
-                let Icon = DroneIcon;
-                if (tech.toLowerCase().includes('wifi')) Icon = SatelliteIcon;
-                if (tech.toLowerCase().includes('escuelas')) Icon = SchoolIcon;
-                if (tech.toLowerCase().includes('radio')) Icon = RadioIcon;
+        {/* Tecnologías afectadas - compacto */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.2 }}
+          className="space-y-2"
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.32em] text-[#C9CDD3] px-1">
+            Tecnologías afectadas
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {solarData.affectedTech.map((tech, index) => {
+              let Icon = DroneIcon;
+              if (tech.toLowerCase().includes('wifi')) Icon = SatelliteIcon;
+              if (tech.toLowerCase().includes('escuelas')) Icon = SchoolIcon;
+              if (tech.toLowerCase().includes('radio')) Icon = RadioIcon;
 
-                return (
-                  <span key={index} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-[var(--text)]/90 transition-all duration-200 hover:border-[rgba(201,162,39,0.18)] hover:bg-white/[0.06]">
-                    <Icon className="h-3.5 w-3.5 text-[var(--primary)]/60" />
-                    <span>{tech}</span>
-                  </span>
-                );
-              })}
-            </div>
+              const isActive = index === 0;
+
+              return (
+                <motion.div
+                  key={index}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.15 }}
+                  className={`rounded-xl border px-3 py-2 shadow-[0_4px_20px_rgba(0,0,0,0.3)] ${
+                    isActive
+                      ? 'border-[var(--primary)] bg-[#14161A]/90'
+                      : 'border-white/8 bg-[#14161A]/90'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className={`h-4 w-4 ${isActive ? 'text-[var(--primary)]' : 'text-[var(--text-muted)]/60'}`} />
+                    <span className={`text-xs font-bold ${isActive ? 'text-[var(--text)]' : 'text-[var(--text-muted)]/80'}`}>
+                      {tech}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="mt-5 pt-2">
+      {/* Botón - CTA principal con dorado sólido */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30, delay: 0.25 }}
+      >
         <button
-          className="flex h-11 w-full items-center justify-center gap-2 rounded-full border border-[rgba(201,162,39,0.22)] bg-[rgba(201,162,39,0.08)] text-[0.75rem] font-semibold uppercase tracking-[0.22em] text-[var(--text)]/92 transition-all duration-200 hover:border-[rgba(201,162,39,0.34)] hover:bg-[rgba(201,162,39,0.14)] hover:scale-[1.01] hover:shadow-[0_10px_28px_rgba(201,162,39,0.12)] active:scale-[0.98]"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#C9A227] text-sm font-bold uppercase tracking-[0.22em] text-[#0B0D0F] transition-all duration-200 hover:bg-[#D4B032] hover:scale-[1.02] hover:shadow-[0_4px_20px_rgba(201,162,39,0.3)] active:scale-[0.98]"
         >
           VER ALERTA COMPLETA
           <span className="ml-2"><svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden><path d="M14 3h7v7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M10 14L21 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M21 21H3V3" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" /></svg></span>
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
