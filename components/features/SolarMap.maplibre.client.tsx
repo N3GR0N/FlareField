@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { createRoot, type Root as ReactRoot } from "react-dom/client";
+import { gsap } from "gsap";
 import { Zone } from "@/types/solar";
 import ZoneMarker from "@/components/ui/ZoneMarker";
 
@@ -15,6 +16,13 @@ const SEVERITY_RANK: Record<Severity, number> = {
   yellow: 1,
   orange: 2,
   red: 3
+};
+
+const SEVERITY_AREA_SIZE: Record<Severity, number> = {
+  green: 30,
+  yellow: 40,
+  orange: 60,
+  red: 90
 };
 
 type CapitalZone = Zone & {
@@ -380,9 +388,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             markerEl.style.position = 'absolute';
             markerEl.style.left = '0';
             markerEl.style.top = '0';
-            markerEl.style.transform = 'translate(-50%, -100%)';
-            markerEl.style.width = '24px';
-            markerEl.style.height = '24px';
+            markerEl.style.transform = 'translate(-50%, -50%)';
             markerEl.style.overflow = 'visible';
             markerEl.style.cursor = 'pointer';
             markerEl.style.zIndex = '10';
@@ -396,6 +402,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
                 severityLabel={severityLabel}
                 coverageLine={coverageLine}
                 techPreview={techPreview}
+                size={SEVERITY_AREA_SIZE[zone.severity]}
               />
             );
             markerRootsRef.current.push(root);
@@ -487,6 +494,69 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
     };
   }, [containerRef, userLocation]);
 
+  // GSAP pulse animation for zone area markers
+  const gsapCtxRef = useRef<gsap.Context | null>(null);
+
+  useEffect(() => {
+    const overlay = document.querySelector('.maplibre-markers-overlay');
+    if (!overlay) return;
+
+    const observer = new MutationObserver(() => {
+      const areas = overlay.querySelectorAll('.zone-ripple-area');
+      if (areas.length === 0) return;
+      observer.disconnect();
+
+      gsapCtxRef.current?.kill();
+      gsapCtxRef.current = gsap.context(() => {
+        areas.forEach((el) => {
+          gsap.fromTo(el,
+            { scale: 1, opacity: 0.5 },
+            {
+              scale: 1.15,
+              opacity: 0.8,
+              duration: 2.5,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+              delay: gsap.utils.random(0, 1.5),
+            }
+          );
+        });
+      }, overlay);
+    });
+
+    observer.observe(overlay, { childList: true, subtree: true });
+
+    // Check if zones already exist
+    const existing = overlay.querySelectorAll('.zone-ripple-area');
+    if (existing.length > 0) {
+      observer.disconnect();
+      gsapCtxRef.current?.kill();
+      gsapCtxRef.current = gsap.context(() => {
+        existing.forEach((el) => {
+          gsap.fromTo(el,
+            { scale: 1, opacity: 0.5 },
+            {
+              scale: 1.15,
+              opacity: 0.8,
+              duration: 2.5,
+              ease: "sine.inOut",
+              repeat: -1,
+              yoyo: true,
+              delay: gsap.utils.random(0, 1.5),
+            }
+          );
+        });
+      }, overlay);
+    }
+
+    return () => {
+      observer.disconnect();
+      gsapCtxRef.current?.kill();
+      gsapCtxRef.current = null;
+    };
+  }, []);
+
   return (
     <div className="relative w-full h-full overflow-hidden maplibre-dark-shell">
       <div 
@@ -503,7 +573,6 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
       />
       
       {/* Markers overlay container */}
-      <div className="maplibre-dot-grid pointer-events-none absolute inset-0 z-[1]" />
       <div 
         className="maplibre-markers-overlay pointer-events-none"
         style={{
@@ -514,18 +583,13 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           bottom: 0,
           width: '100%',
           height: '100%',
-          zIndex: 5
+          zIndex: 2,
+          overflow: 'visible'
         }}
       />
+
+
       
-      <div className="pointer-events-none absolute right-6 top-20 z-10 flex max-w-[260px] flex-col gap-2">
-        <div className="maplibre-hud-pill">Impacto Global</div>
-        <div className="maplibre-hud-card bg-black/20 backdrop-blur-md border border-white/10 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
-          <p className="maplibre-hud-kicker nrg-hud-kicker">Monitor de Tormentas</p>
-          <p className="maplibre-hud-title nrg-hud-title">Eventos Solares</p>
-          <p className="maplibre-hud-body text-[0.78rem] text-[var(--text-muted)]/75">Flujos • {WORLD_ZONES.length} zonas</p>
-        </div>
-      </div>
     </div>
   );
 }

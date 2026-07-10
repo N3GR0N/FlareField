@@ -8,13 +8,9 @@ interface ZoneMarkerProps {
   severityLabel: string;
   coverageLine: string;
   techPreview: string;
+  size?: number;
   className?: string;
 }
-
-const SEVERITY_RGB: Record<ZoneMarkerSeverity, string> = {
-  media: "183 122 67",
-  alta: "168 95 74",
-};
 
 export default function ZoneMarker({
   severity,
@@ -22,6 +18,7 @@ export default function ZoneMarker({
   severityLabel,
   coverageLine,
   techPreview,
+  size = 60,
   className = "",
 }: ZoneMarkerProps) {
   const [hovered, setHovered] = useState(false);
@@ -34,10 +31,7 @@ export default function ZoneMarker({
       className={`zone-ripple-marker group ${className}`}
       data-severity={severity}
       data-open={isOpen ? "true" : "false"}
-      style={{
-        "--zone-tone-rgb": SEVERITY_RGB[severity],
-        "--zone-core-rgb": "201 162 39",
-      } as React.CSSProperties & Record<string, string | number>}
+      style={{ "--zone-area-size": `${size}px` } as React.CSSProperties}
       aria-label={zoneName}
       aria-expanded={isOpen}
       role="button"
@@ -48,26 +42,24 @@ export default function ZoneMarker({
       onBlur={() => setHovered(false)}
       onClick={() => setPinned((value) => !value)}
     >
-      <span className="zone-ripple-ring" />
-      <span className="zone-ripple-halo" />
-      <span className="zone-ripple-core" />
-      <div className="zone-ripple-tooltip pointer-events-none absolute bottom-[calc(100%+12px)] left-1/2 z-20 w-60 -translate-x-1/2 translate-y-2 scale-95 rounded-[18px] border border-white/10 bg-[rgba(11,13,15,0.84)] px-4 py-3 text-left shadow-[0_18px_40px_rgba(0,0,0,0.28)] backdrop-blur-md transition-all duration-200 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 data-[open=true]:translate-y-0 data-[open=true]:scale-100 data-[open=true]:opacity-100 opacity-0">
+      <span className="zone-ripple-area" data-severity={severity} />
+      <div className="zone-ripple-tooltip pointer-events-none absolute bottom-[calc(100%+12px)] left-1/2 z-20 w-60 -translate-x-1/2 translate-y-2 scale-95 rounded-[var(--radius-card)] border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-left opacity-0 backdrop-blur-[20px] transition-all duration-300 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 data-[open=true]:translate-y-0 data-[open=true]:scale-100 data-[open=true]:opacity-100 shadow-[var(--shadow-glass)]">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-[0.78rem] font-semibold uppercase tracking-[0.26em] text-[var(--text)]/92">
+            <div className="text-[0.78rem] font-semibold uppercase tracking-[0.26em] text-[var(--color-primary)]">
               {zoneName}
             </div>
-            <div className="mt-1 text-[0.68rem] uppercase tracking-[0.28em] text-[var(--primary)]/88">
+            <div className="mt-1 text-[0.68rem] uppercase tracking-[0.28em] text-[var(--color-muted)]">
               {severityLabel}
             </div>
           </div>
-          <div className="mt-0.5 rounded-full border border-[rgba(201,162,39,0.22)] bg-[rgba(201,162,39,0.08)] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[var(--primary)]/92">
+          <div className="mt-0.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
             {severity === "alta" ? "ALERTA" : "MEDIA"}
           </div>
         </div>
-        <div className="mt-3 space-y-1 text-[0.72rem] leading-5 text-[var(--text-muted)]/80">
-          <div><span className="font-semibold text-[var(--text)]/88">Cobertura:</span> {coverageLine}</div>
-          <div><span className="font-semibold text-[var(--text)]/88">Sistemas:</span> {techPreview}</div>
+        <div className="mt-3 space-y-1 text-[0.72rem] leading-5 text-[var(--color-muted)]">
+          <div><span className="font-semibold text-[var(--color-primary)]">Cobertura:</span> {coverageLine}</div>
+          <div><span className="font-semibold text-[var(--color-primary)]">Sistemas:</span> {techPreview}</div>
         </div>
       </div>
     </div>

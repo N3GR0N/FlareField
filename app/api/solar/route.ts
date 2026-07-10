@@ -78,7 +78,7 @@ function processKpIndex(kpData: KpIndexEntry[]): { kp: number; time_tag: string;
 
   // Get the most recent Kp index reading
   const latestKp = kpData[kpData.length - 1];
-  const kpValue = parseFloat(latestKp.kp_index || "0");
+  const kpValue = parseFloat(String(latestKp.kp_index ?? "0"));
 
   // Map Kp value to severity
   let severity: "green" | "yellow" | "orange" | "red";

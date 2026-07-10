@@ -58,7 +58,7 @@ export function formatCoordinates(lat: number, lng: number): string {
 export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
-): (...args: Parameters<T>) => ReturnType<T> {
+): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
 
   return function executedFunction(...args: Parameters<T>) {

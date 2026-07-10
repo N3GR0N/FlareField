@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -9,22 +10,37 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnpm-store/
+.npm/
 
 # testing
 /coverage
+coverage/
 
 # next.js
 /.next/
+.next/
 /out/
+out/
 
 # production
 /build
+dist/
 
 # misc
 .DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+._*
 *.pem
 
-# debug
+# debug / logs
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -33,17 +49,10 @@ yarn-error.log*
 dev.log
 
 # env files (keep the example file tracked)
+.env
+.env.*
 .env/
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env/.local
 !.env.example
-
-# local assistant / tooling state
-.claude/
-.github/skills/
 
 # vercel
 .vercel
@@ -51,34 +60,15 @@ dev.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-# local env
-.env
-.env.*
-!.env.example
 
-# next.js
-.next/
-out/
-
-# package managers / caches
-node_modules/
-.pnpm-store/
-.npm/
-.yarn/
-.yarn/cache/
-.yarn/unplugged/
-.yarn/build-state.yml
-.yarn/install-state.gz
+# caches
 .turbo/
 .parcel-cache/
-dist/
-coverage/
 
-# windows / os junk
-.DS_Store
-Thumbs.db
-Desktop.ini
-ehthumbs.db
-$RECYCLE.BIN/
-._*
+# local assistant / tooling state
+.claude/
+.github/skills/
+.agents/skills/
 .aider*
+.vscode/
+skills-lock.json

@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 export default {
-  darkMode: ['class'],
+  darkMode: 'class',
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -19,18 +19,17 @@ export default {
     },
     extend: {
       colors: {
-        background: '#0B0D0F',
-        surface: 'rgba(18,20,24,0.72)',
-        surfaceDark: 'rgba(10,12,14,0.88)',
-        border: 'rgba(242,240,234,0.10)',
-        primary: '#C9A227',
-        secondary: '#B8A58A',
-        'alert-green': '#86B48C',
-        'alert-yellow': '#C9A227',
-        'alert-orange': '#B77A43',
-        'alert-red': '#A85F4A',
-        text: '#F2F0EA',
-        'text-muted': '#B8B1A5',
+        background: '#05070B',
+        surface: 'rgba(10, 15, 26, 0.65)',
+        primary: '#FFFFFF',
+        accent: '#C5A880',
+        neutral: 'rgba(175, 190, 215, 0.65)',
+        'alert-green': 'rgba(175, 190, 215, 0.4)',
+        'alert-yellow': 'rgba(175, 190, 215, 0.65)',
+        'alert-orange': '#C5A880',
+        'alert-red': '#C5A880',
+        text: '#FFFFFF',
+        'text-muted': 'rgba(175, 190, 215, 0.65)',
       },
       fontFamily: {
         display: ['var(--font-serif)', 'Georgia', 'serif'],

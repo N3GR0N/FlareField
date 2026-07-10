@@ -5,28 +5,28 @@ interface AlertChipProps {
   children: ReactNode;
 }
 
+const colorMap = {
+  stable: { color: "rgba(83, 112, 109, 0.5)", bg: "rgba(83, 112, 109, 0.08)" },
+  elevated: { color: "rgba(83, 112, 109, 0.75)", bg: "rgba(83, 112, 109, 0.1)" },
+  active: { color: "#214c4e", bg: "rgba(33, 76, 78, 0.12)" },
+  critical: { color: "#214c4e", bg: "rgba(33, 76, 78, 0.2)" },
+};
+
 export default function AlertChip({
   variant,
   children,
 }: AlertChipProps) {
-  // Map variant to color token
-  const getVariantClass = () => {
-    switch (variant) {
-      case "stable":
-        return "border-alert-green/20 bg-alert-green/5 text-alert-green";
-      case "elevated":
-        return "border-alert-yellow/20 bg-alert-yellow/5 text-alert-yellow";
-      case "active":
-        return "border-alert-orange/20 bg-alert-orange/5 text-alert-orange";
-      case "critical":
-        return "border-alert-red/20 bg-alert-red/5 text-alert-red";
-      default:
-        return "border-alert-green/20 bg-alert-green/5 text-alert-green";
-    }
-  };
+  const colors = colorMap[variant];
 
   return (
-    <span className={`inline-flex items-center px-2.5 pt-0.5 pb-[2px] rounded-chip text-label font-label text-xs whitespace-nowrap ${getVariantClass()} `}>
+    <span
+      className="inline-flex items-center rounded-[var(--radius-chip)] border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.15em] whitespace-nowrap"
+      style={{
+        borderColor: colors.color,
+        backgroundColor: colors.bg,
+        color: colors.color,
+      }}
+    >
       {children}
     </span>
   );
