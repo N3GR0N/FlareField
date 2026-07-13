@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Rethink_Sans, Playfair_Display, Space_Grotesk } from 'next/font/google';
+import { Rethink_Sans, Playfair_Display, Space_Grotesk, Cormorant_Garamond, Work_Sans, DM_Mono } from 'next/font/google';
 
 const rethinkSans = Rethink_Sans({
   subsets: ['latin'],
@@ -23,6 +23,27 @@ const spaceGrotesk = Space_Grotesk({
   display: 'swap'
 });
 
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-display',
+  display: 'swap'
+});
+
+const workSans = Work_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-body',
+  display: 'swap'
+});
+
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-mono',
+  display: 'swap'
+});
+
 export const metadata: Metadata = {
   title: "FlareField",
   description: "Space weather alert app for rural workers in Argentina",
@@ -36,7 +57,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`h-full antialiased ${rethinkSans.variable} ${playfair.variable} ${spaceGrotesk.variable}`}
+      className={`h-full antialiased ${rethinkSans.variable} ${playfair.variable} ${spaceGrotesk.variable} ${cormorant.variable} ${workSans.variable} ${dmMono.variable}`}
     >
       <body className="min-h-full flex flex-col bg-background text-text">{children}</body>
     </html>

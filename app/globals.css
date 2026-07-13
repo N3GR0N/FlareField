@@ -273,7 +273,6 @@ html {
 @media (hover: hover) and (pointer: fine) {
   .card-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 28px 64px -12px rgba(0, 0, 0, 0.8);
     background: rgba(0, 0, 0, 0.3);
   }
 }

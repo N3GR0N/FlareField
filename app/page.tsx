@@ -86,15 +86,7 @@ export default function Home() {
     });
   }, []);
 
-  // Title fades out when nav opens, in when nav closes
-  useEffect(() => {
-    if (!titleRef.current) return;
-    gsap.to(titleRef.current, {
-      opacity: isNavOpen ? 0 : 1,
-      duration: 0.25,
-      ease: "power2.inOut",
-    });
-  }, [isNavOpen]);
+
 
   return (
     <div className="min-h-screen bg-[#0b0f19] overflow-hidden">

@@ -1,13 +1,24 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Zone } from "@/types/solar";
 import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon } from "@/components/ui/Icons";
 
-const ACCENT = "#C5A880";
+const ACCENT = "#214c4e";
+
+function ContextMenuBlocker() {
+  const map = useMap();
+  useEffect(() => {
+    const container = map.getContainer();
+    const handler = (e: Event) => e.preventDefault();
+    container.addEventListener("contextmenu", handler);
+    return () => container.removeEventListener("contextmenu", handler);
+  }, [map]);
+  return null;
+}
 
 const severityOpacity: Record<Zone['severity'], string> = {
   green: "0.3",
@@ -74,6 +85,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             trackResize={true}
             className="absolute inset-0"
           >
+            <ContextMenuBlocker />
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -82,16 +94,16 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             {zones.map(zone => (
               <Marker key={zone.id} position={[zone.lat, zone.lng]} icon={getZoneIcon(zone.severity)}>
                 <Popup>
-                  <div className="text-sm space-y-2">
-                    <div className="font-mono text-xs uppercase tracking-wider text-[var(--color-primary)]">{zone.name}</div>
-                    <div className="flex items-center gap-2">
+                  <div className="bg-black/25 backdrop-blur-lg border border-white/10 rounded-[var(--radius-glass)] shadow-lg shadow-black/20 p-6 min-w-[280px]">
+                    <div className="font-sans text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] mb-4">{zone.name}</div>
+                    <div className="flex items-center gap-2 mb-4">
                       <span className="h-2 w-2 rounded-full" style={{ backgroundColor: ACCENT, opacity: severityOpacity[zone.severity] }} />
-                      <span className="text-xs uppercase tracking-[0.12em] text-[var(--color-text)]">
+                      <span className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)]">
                         {zone.severity === 'green' ? 'SEÑAL ESTABLE' : zone.severity === 'yellow' ? 'KP ELEVADO' : zone.severity === 'orange' ? 'TORMENTA ACTIVA' : 'TORMENTA CRÍTICA'}
                       </span>
                     </div>
-                    <div className="text-xs text-[var(--color-text)]">Tecnologías afectadas:</div>
-                    <div className="flex flex-wrap gap-1 text-xs">
+                    <div className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)] mb-3">Tecnologías afectadas:</div>
+                    <div className="flex flex-wrap gap-2 text-xs mb-4">
                       {zone.affectedTech.map(tech => {
                         let Icon = DroneIcon;
                         if (tech.toLowerCase().includes('wifi')) Icon = SatelliteIcon;
@@ -99,14 +111,14 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
                         if (tech.toLowerCase().includes('radio')) Icon = RadioIcon;
 
                           return (
-                             <span key={tech} className="px-1.5 py-0.5 rounded-[var(--radius-chip)] text-xs border border-[var(--color-border)] bg-[var(--color-bg)] text-[var(--color-text)] inline-flex items-center gap-1.5">
-                              <Icon className="h-3 w-3 text-[var(--color-text-secondary)]" />
-                              <span>{tech}</span>
+                             <span key={tech} className="flex items-center gap-2 rounded-[var(--radius-glass-sm)] border border-white/[0.08] bg-[rgba(11,15,25,0.9)] px-3 py-2">
+                              <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--color-accent)]" />
+                              <span className="text-xs text-[var(--text-muted)] truncate">{tech}</span>
                             </span>
                           );
                       })}
                     </div>
-                    <div className="mt-2 text-xs text-[var(--color-text-secondary)]">Actualizado hace 2 min</div>
+                    <div className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Actualizado hace 2 min</div>
                   </div>
                 </Popup>
 
@@ -117,8 +129,8 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
               <Marker position={[userLocation.lat, userLocation.lng]} icon={new L.DivIcon({ html: `<div class="relative w-6 h-6 flex items-center justify-center"><div style="width:10px;height:10px;border-radius:9999px;border:2px solid rgba(40,54,85,0.4);background:rgba(40,54,85,0.15)"></div></div>`, iconSize: [12,12], iconAnchor: [6,6] })}>
                 <Popup>
                   <div className="text-sm">
-                    <div className="font-mono text-xs uppercase tracking-wider text-[var(--color-primary)]">Tu ubicación</div>
-                    <div className="mt-1 text-xs text-[var(--color-text)]">{userLocation.name}</div>
+                    <div className="font-mono text-xs uppercase tracking-wider text-[var(--text-primary)]">Tu ubicación</div>
+                    <div className="mt-1 text-xs text-[var(--text-secondary)]">{userLocation.name}</div>
                   </div>
                 </Popup>
               </Marker>
@@ -150,10 +162,10 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
       </div>
 
       {!userLocation && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[var(--background)]">
+        <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg)]">
           <div className="text-center space-y-4">
-            <div className="h-6 w-6 rounded-full border-2 border-[var(--border)]"></div>
-            <p className="text-xs uppercase tracking-[0.14em] text-[var(--text)]">Detectando tu ubicación...</p>
+            <div className="h-6 w-6 rounded-full border-2 border-[var(--glass-border)]"></div>
+            <p className="text-xs uppercase tracking-[0.14em] text-[var(--text-primary)]">Detectando tu ubicación...</p>
           </div>
         </div>
       )}

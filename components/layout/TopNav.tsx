@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MapPin, Bell } from "lucide-react";
 import { gsap } from "gsap";
-import { BoltIcon } from "@/components/ui/Icons";
 
 function NavLink({ href, pathname, label }: { href: string; pathname: string; label: string }) {
   const isActive = pathname === href;
@@ -121,16 +120,6 @@ export default function TopNav({ locationName = "Detectando...", isNavOpen = fal
         className="flex h-full items-center gap-4 pl-3 pr-12"
         style={{ width: "min(90vw, 600px)" }}
       >
-        <Link
-          href="/"
-          className="flex shrink-0 items-center gap-2 transition-[opacity] duration-[160ms] ease-out-expo hover:opacity-80 active:scale-[0.97]"
-        >
-          <BoltIcon className="h-[18px] w-[18px] text-[var(--color-accent)]" />
-          <span className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">
-            FlareField
-          </span>
-        </Link>
-
         <div className="flex shrink-0 items-center gap-1.5">
           <NavLink href="/" pathname={pathname} label="Mapa" />
           <NavLink href="/reports" pathname={pathname} label="Reportes" />
@@ -154,7 +143,7 @@ export default function TopNav({ locationName = "Detectando...", isNavOpen = fal
 
       <button
         onClick={toggle}
-        className="absolute top-0 right-0 z-10 flex h-11 w-11 items-center justify-center transition-[background] duration-[160ms] ease-out-expo hover:bg-[rgba(255,255,255,0.04)] active:scale-[0.97]"
+        className="absolute top-1/2 right-0 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center transition-[background] duration-[160ms] ease-out-expo hover:bg-[rgba(255,255,255,0.04)] active:scale-[0.97]"
         aria-label={isNavOpen ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={isNavOpen}
       >

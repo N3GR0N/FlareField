@@ -62,7 +62,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
           <div className="flex items-center gap-3">
             <BoltIcon className="h-5 w-5 text-[var(--color-accent)]" />
             <div>
-              <h2 className="text-glass-title text-base font-semibold tracking-tight text-[var(--text-primary)] normal-case tracking-normal">FlareField</h2>
+              <h2 className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">FlareField</h2>
               <p className="text-glass-label">
                 {locationName}
               </p>

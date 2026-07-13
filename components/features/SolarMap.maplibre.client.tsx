@@ -295,6 +295,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
     if (!containerRef.current) return;
 
     let cancelled = false;
+    const preventContextMenu = (e: Event) => e.preventDefault();
 
     (async () => {
       try {
@@ -321,7 +322,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           pitch: camera.pitch,
           bearing: camera.bearing,
           antialias: true,
-          maxPitch: 80,
+          maxPitch: 0,
           minZoom: 2,
           maxZoom: 18,
           renderWorldCopies: true
@@ -341,12 +342,15 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             });
           }, 150);
 
-          // Enable interactions
-          if (!map.dragRotate.isEnabled()) map.dragRotate.enable();
-          if (!map.touchZoomRotate.isEnabled()) map.touchZoomRotate.enable();
+          // Disable right-click drag rotation and touch rotation — 2D only
+          map.dragRotate.disable();
+          map.touchZoomRotate.disableRotation();
           map.dragPan.enable();
           map.scrollZoom.enable();
           map.doubleClickZoom.enable();
+
+          // Prevent browser context menu on right-click over the map
+          container.addEventListener('contextmenu', preventContextMenu);
 
           mapRef.current = map;
         });
@@ -477,6 +481,9 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
 
     return () => {
       cancelled = true;
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('contextmenu', preventContextMenu);
+      }
       if (mapRef.current) {
         const overlay = document.querySelector('.maplibre-markers-overlay');
         overlay?.replaceChildren();
