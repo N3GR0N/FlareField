@@ -2,9 +2,16 @@
 
 import { useEffect, useState } from "react";
 import AlertChip from "@/components/ui/AlertChip";
-import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon, BoltIcon } from "@/components/ui/Icons";
+import BubbleCard from "@/components/ui/BubbleCard";
 
 type SolarCondition = "SEÑAL ESTABLE" | "KP ELEVADO" | "TORMENTA ACTIVA";
+
+const techIcons: Record<string, string> = {
+  "drones": "agriculture",
+  "wifi": "wifi",
+  "escuelas": "school",
+  "radio": "cell_tower",
+};
 
 export default function ZonePanel({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
   const [solarData, setSolarData] = useState<{
@@ -57,88 +64,104 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div className="bg-black/25 backdrop-blur-lg border border-white/10 rounded-[var(--radius-glass)] shadow-lg shadow-black/20 relative card-hover">
-        <div className="px-6 py-4">
-          <div className="flex items-center gap-3">
-            <BoltIcon className="h-5 w-5 text-[var(--color-accent)]" />
-            <div>
-              <h2 className="text-sm font-semibold tracking-tight text-[var(--text-primary)]">FlareField</h2>
-              <p className="text-glass-label">
-                {locationName}
-              </p>
-            </div>
+      <BubbleCard delay={0}>
+        <div className="flex items-center gap-3">
+          <span
+            className="material-symbols-outlined text-[20px]"
+            style={{ color: "var(--md-sys-color-primary)" }}
+          >
+            bolt
+          </span>
+          <div>
+            <h2 className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+              FlareField
+            </h2>
+            <p className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+              {locationName}
+            </p>
           </div>
         </div>
-      </div>
+      </BubbleCard>
 
       {/* KP Index */}
-      <div className="bg-black/25 backdrop-blur-lg border border-white/10 rounded-[var(--radius-glass)] shadow-lg shadow-black/20 relative card-hover">
-        <div className="p-6">
-          <div className="flex items-start justify-between gap-6">
-            <div className="flex-1">
-              <p className="mb-2 text-glass-label">
-                Kp Index
-              </p>
-              <div className="text-glass-value text-6xl">
-                {solarData.kpIndex}
-              </div>
-            </div>
-            <AlertChip variant={severityLevel}>
-              {solarData.condition}
-            </AlertChip>
-          </div>
-        </div>
-
-        <div className="h-px bg-[var(--glass-border)]" />
-
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <p className="text-glass-label">
-              PRÓXIMAS HORAS
+      <BubbleCard delay={1}>
+        <div className="flex items-start justify-between gap-6">
+          <div className="flex-1">
+            <p className="mb-2 text-label-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+              Kp Index
             </p>
-            <span className="text-glass-value text-base">
-              +3h
-            </span>
+            <div className="text-display-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+              {solarData.kpIndex}
+            </div>
           </div>
+          <AlertChip variant={severityLevel}>
+            {solarData.condition}
+          </AlertChip>
         </div>
-      </div>
+
+        <div className="md-divider my-4" />
+
+        <div className="flex items-center justify-between">
+          <p className="text-label-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+            PRÓXIMAS HORAS
+          </p>
+          <span className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+            +3h
+          </span>
+        </div>
+      </BubbleCard>
 
       {/* Tecnologías afectadas */}
-      <div className="bg-black/25 backdrop-blur-lg border border-white/10 rounded-[var(--radius-glass)] shadow-lg shadow-black/20 relative card-hover">
-        <div className="p-6">
-          <div className="mb-4">
-            <span className="text-glass-title">Tecnologías Afectadas</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {solarData.affectedTech.map((tech, i) => {
-              const Icon = tech.toLowerCase().includes('wifi') ? SatelliteIcon
-                : tech.toLowerCase().includes('escuelas') ? SchoolIcon
-                : tech.toLowerCase().includes('radio') ? RadioIcon
-                : DroneIcon;
-              return (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 rounded-[var(--radius-glass-sm)] border border-[var(--glass-border)] bg-[rgba(255,255,255,0.02)] px-3 py-2.5 tech-hover"
+      <BubbleCard delay={2}>
+        <div className="mb-4">
+          <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+            Tecnologías Afectadas
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {solarData.affectedTech.map((tech, i) => {
+            const iconKey = Object.keys(techIcons).find(k => tech.toLowerCase().includes(k));
+            const icon = iconKey ? techIcons[iconKey] : "devices";
+            return (
+              <div
+                key={i}
+                className="flex items-center gap-2 rounded-2xl border px-3 py-2.5 tech-hover"
+                style={{
+                  borderColor: "var(--md-sys-color-outline-variant)",
+                  background: "var(--md-sys-color-surface-container)",
+                }}
+              >
+                <span
+                  className="material-symbols-outlined text-[14px] shrink-0"
+                  style={{ color: "var(--md-sys-color-primary)" }}
                 >
-                  <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--color-accent)]" />
-                  <span className="text-xs text-[var(--text-secondary)] truncate">{tech}</span>
-                </div>
-              );
-            })}
-          </div>
+                  {icon}
+                </span>
+                <span className="text-body-small truncate" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                  {tech}
+                </span>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="h-px bg-[var(--glass-border)]" />
+        <div className="md-divider my-3" />
 
-        <button className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-b-[var(--radius-glass)] bg-transparent text-[0.65rem] font-medium uppercase tracking-[0.16em] text-[var(--color-accent)] transition-[transform,background] duration-[160ms] ease-out-expo hover:bg-[rgba(33,76,78,0.12)] active:scale-[0.97]">
+        <button
+          className="relative flex h-10 w-full items-center justify-center gap-2 overflow-hidden rounded-full transition-[background,transform] duration-200 active:scale-[0.97] alert-btn"
+          style={{
+            background: "transparent",
+            color: "var(--md-sys-color-primary)",
+            fontFamily: "var(--font-mono-stat), sans-serif",
+            fontSize: "11px",
+            fontWeight: 600,
+            letterSpacing: "0.06em",
+          }}
+        >
           Ver Alerta Completa
-          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-            <path d="M14 3h7v7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M10 14L21 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M21 21H3V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-          </svg>
+          <span className="material-symbols-outlined text-[16px]">open_in_new</span>
         </button>
-      </div>
+      </BubbleCard>
     </div>
   );
 }

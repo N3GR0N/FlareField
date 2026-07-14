@@ -43,7 +43,7 @@ export default function ZoneMarker({
       onClick={() => setPinned((value) => !value)}
     >
       <span className="zone-ripple-area" data-severity={severity} />
-      <div className="zone-ripple-tooltip pointer-events-none absolute bottom-[calc(100%+12px)] left-1/2 z-20 w-60 -translate-x-1/2 translate-y-2 scale-95 rounded-[var(--radius-glass)] border border-white/10 bg-black/25 px-4 py-3 text-left opacity-0 backdrop-blur-lg transition-all duration-300 shadow-lg shadow-black/20 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 data-[open=true]:translate-y-0 data-[open=true]:scale-100 data-[open=true]:opacity-100">
+      <div className="zone-ripple-tooltip pointer-events-none absolute bottom-[calc(100%+12px)] left-1/2 z-20 w-60 -translate-x-1/2 translate-y-2 scale-95 px-4 py-3 text-left opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 data-[open=true]:translate-y-0 data-[open=true]:scale-100 data-[open=true]:opacity-100 md-card-elevated">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="text-[0.78rem] font-semibold uppercase tracking-[0.26em] text-[var(--text-primary)]">
@@ -53,7 +53,7 @@ export default function ZoneMarker({
               {severityLabel}
             </div>
           </div>
-          <div className="mt-0.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)]">
+          <div className="mt-0.5 rounded-full border border-[var(--md-outline-variant)] bg-[var(--md-surface-container)] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[var(--md-on-surface-variant)]">
             {severity === "alta" ? "ALERTA" : "MEDIA"}
           </div>
         </div>

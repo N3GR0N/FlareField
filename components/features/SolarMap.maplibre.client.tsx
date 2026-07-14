@@ -426,7 +426,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             userMarker.style.left = '0';
             userMarker.style.top = '0';
             userMarker.style.transform = 'translate(-50%, -50%)';
-            userMarker.style.background = 'radial-gradient(circle, #4a9eff 0%, #0066cc 70%)';
+            userMarker.style.background = 'radial-gradient(circle, var(--md-sys-color-primary) 0%, var(--md-sys-color-primary-container) 70%)';
             userMarker.style.border = '2px solid white';
             userMarker.style.borderRadius = '50%';
             userMarker.style.zIndex = '5';

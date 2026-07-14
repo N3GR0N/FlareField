@@ -14,6 +14,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^1.16.0",
     "maplibre-gl": "^2.4.0",
+    "material": "github:material-esm/material",
     "motion": "^12.42.2",
     "next": "16.2.6",
     "react": "19.2.4",

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useCallback, useRef, useLayoutEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import TopNav from "@/components/layout/TopNav";
+import BottomNav from "@/components/layout/BottomNav";
 
 interface GlossaryEntry {
   id: string;
@@ -81,9 +82,9 @@ const glossaryData: GlossaryEntry[] = [
 ];
 
 const annotations: Annotation[] = [
-  { id: "kp",        label: "Escala de 0 a 9. Cuanto más\nalto, peor para tus equipos.",  cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.18 },
-  { id: "status",    label: "El estado actual de tu zona:\nestable, elevado o crítico.",     cardId: "storm",  elX: "left",  labelSide: "left",  labelYPct: -0.12 },
-  { id: "gauge",     label: "Muestra qué tan activo está el\ncampo magnético ahora mismo.", cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.38 },
+  { id: "kp",        label: "Escala de 0 a 9. Cuanto más\nalto, peor para tus equipos.",  cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.10 },
+  { id: "status",    label: "El estado actual de tu zona:\nestable, elevado o crítico.",     cardId: "storm",  elX: "left",  labelSide: "left",  labelYPct: -0.25 },
+  { id: "gauge",     label: "Muestra qué tan activo está el\ncampo magnético ahora mismo.", cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.46 },
   { id: "hours",     label: "Ventana de tiempo en que el\nefecto va a durar.",               cardId: "storm",  elX: "left",  labelSide: "left",  labelYPct: 0.82 },
   { id: "eventname", label: "El nombre del evento\ndetectado por la NASA.",                  cardId: "flare",  elX: "right", labelSide: "right", labelYPct: 0.02 },
   { id: "intensity", label: "La intensidad del evento.\nG y X son las más peligrosas.",      cardId: "flare",  elX: "right", labelSide: "right", labelYPct: 0.28 },
@@ -106,20 +107,19 @@ function DiagramCard({
   const isStorm = highlightedId === "status" || highlightedId === "hours";
   const isFlare = highlightedId === "eventname" || highlightedId === "intensity";
   const isNasa = highlightedId === "source";
-  const isTech = highlightedId === "tech";
 
-  const glow = "shadow-[0_0_20px_-3px_rgba(33,76,78,0.18)] border-[#214c4e]/25";
-  const noGlow = "border-[#c8bfb0]/50";
-  const elGlow = "bg-[#214c4e]/8 ring-1 ring-[#214c4e]/15";
+  const glow = "shadow-[0_0_20px_-3px_var(--md-sys-color-primary-container)] border-[var(--md-sys-color-primary)]/25";
+  const noGlow = "border-[var(--md-sys-color-outline-variant)]/50";
+  const elGlow = "bg-[var(--md-sys-color-primary)]/8 ring-1 ring-[var(--md-sys-color-primary)]/15";
   const elNoGlow = "";
 
   return (
     <div className="flex flex-col md:flex-row gap-5 justify-center">
       {/* ─── Monitoreo en Vivo ─── */}
-      <div className={`w-full md:w-[280px] rounded-2xl p-5 bg-white/80 border transition-all duration-300 ${isKp || isStorm ? glow : noGlow}`}>
+      <div className={`w-full md:w-[280px] p-5 glass-card-light transition-all duration-300 ${isKp || isStorm ? glow : noGlow}`}>
         <div className="flex items-center gap-2 mb-4">
-          <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#214c4e] animate-pulse" />
-          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#8a8279]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Monitoreo en Vivo</span>
+          <span className="inline-block h-[6px] w-[6px] rounded-full bg-[var(--md-sys-color-primary)] animate-pulse" />
+          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--md-sys-color-on-surface-variant)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Monitoreo en Vivo</span>
         </div>
         <div className="flex items-center gap-4">
           <div
@@ -129,8 +129,8 @@ function DiagramCard({
             onMouseLeave={onElementLeave}
           >
             <svg viewBox="0 0 120 120" className="w-full h-full" style={{ transform: "rotate(-90deg)" }}>
-              <circle fill="none" cx="60" cy="60" r="50" stroke="#e8e2d8" strokeWidth="5" />
-              <circle fill="none" cx="60" cy="60" r="50" stroke="#214c4e" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 50} strokeDashoffset={2 * Math.PI * 50 * 0.44} />
+              <circle fill="none" cx="60" cy="60" r="50" stroke="var(--md-sys-color-outline-variant)" strokeWidth="5" />
+              <circle fill="none" cx="60" cy="60" r="50" stroke="var(--md-sys-color-primary)" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 50} strokeDashoffset={2 * Math.PI * 50 * 0.44} />
             </svg>
             <div
               ref={refs.kp}
@@ -138,16 +138,16 @@ function DiagramCard({
               onMouseEnter={() => onElementEnter("kp")}
               onMouseLeave={onElementLeave}
             >
-              <span className="text-[28px] font-bold tracking-tight text-[#2b2520]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>4</span>
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[#8a8279]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Kp</span>
+              <span className="text-[28px] font-bold tracking-tight text-[var(--md-sys-color-on-surface)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>4</span>
+              <span className="text-[9px] uppercase tracking-[0.2em] text-[var(--md-sys-color-on-surface-variant)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Kp</span>
             </div>
           </div>
           <div className="flex flex-col gap-3 flex-1 min-w-0">
             <div>
-              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#8a8279] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Estado</div>
+              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--md-sys-color-on-surface-variant)] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Estado</div>
               <span
                 ref={refs.status}
-                className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] border-[#83706d]/30 bg-[#83706d]/8 text-[#6b5e5a] transition-all duration-200 cursor-pointer ${highlightedId === "status" ? "bg-[#214c4e]/10 border-[#214c4e]/25 text-[#214c4e] ring-1 ring-[#214c4e]/10" : ""}`}
+                className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] border-[var(--md-sys-color-outline)]/30 bg-[var(--md-sys-color-surface-container)] text-[var(--md-sys-color-on-surface-variant)] transition-all duration-200 cursor-pointer ${highlightedId === "status" ? "bg-[var(--md-sys-color-primary-container)] border-[var(--md-sys-color-primary)]/25 text-[var(--md-sys-color-on-primary-container)] ring-1 ring-[var(--md-sys-color-primary)]/10" : ""}`}
                 style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
                 onMouseEnter={() => onElementEnter("status")}
                 onMouseLeave={onElementLeave}
@@ -161,10 +161,10 @@ function DiagramCard({
               onMouseEnter={() => onElementEnter("hours")}
               onMouseLeave={onElementLeave}
             >
-              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#8a8279] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Próximas horas</div>
+              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--md-sys-color-on-surface-variant)] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Próximas horas</div>
               <div className="flex items-center gap-1.5">
-                <span className="inline-block h-[5px] w-[5px] rounded-full bg-[#214c4e] animate-pulse" />
-                <span className="text-[13px] text-[#5a524a]" style={{ fontFamily: "var(--font-body), sans-serif" }}>+3h</span>
+                <span className="inline-block h-[5px] w-[5px] rounded-full bg-[var(--md-sys-color-primary)] animate-pulse" />
+                <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant)]" style={{ fontFamily: "var(--font-body), sans-serif" }}>+3h</span>
               </div>
             </div>
           </div>
@@ -172,18 +172,18 @@ function DiagramCard({
       </div>
 
       {/* ─── Eventos Activos ─── */}
-      <div className={`w-full md:w-[280px] rounded-2xl p-5 bg-white/80 border transition-all duration-300 ${isFlare || isNasa ? glow : noGlow}`}>
+      <div className={`w-full md:w-[280px] p-5 glass-card-light transition-all duration-300 ${isFlare || isNasa ? glow : noGlow}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <span className="inline-block h-[6px] w-[6px] rounded-full bg-[#214c4e] animate-pulse" />
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#8a8279]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Eventos Activos</span>
+            <span className="inline-block h-[6px] w-[6px] rounded-full bg-[var(--md-sys-color-primary)] animate-pulse" />
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--md-sys-color-on-surface-variant)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Eventos Activos</span>
           </div>
         </div>
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="min-w-0">
             <div
               ref={refs.eventname}
-              className={`text-[14px] font-semibold text-[#2b2520] truncate rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "eventname" ? elGlow : elNoGlow}`}
+              className={`text-[14px] font-semibold text-[var(--md-sys-color-on-surface)] truncate rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "eventname" ? elGlow : elNoGlow}`}
               style={{ fontFamily: "var(--font-body), sans-serif" }}
               onMouseEnter={() => onElementEnter("eventname")}
               onMouseLeave={onElementLeave}
@@ -192,7 +192,7 @@ function DiagramCard({
             </div>
             <div
               ref={refs.source}
-              className={`text-[10px] font-medium uppercase tracking-[0.18em] text-[#8a8279] mt-0.5 rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "source" ? "bg-[#214c4e]/8 text-[#214c4e] ring-1 ring-[#214c4e]/15" : ""}`}
+              className={`text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--md-sys-color-on-surface-variant)] mt-0.5 rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "source" ? "bg-[var(--md-sys-color-primary-container)]/10 text-[var(--md-sys-color-primary)] ring-1 ring-[var(--md-sys-color-primary)]/15" : ""}`}
               style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
               onMouseEnter={() => onElementEnter("source")}
               onMouseLeave={onElementLeave}
@@ -203,26 +203,26 @@ function DiagramCard({
           <div className="flex items-center gap-2 shrink-0">
             <span
               ref={refs.intensity}
-              className={`text-[20px] font-bold tracking-tight text-[#2b2520] rounded px-1 transition-all duration-200 cursor-pointer ${highlightedId === "intensity" ? elGlow : elNoGlow}`}
+              className={`text-[20px] font-bold tracking-tight text-[var(--md-sys-color-on-surface)] rounded px-1 transition-all duration-200 cursor-pointer ${highlightedId === "intensity" ? elGlow : elNoGlow}`}
               style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
               onMouseEnter={() => onElementEnter("intensity")}
               onMouseLeave={onElementLeave}
             >
               G3
             </span>
-            <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] border-[#214c4e]/30 bg-[#214c4e]/10 text-[#214c4e]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+            <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] border-[var(--md-sys-color-primary)]/30 bg-[var(--md-sys-color-primary-container)]/20 text-[var(--md-sys-color-primary)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
               TORMENTA ACTIVA
             </span>
           </div>
         </div>
-        <div className="h-px bg-[#c8bfb0]/40 mb-3" />
+        <div className="h-px bg-[var(--md-sys-color-outline-variant)]/40 mb-3" />
         <div
           ref={refs.tech}
           className={`rounded-lg p-1 -m-1 transition-all duration-200 cursor-pointer ${highlightedId === "tech" ? elGlow : elNoGlow}`}
           onMouseEnter={() => onElementEnter("tech")}
           onMouseLeave={onElementLeave}
         >
-          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#8a8279] mb-2" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Tecnologías Afectadas</div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--md-sys-color-on-surface-variant)] mb-2" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Tecnologías Afectadas</div>
           <div className="grid grid-cols-2 gap-2">
             {[
               { icon: "M12 7a5 5 0 100 10 5 5 0 000-10zM4 4l4 4M20 4l-4 4M4 20l4-4M20 20l-4-4", label: "Drones" },
@@ -230,11 +230,11 @@ function DiagramCard({
               { icon: "M12 3l9 5-9 5-9-5 9-5zM3 10v7a2 2 0 002 2h14", label: "Escuela" },
               { icon: "M12 15a3 3 0 100-6 3 3 0 000 6zM4.93 4.93l14.14 14.14", label: "Radio" },
             ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-2 border border-[#c8bfb0]/40 rounded-xl px-3 py-2 bg-[#f7f3ed]/40">
-                <svg className="h-[14px] w-[14px] shrink-0 text-[#8a8279]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <div key={label} className="flex items-center gap-2 border border-[var(--md-sys-color-outline-variant)]/40 rounded-xl px-3 py-2 bg-[var(--md-sys-color-surface-container)]/40">
+                <svg className="h-[14px] w-[14px] shrink-0 text-[var(--md-sys-color-on-surface-variant)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d={icon} />
                 </svg>
-                <span className="text-[12px] text-[#5a524a] truncate" style={{ fontFamily: "var(--font-body), sans-serif" }}>{label}</span>
+                <span className="text-[12px] text-[var(--md-sys-color-on-surface-variant)] truncate" style={{ fontFamily: "var(--font-body), sans-serif" }}>{label}</span>
               </div>
             ))}
           </div>
@@ -245,34 +245,60 @@ function DiagramCard({
 }
 
 function GlossaryCard({
-  entry, isVisible, isHighlighted, onMouseEnter, onMouseLeave,
+  entry, isVisible, isHighlighted, onMouseEnter, onMouseLeave, reducedMotion,
 }: {
   entry: GlossaryEntry; isVisible: boolean; isHighlighted: boolean;
-  onMouseEnter: () => void; onMouseLeave: () => void;
+  onMouseEnter: () => void; onMouseLeave: () => void; reducedMotion: boolean;
 }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={`p-8 rounded-2xl transition-all duration-500 ease-out cursor-default ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-      } ${
-        isHighlighted
-          ? "bg-white shadow-[0_0_30px_-5px_rgba(33,76,78,0.15)] border border-[#214c4e]/20"
-          : "bg-white/70 border border-[#c8bfb0]/40 shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:bg-white hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)] hover:border-[#c8bfb0]/60"
-      }`}
+      onMouseEnter={() => { setIsHovered(true); onMouseEnter(); }}
+      onMouseLeave={() => { setIsHovered(false); onMouseLeave(); }}
+      className="glass-card-light p-8 cursor-default"
+        style={{
+          opacity: isVisible ? 1 : 0,
+          transform: isVisible
+            ? (isHovered ? "translateY(-3px)" : "translateY(0)")
+            : "translateY(16px)",
+          transition: reducedMotion ? "none" : "opacity 0.5s ease-out, transform 0.4s ease-out, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease",
+          backgroundColor: isHighlighted ? "var(--md-sys-color-surface-container-high)" : (isHovered ? "var(--md-sys-color-surface-container)" : undefined),
+          borderColor: isHighlighted ? "var(--md-sys-color-primary-container)" : (isHovered ? "var(--md-sys-color-outline-variant)" : undefined),
+          boxShadow: isHighlighted
+            ? "0 0 30px -5px var(--md-sys-color-primary-container), 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 var(--md-sys-color-surface-container-high), inset 0 0 8px 4px var(--md-sys-color-surface-container-high)"
+            : (isHovered ? "0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 var(--md-sys-color-surface-container-high), inset 0 0 8px 4px var(--md-sys-color-surface-container-high)" : undefined),
+        }}
     >
-      <span className="block text-[11px] text-[#b0a89e] mb-4" style={{ fontFamily: "var(--font-mono), monospace" }}>
+      <span
+        className="block text-[11px] mb-4"
+        style={{
+          fontFamily: "var(--font-mono), monospace",
+          color: isHovered ? "var(--md-sys-color-primary)" : "var(--md-sys-color-on-surface-variant)",
+          transition: reducedMotion ? "none" : "color 0.3s ease",
+        }}
+      >
         {entry.number}
       </span>
-      <h3 className="text-[15px] font-semibold text-[#2b2520] mb-4" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+      <h3 className="text-[15px] font-semibold text-[var(--md-sys-color-on-surface)] mb-4" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
         {entry.title}
       </h3>
-      <div className="h-px bg-[#c8bfb0]/40 mb-4" />
-      <p className="text-[15px] leading-[1.8] text-[#5a524a] mb-4" style={{ fontFamily: "var(--font-body), sans-serif" }}>
+      {/* Divider with sweep animation */}
+      <div className="relative h-px mb-4 overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: isHovered
+              ? "linear-gradient(90deg, var(--md-sys-color-primary) 0%, var(--md-sys-color-outline-variant) 100%)"
+              : "var(--md-sys-color-outline-variant)",
+            transition: reducedMotion ? "none" : "background 0.4s ease",
+          }}
+        />
+      </div>
+      <p className="text-[15px] leading-[1.8] text-[var(--md-sys-color-on-surface)] mb-4" style={{ fontFamily: "var(--font-body), sans-serif" }}>
         {entry.body}
       </p>
-      <p className="text-[13px] italic leading-relaxed text-[#8a8279]" style={{ fontFamily: "var(--font-body), sans-serif" }}>
+      <p className="text-[13px] italic leading-relaxed text-[var(--md-sys-color-on-surface-variant)]" style={{ fontFamily: "var(--font-body), sans-serif" }}>
         {entry.example}
       </p>
     </div>
@@ -285,21 +311,52 @@ export default function GlossaryPage() {
   const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [isDiagramVisible, setIsDiagramVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [positions, setPositions] = useState<Record<string, { cx: number; cy: number }>>({});
+  const [heroVisible, setHeroVisible] = useState(false);
+  const reducedMotion = useSyncExternalStore(
+    (callback) => {
+      const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+      mq.addEventListener("change", callback);
+      return () => mq.removeEventListener("change", callback);
+    },
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    () => false,
+  );
+  const [arrowsDrawn, setArrowsDrawn] = useState(false);
+  const [positions, setPositions] = useState<Record<string, { cx: number; cy: number; elLeft: number; elRight: number }>>({});
   const [labelPositions, setLabelPositions] = useState<Record<string, LabelPos>>({});
   const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [titleOpacity, setTitleOpacity] = useState(1);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
+  const elKp = useRef<HTMLDivElement | null>(null);
+  const elGauge = useRef<HTMLDivElement | null>(null);
+  const elStatus = useRef<HTMLDivElement | null>(null);
+  const elHours = useRef<HTMLDivElement | null>(null);
+  const elEventname = useRef<HTMLDivElement | null>(null);
+  const elIntensity = useRef<HTMLDivElement | null>(null);
+  const elSource = useRef<HTMLDivElement | null>(null);
+  const elTech = useRef<HTMLDivElement | null>(null);
+
+  const labelKp = useRef<HTMLDivElement | null>(null);
+  const labelGauge = useRef<HTMLDivElement | null>(null);
+  const labelStatus = useRef<HTMLDivElement | null>(null);
+  const labelHours = useRef<HTMLDivElement | null>(null);
+  const labelEventname = useRef<HTMLDivElement | null>(null);
+  const labelIntensity = useRef<HTMLDivElement | null>(null);
+  const labelSource = useRef<HTMLDivElement | null>(null);
+  const labelTech = useRef<HTMLDivElement | null>(null);
+
   const elRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
-    kp: useRef(null), gauge: useRef(null), status: useRef(null), hours: useRef(null),
-    eventname: useRef(null), intensity: useRef(null), source: useRef(null), tech: useRef(null),
+    kp: elKp, gauge: elGauge, status: elStatus, hours: elHours,
+    eventname: elEventname, intensity: elIntensity, source: elSource, tech: elTech,
   };
 
   const labelRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
-    kp: useRef(null), gauge: useRef(null), status: useRef(null), hours: useRef(null),
-    eventname: useRef(null), intensity: useRef(null), source: useRef(null), tech: useRef(null),
+    kp: labelKp, gauge: labelGauge, status: labelStatus, hours: labelHours,
+    eventname: labelEventname, intensity: labelIntensity, source: labelSource, tech: labelTech,
   };
 
   const handleAnnotationEnter = useCallback((id: string) => setHighlightedId(id), []);
@@ -317,6 +374,45 @@ export default function GlossaryPage() {
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Hero entrance animation
+  useEffect(() => {
+    if (reducedMotion) {
+      setHeroVisible(true);
+      return;
+    }
+    const timer = setTimeout(() => setHeroVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, [reducedMotion]);
+
+  // Arrow draw-in animation when diagram becomes visible
+  useEffect(() => {
+    if (isDiagramVisible && !reducedMotion) {
+      const timer = setTimeout(() => setArrowsDrawn(true), 300);
+      return () => clearTimeout(timer);
+    }
+    if (reducedMotion && isDiagramVisible) {
+      setArrowsDrawn(true);
+    }
+  }, [isDiagramVisible, reducedMotion]);
+
+  // Scroll progress indicator + title fade
+  useEffect(() => {
+    const onScroll = () => {
+      const docH = document.documentElement.scrollHeight;
+      const winH = window.innerHeight;
+      const y = window.scrollY;
+      const max = docH - winH;
+      setScrollProgress(max > 0 ? (y / max) * 100 : 0);
+      // title fade: fully visible 0–150, fade out 150–300
+      if (y <= 150) setTitleOpacity(1);
+      else if (y >= 300) setTitleOpacity(0);
+      else setTitleOpacity(1 - (y - 150) / 150);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // Measure all positions on mount and resize
@@ -363,7 +459,6 @@ export default function GlossaryPage() {
     measure();
 
     let raf: number;
-    const onResize = () => cancelAnimationFrame(raf);
     const resizeObs = new ResizeObserver(() => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(measure);
@@ -422,9 +517,9 @@ export default function GlossaryPage() {
 
     if (ann.id === "status") {
       const cp1x = startX - 25;
-      const cp1y = startY - 50;
+      const cp1y = startY - 55;
       const cp2x = endX + 20;
-      const cp2y = endY + 30;
+      const cp2y = endY + 40;
       return {
         ...ann,
         path: `M${startX},${startY} C${cp1x},${cp1y} ${cp2x},${cp2y} ${endX},${endY}`,
@@ -525,36 +620,112 @@ export default function GlossaryPage() {
   }).filter(Boolean) as Array<Annotation & { path: string }>;
 
   return (
-    <div className="relative min-h-screen" style={{ background: "#f7f3ed", color: "#2b2520" }}>
+    <>
+      {/* ─── Scroll Progress Bar ─── */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: `${scrollProgress}%`,
+          height: "2px",
+          background: "var(--md-sys-color-primary)",
+          zIndex: 100,
+          transition: "width 0.1s linear",
+        }}
+      />
+
+      {/* ─── FlareField Hero Title (fixed top-left, matching map page) ─── */}
+      <div
+        className="pointer-events-none max-w-xl md:left-8 lg:left-12"
+        style={{ position: "fixed", top: 0, left: "0.5rem", zIndex: 50, opacity: titleOpacity, pointerEvents: titleOpacity === 0 ? "none" : undefined }}
+      >
+        <p
+          className="text-glass-kicker mb-3"
+          style={{
+            color: "var(--md-sys-color-on-surface-variant)",
+            opacity: heroVisible ? 1 : 0,
+            transform: heroVisible ? "translateY(0)" : "translateY(12px)",
+            transition: reducedMotion ? "none" : "opacity 0.6s ease-out 0.1s, transform 0.6s ease-out 0.1s",
+          }}
+        >
+          Monitoreo espacial en tiempo real
+        </p>
+        <h1
+          className="text-glass-hero text-5xl md:text-6xl lg:text-7xl"
+          style={{
+            color: "var(--md-sys-color-on-surface)",
+            opacity: heroVisible ? 1 : 0,
+            transform: heroVisible ? "translateY(0)" : "translateY(16px)",
+            transition: reducedMotion ? "none" : "opacity 0.7s ease-out, transform 0.7s ease-out",
+          }}
+        >
+          FlareField
+        </h1>
+      </div>
+
+      <div className="relative min-h-screen" style={{ background: "var(--md-sys-color-background)", color: "var(--md-sys-color-on-surface)" }}>
+      {/* ─── Background Texture ─── */}
+      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
+        {/* Dot grid pattern */}
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle, var(--md-sys-color-outline-variant) 0.8px, transparent 0.8px)", backgroundSize: "24px 24px", opacity: 0.3 }} />
+        {/* Warm blurred organic shapes */}
+        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full" style={{ background: "radial-gradient(circle, var(--md-sys-color-tertiary-container) 0%, transparent 70%)", opacity: 0.15, filter: "blur(80px)" }} />
+        <div className="absolute top-1/3 -right-24 w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, var(--md-sys-color-primary-container) 0%, transparent 70%)", opacity: 0.12, filter: "blur(100px)" }} />
+        <div className="absolute bottom-20 left-1/4 w-[350px] h-[350px] rounded-full" style={{ background: "radial-gradient(circle, var(--md-sys-color-tertiary-container) 0%, transparent 70%)", opacity: 0.15, filter: "blur(90px)" }} />
+      </div>
+
       <TopNav isNavOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
+      <BottomNav />
 
       <main className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-12">
         {/* ─── Hero ─── */}
-        <section className="pt-[120px] pb-20 text-center">
-          <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[#8a8279] mb-6" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
-            Guía de referencia
-          </p>
-          <h1 className="text-5xl sm:text-6xl md:text-7xl font-light text-[#2b2520] tracking-tight mb-6" style={{ fontFamily: "var(--font-display), Georgia, serif" }}>
+        <section className="pt-[100px] pb-20 text-center">
+          <h2
+            className="text-6xl sm:text-7xl md:text-[96px] font-light text-[var(--md-sys-color-on-surface)] tracking-tight mb-6"
+            style={{
+              fontFamily: "var(--font-display), Georgia, serif",
+              opacity: heroVisible ? 1 : 0,
+              transform: heroVisible ? "translateY(0)" : "translateY(16px)",
+              transition: reducedMotion ? "none" : "opacity 0.7s ease-out 0.1s, transform 0.7s ease-out 0.1s",
+            }}
+          >
             Glosario
-          </h1>
-          <p className="mx-auto max-w-md text-[15px] leading-relaxed text-[#8a8279]" style={{ fontFamily: "var(--font-body), sans-serif" }}>
+          </h2>
+          <p
+            className="mx-auto max-w-md text-[15px] leading-relaxed text-[var(--md-sys-color-on-surface-variant)]"
+            style={{
+              fontFamily: "var(--font-body), sans-serif",
+              opacity: heroVisible ? 1 : 0,
+              transform: heroVisible ? "translateY(0)" : "translateY(10px)",
+              transition: reducedMotion ? "none" : "opacity 0.6s ease-out 0.25s, transform 0.6s ease-out 0.25s",
+            }}
+          >
             Entendé qué afecta tu tecnología y cuándo actuar.
           </p>
+          {/* Decorative rule */}
+          <div
+            className="mx-auto mt-8 h-px bg-[var(--md-sys-color-outline-variant)]/50"
+            style={{
+              width: heroVisible ? "120px" : "0px",
+              transition: reducedMotion ? "none" : "width 0.8s ease-out 0.4s",
+            }}
+          />
         </section>
 
         {/* ─── Mobile: Simple list ─── */}
         {isMobile && (
           <section className="pb-16">
-            <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[#8a8279] mb-6 text-center" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+            <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--md-sys-color-on-surface-variant)] mb-6 text-center" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
               Qué estás viendo en el mapa
             </p>
             <div className="space-y-3">
               {glossaryData.map((entry) => (
-                <div key={entry.id} className="flex items-start gap-3 py-3 border-b border-[#c8bfb0]/30 last:border-0">
-                  <span className="text-[11px] text-[#b0a89e] mt-0.5 shrink-0" style={{ fontFamily: "var(--font-mono), monospace" }}>{entry.number}</span>
+                <div key={entry.id} className="flex items-start gap-3 py-3 border-b border-[var(--md-sys-color-outline-variant)]/30 last:border-0">
+                  <span className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] mt-0.5 shrink-0" style={{ fontFamily: "var(--font-mono), monospace" }}>{entry.number}</span>
                   <div className="min-w-0">
-                    <div className="text-[14px] font-semibold text-[#2b2520]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>{entry.title}</div>
-                    <p className="text-[13px] text-[#8a8279] mt-0.5" style={{ fontFamily: "var(--font-body), sans-serif" }}>{entry.summary}</p>
+                    <div className="text-[14px] font-semibold text-[var(--md-sys-color-on-surface)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>{entry.title}</div>
+                    <p className="text-[13px] text-[var(--md-sys-color-on-surface-variant)] mt-0.5" style={{ fontFamily: "var(--font-body), sans-serif" }}>{entry.summary}</p>
                   </div>
                 </div>
               ))}
@@ -568,11 +739,31 @@ export default function GlossaryPage() {
             id="diagram-section"
             className={`pb-24 transition-all duration-700 ease-out ${isDiagramVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
-            <p className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[#8a8279] mb-12" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+            <p
+              className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--md-sys-color-on-surface-variant)] mb-12 flex items-center justify-center gap-3"
+              style={{
+                fontFamily: "var(--font-mono-stat), sans-serif",
+                opacity: isDiagramVisible ? 1 : 0,
+                transition: reducedMotion ? "none" : "opacity 0.6s ease-out",
+              }}
+            >
+              <span className="inline-block w-5 h-px bg-[var(--md-sys-color-outline-variant)]/60" />
               Qué estás viendo en el mapa
+              <span className="inline-block w-5 h-px bg-[var(--md-sys-color-outline-variant)]/60" />
             </p>
 
             <div ref={containerRef} className="relative px-[170px]">
+              {/* Soft warm glow behind cards */}
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full pointer-events-none"
+                style={{
+                  background: "radial-gradient(ellipse, var(--md-sys-color-tertiary-container) 0%, transparent 70%)",
+                  opacity: isDiagramVisible ? 0.15 : 0,
+                  filter: "blur(60px)",
+                  transition: reducedMotion ? "none" : "opacity 1s ease-out",
+                }}
+                aria-hidden="true"
+              />
               {/* SVG overlay — coordinates = DOM pixels relative to this container */}
               {containerSize.w > 0 && (
                 <svg
@@ -585,15 +776,15 @@ export default function GlossaryPage() {
                   aria-label="Diagrama anotado que explica los elementos de las tarjetas de monitoreo"
                 >
                   <defs>
-                    <marker id="ah" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                      <path d="M 0,0 L 8,3 L 0,6 Z" fill="#8a8279" opacity="0.7" />
+                    <marker id="ah" viewBox="0 0 10 7" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="var(--md-sys-color-on-surface-variant)" />
                     </marker>
-                    <marker id="ah-active" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-                      <path d="M 0,0 L 8,3 L 0,6 Z" fill="#214c4e" opacity="0.9" />
+                    <marker id="ah-active" viewBox="0 0 10 7" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                      <polygon points="0 0, 10 3.5, 0 7" fill="var(--md-sys-color-primary)" />
                     </marker>
                   </defs>
 
-                  {arrowPaths.map((ann) => (
+                  {arrowPaths.map((ann, idx) => (
                     <g
                       key={ann.id}
                       className="pointer-events-auto cursor-pointer"
@@ -602,16 +793,24 @@ export default function GlossaryPage() {
                     >
                       {/* Invisible wide hit area */}
                       <path d={ann.path} fill="none" stroke="transparent" strokeWidth="16" />
-                      {/* Visible arrow */}
+                      {/* Visible arrow with draw-in animation */}
                       <path
                         d={ann.path}
                         fill="none"
-                        stroke={highlightedId === ann.id ? "#214c4e" : "#8a8279"}
+                        stroke={highlightedId === ann.id ? "var(--md-sys-color-primary)" : "var(--md-sys-color-on-surface-variant)"}
                         strokeWidth={highlightedId === ann.id ? "1.8" : "1.2"}
                         strokeLinecap="round"
                         markerEnd={highlightedId === ann.id ? "url(#ah-active)" : "url(#ah)"}
                         opacity={highlightedId === ann.id ? "0.9" : "0.45"}
-                        style={{ transition: "all 0.3s ease" }}
+                        style={{
+                          transition: "all 0.3s ease",
+                          strokeDasharray: reducedMotion ? "none" : "1000",
+                          strokeDashoffset: arrowsDrawn ? "0" : "1000",
+                          transitionProperty: "stroke-dashoffset, stroke, strokeWidth, opacity",
+                          transitionDuration: reducedMotion ? "0s" : "0.8s, 0.3s, 0.3s, 0.3s",
+                          transitionTimingFunction: "ease-out, ease, ease, ease",
+                          transitionDelay: reducedMotion ? "0s" : `${idx * 0.15}s, 0s, 0s, 0s`,
+                        }}
                       />
                     </g>
                   ))}
@@ -619,12 +818,17 @@ export default function GlossaryPage() {
               )}
 
               {/* Left annotation labels */}
-              {annotations.filter((a) => a.labelSide === "left").map((ann) => (
+              {annotations.filter((a) => a.labelSide === "left").map((ann, idx) => (
                 <div
                   key={`lbl-${ann.id}`}
                   ref={labelRefs[ann.id]}
                   className="absolute left-0 w-[150px] text-right cursor-pointer"
-                  style={{ top: `${ann.labelYPct * 100}%`, transform: "translateY(-50%)" }}
+                  style={{
+                    top: `${ann.labelYPct * 100}%`,
+                    transform: "translateY(-50%)",
+                    opacity: arrowsDrawn ? 1 : 0,
+                    transition: reducedMotion ? "none" : `opacity 0.5s ease-out ${0.8 + idx * 0.15}s`,
+                  }}
                   onMouseEnter={() => handleAnnotationEnter(ann.id)}
                   onMouseLeave={handleAnnotationLeave}
                 >
@@ -632,7 +836,7 @@ export default function GlossaryPage() {
                     <span
                       key={i}
                       className={`block text-[12px] italic leading-snug transition-all duration-300 ${
-                        highlightedId === ann.id ? "text-[#214c4e] opacity-100" : "text-[#5a524a] opacity-70"
+                        highlightedId === ann.id ? "text-[var(--md-sys-color-primary)] opacity-100" : "text-[var(--md-sys-color-on-surface-variant)] opacity-70"
                       }`}
                       style={{ fontFamily: "var(--font-body), sans-serif" }}
                     >
@@ -643,12 +847,17 @@ export default function GlossaryPage() {
               ))}
 
               {/* Right annotation labels */}
-              {annotations.filter((a) => a.labelSide === "right").map((ann) => (
+              {annotations.filter((a) => a.labelSide === "right").map((ann, idx) => (
                 <div
                   key={`lbl-${ann.id}`}
                   ref={labelRefs[ann.id]}
                   className="absolute right-0 w-[150px] cursor-pointer"
-                  style={{ top: `${ann.labelYPct * 100}%`, transform: "translateY(-50%)" }}
+                  style={{
+                    top: `${ann.labelYPct * 100}%`,
+                    transform: "translateY(-50%)",
+                    opacity: arrowsDrawn ? 1 : 0,
+                    transition: reducedMotion ? "none" : `opacity 0.5s ease-out ${0.8 + idx * 0.15}s`,
+                  }}
                   onMouseEnter={() => handleAnnotationEnter(ann.id)}
                   onMouseLeave={handleAnnotationLeave}
                 >
@@ -656,7 +865,7 @@ export default function GlossaryPage() {
                     <span
                       key={i}
                       className={`block text-[12px] italic leading-snug transition-all duration-300 ${
-                        highlightedId === ann.id ? "text-[#214c4e] opacity-100" : "text-[#5a524a] opacity-70"
+                        highlightedId === ann.id ? "text-[var(--md-sys-color-primary)] opacity-100" : "text-[var(--md-sys-color-on-surface-variant)] opacity-70"
                       }`}
                       style={{ fontFamily: "var(--font-body), sans-serif" }}
                     >
@@ -679,8 +888,17 @@ export default function GlossaryPage() {
 
         {/* ─── Glossary Cards ─── */}
         <section className="pb-24">
-          <p className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[#8a8279] mb-8" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+          <p
+            className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--md-sys-color-on-surface-variant)] mb-8 flex items-center justify-center gap-3"
+            style={{
+              fontFamily: "var(--font-mono-stat), sans-serif",
+              opacity: visibleCards.size > 0 ? 1 : 0,
+              transition: reducedMotion ? "none" : "opacity 0.6s ease-out",
+            }}
+          >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--md-sys-color-outline-variant)]/60" />
             Términos clave
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--md-sys-color-outline-variant)]/60" />
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {glossaryData.map((entry) => (
@@ -691,6 +909,7 @@ export default function GlossaryPage() {
                   isHighlighted={highlightedCardId === entry.id}
                   onMouseEnter={() => handleCardEnter(entry.id)}
                   onMouseLeave={handleCardLeave}
+                  reducedMotion={reducedMotion}
                 />
               </div>
             ))}
@@ -698,11 +917,11 @@ export default function GlossaryPage() {
         </section>
 
         {/* ─── Footer ─── */}
-        <footer className="text-center py-12 border-t border-[#c8bfb0]/40">
-          <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[#8a8279] mb-6" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+        <footer className="text-center py-12 border-t border-[var(--md-sys-color-outline-variant)]/40">
+          <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--md-sys-color-on-surface-variant)] mb-6" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
             © 2026 FlareField
           </p>
-          <Link href="/" className="inline-flex items-center gap-2 text-[13px] text-[#8a8279] hover:text-[#2b2520] transition-colors duration-150" style={{ fontFamily: "var(--font-body), sans-serif" }}>
+          <Link href="/" className="inline-flex items-center gap-2 text-[13px] text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)] transition-colors duration-150" style={{ fontFamily: "var(--font-body), sans-serif" }}>
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
@@ -711,5 +930,6 @@ export default function GlossaryPage() {
         </footer>
       </main>
     </div>
+    </>
   );
 }

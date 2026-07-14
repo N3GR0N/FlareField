@@ -3,12 +3,19 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import AlertChip from "@/components/ui/AlertChip";
-import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon } from "@/components/ui/Icons";
+import BubbleCard from "@/components/ui/BubbleCard";
 
 type SolarCondition = "SEÑAL ESTABLE" | "KP ELEVADO" | "TORMENTA ACTIVA";
 type EventSeverity = "green" | "yellow" | "orange" | "red";
 
 const KP_CIRCUMFERENCE = 2 * Math.PI * 50;
+
+const techIcons: Record<string, string> = {
+  "drones": "agriculture",
+  "wifi": "wifi",
+  "escuelas": "school",
+  "radio": "cell_tower",
+};
 
 export default function MonitoringPanel({ userLocation, showOnlyKp = false, showOnlyEvent = false }: { userLocation: { lat: number; lng: number; name: string } | null; showOnlyKp?: boolean; showOnlyEvent?: boolean }) {
   const [solarData, setSolarData] = useState<{
@@ -122,160 +129,181 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
   return (
     <div className="flex flex-col gap-5 w-[380px] pointer-events-auto">
       {!showOnlyEvent && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          layout
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="bg-black/25 backdrop-blur-lg border border-white/10 rounded-[var(--radius-glass)] shadow-lg shadow-black/20 relative card-hover"
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2.5">
-                <motion.span
-                  className="live-dot"
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        <BubbleCard delay={0}>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2.5">
+              <motion.span
+                className="live-dot"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                Monitoreo en Vivo
+              </span>
+            </div>
+            <span className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+              {locationName}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-8">
+            <div className="kp-gauge">
+              <svg viewBox="0 0 120 120" className="w-full h-full">
+                <defs>
+                  <linearGradient id="kpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="var(--md-sys-color-primary)" />
+                    <stop offset="100%" stopColor="var(--md-sys-color-tertiary)" />
+                  </linearGradient>
+                </defs>
+                <circle fill="none" className="kp-gauge-track" cx="60" cy="60" r="50" />
+                <circle
+                  fill="none"
+                  className="kp-gauge-fill"
+                  cx="60" cy="60" r="50"
+                  stroke="url(#kpGradient)"
+                  strokeDasharray={KP_CIRCUMFERENCE}
+                  strokeDashoffset={dashOffset}
                 />
-                <span className="text-glass-title">Monitoreo en Vivo</span>
+              </svg>
+              <div className="kp-gauge-value">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={solarData.kpIndex}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-title-large"
+                    style={{ color: "var(--md-sys-color-on-surface)" }}
+                  >
+                    {solarData.kpIndex}
+                  </motion.span>
+                </AnimatePresence>
+                <span className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>Kp</span>
               </div>
-              <span className="text-glass-label">{locationName}</span>
             </div>
 
-            <div className="flex items-center gap-8">
-              <div className="kp-gauge">
-                <svg viewBox="0 0 120 120" className="w-full h-full">
-                  <defs>
-                    <linearGradient id="kpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#214c4e" />
-                      <stop offset="100%" stopColor="#284863" />
-                    </linearGradient>
-                  </defs>
-                  <circle fill="none" className="kp-gauge-track" cx="60" cy="60" r="50" />
-                  <circle
-                    fill="none"
-                    className="kp-gauge-fill"
-                    cx="60" cy="60" r="50"
-                    stroke="url(#kpGradient)"
-                    strokeDasharray={KP_CIRCUMFERENCE}
-                    strokeDashoffset={dashOffset}
-                  />
-                </svg>
-                <div className="kp-gauge-value">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={solarData.kpIndex}
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                      className="text-3xl font-bold font-mono tracking-tight text-[var(--text-primary)]"
-                    >
-                      {solarData.kpIndex}
-                    </motion.span>
-                  </AnimatePresence>
-                  <span className="text-[0.5rem] uppercase tracking-[0.25em] text-[var(--text-muted)] mt-0.5">Kp</span>
-                </div>
+            <div className="flex flex-col gap-4">
+              <div>
+                <div className="text-label-small mb-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>Estado</div>
+                <AlertChip variant={severityLevel}>
+                  {solarData.condition}
+                </AlertChip>
               </div>
-
-              <div className="flex flex-col gap-4">
-                <div>
-                  <div className="text-glass-label mb-1">Estado</div>
-                  <AlertChip variant={severityLevel}>
-                    {solarData.condition}
-                  </AlertChip>
-                </div>
-                <div>
-                  <div className="text-glass-label mb-1">Actualizado</div>
-                  <div className="text-sm text-[var(--text-secondary)]">{updatedTime}</div>
-                </div>
-                <div>
-                  <div className="text-glass-label mb-1">Próximas horas</div>
-                  <div className="flex items-center gap-1.5">
-                    <motion.span
-                      className="live-dot"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                    <span className="text-sm text-[var(--text-secondary)]">+3h</span>
-                  </div>
+              <div>
+                <div className="text-label-small mb-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>Actualizado</div>
+                <div className="text-body-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>{updatedTime}</div>
+              </div>
+              <div>
+                <div className="text-label-small mb-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>Próximas horas</div>
+                <div className="flex items-center gap-1.5">
+                  <motion.span
+                    className="live-dot"
+                    animate={{ opacity: [0.5, 1, 0.5] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <span className="text-body-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>+3h</span>
                 </div>
               </div>
             </div>
           </div>
-        </motion.div>
+        </BubbleCard>
       )}
 
       {!showOnlyKp && (
-        <div className="bg-black/25 backdrop-blur-lg border border-white/10 rounded-[var(--radius-glass)] shadow-lg shadow-black/20 relative card-hover animate-glass-in"
-          style={{ animationDelay: '100ms' }}
-        >
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-2.5">
-                <span className="live-dot" />
-                <span className="text-glass-title">Eventos Activos</span>
-              </div>
-              <span className="text-glass-label">{eventTime}</span>
+        <BubbleCard delay={1}>
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-2.5">
+              <span className="live-dot" />
+              <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                Eventos Activos
+              </span>
             </div>
+            <span className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+              {eventTime}
+            </span>
+          </div>
 
-            <div className="flex items-center justify-between gap-3 mb-5">
-              <div className="min-w-0">
-                <div className="text-sm font-semibold text-[var(--text-primary)] truncate">{event.type}</div>
-                <div className="text-glass-label mt-0.5 truncate">{event.source}</div>
+          <div className="flex items-center justify-between gap-3 mb-5">
+            <div className="min-w-0">
+              <div className="text-body-large font-semibold truncate" style={{ color: "var(--md-sys-color-on-surface)" }}>
+                {event.type}
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-glass-value text-lg">{event.class}</span>
-                <AlertChip variant={chipVariant}>
-                  {chipLabel}
-                </AlertChip>
+              <div className="text-label-small mt-0.5 truncate" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                {event.source}
               </div>
             </div>
-
-            <div className="h-px bg-[var(--glass-border)] mb-5" />
-
-            <div className="mb-4">
-              <span className="text-glass-title">Tecnologías Afectadas</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {solarData.affectedTech.map((tech, i) => {
-                const Icon = tech.toLowerCase().includes('wifi') ? SatelliteIcon
-                  : tech.toLowerCase().includes('escuelas') ? SchoolIcon
-                  : tech.toLowerCase().includes('radio') ? RadioIcon
-                  : DroneIcon;
-                return (
-                  <div key={i} className="flex items-center gap-2 rounded-[var(--radius-glass-sm)] border border-[var(--glass-border)] bg-[rgba(255,255,255,0.02)] px-3 py-2.5 tech-hover">
-                    <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--color-accent)]" />
-                    <span className="text-xs text-[var(--text-secondary)] truncate">{tech}</span>
-                  </div>
-                );
-              })}
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+                {event.class}
+              </span>
+              <AlertChip variant={chipVariant}>
+                {chipLabel}
+              </AlertChip>
             </div>
           </div>
 
-          <div className="h-px bg-[var(--glass-border)]" />
+          <div className="md-divider mb-5" />
+
+          <div className="mb-4">
+            <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+              Tecnologías Afectadas
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {solarData.affectedTech.map((tech, i) => {
+              const iconKey = Object.keys(techIcons).find(k => tech.toLowerCase().includes(k));
+              const icon = iconKey ? techIcons[iconKey] : "devices";
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 rounded-2xl border px-3 py-2.5 tech-hover"
+                  style={{
+                    borderColor: "var(--md-sys-color-outline-variant)",
+                    background: "var(--md-sys-color-surface-container)",
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined text-[14px] shrink-0"
+                    style={{ color: "var(--md-sys-color-primary)" }}
+                  >
+                    {icon}
+                  </span>
+                  <span className="text-body-small truncate" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                    {tech}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="md-divider mt-4 mb-3" />
 
           <button
             onClick={() => { setRippleActive(true); setTimeout(() => setRippleActive(false), 400); }}
-            className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-b-[var(--radius-glass)] bg-transparent text-[0.65rem] font-medium uppercase tracking-[0.16em] text-[var(--color-accent)] transition-[transform,background] duration-[160ms] ease-out-expo hover:bg-[rgba(33,76,78,0.12)] active:scale-[0.97]"
+            className="relative flex h-10 w-full items-center justify-center gap-2 overflow-hidden rounded-full transition-[background,transform] duration-200 active:scale-[0.97] alert-btn"
+            style={{
+              background: "transparent",
+              color: "var(--md-sys-color-primary)",
+              fontFamily: "var(--font-mono-stat), sans-serif",
+              fontSize: "11px",
+              fontWeight: 600,
+              letterSpacing: "0.06em",
+            }}
           >
             {rippleActive && (
               <motion.span
-                className="absolute inset-0 bg-[var(--color-accent)]/10"
+                className="absolute inset-0"
+                style={{ background: "var(--md-sys-color-primary-container)" }}
                 initial={{ scale: 0, opacity: 0.5 }}
                 animate={{ scale: 2.5, opacity: 0 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                style={{ borderRadius: "50%", left: "50%", top: "50%", width: 40, height: 40, transform: "translate(-50%, -50%)" }}
               />
             )}
             Ver Alerta Completa
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-              <path d="M14 3h7v7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M10 14L21 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M21 21H3V3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-            </svg>
+            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
           </button>
-        </div>
+        </BubbleCard>
       )}
     </div>
   );

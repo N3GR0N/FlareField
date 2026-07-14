@@ -7,7 +7,7 @@ import L from "leaflet";
 import { Zone } from "@/types/solar";
 import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon } from "@/components/ui/Icons";
 
-const ACCENT = "#214c4e";
+const ACCENT = "var(--md-sys-color-primary)";
 
 function ContextMenuBlocker() {
   const map = useMap();
@@ -72,7 +72,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
   }, [userLocation]);
 
   return (
-    <div className="relative h-[calc(100vh-4rem)] w-full nrg-map-base">
+    <div className="relative h-[calc(100vh-3rem)] w-full nrg-map-base">
       <div className="absolute inset-0 overflow-hidden">
         <div className="relative h-full w-full overflow-hidden">
           <MapContainer
@@ -94,51 +94,46 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             {zones.map(zone => (
               <Marker key={zone.id} position={[zone.lat, zone.lng]} icon={getZoneIcon(zone.severity)}>
                 <Popup>
-                  <div className="bg-black/25 backdrop-blur-lg border border-white/10 rounded-[var(--radius-glass)] shadow-lg shadow-black/20 p-6 min-w-[280px]">
-                    <div className="font-sans text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] mb-4">{zone.name}</div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: ACCENT, opacity: severityOpacity[zone.severity] }} />
-                      <span className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)]">
-                        {zone.severity === 'green' ? 'SEÑAL ESTABLE' : zone.severity === 'yellow' ? 'KP ELEVADO' : zone.severity === 'orange' ? 'TORMENTA ACTIVA' : 'TORMENTA CRÍTICA'}
-                      </span>
-                    </div>
-                    <div className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)] mb-3">Tecnologías afectadas:</div>
-                    <div className="flex flex-wrap gap-2 text-xs mb-4">
-                      {zone.affectedTech.map(tech => {
-                        let Icon = DroneIcon;
-                        if (tech.toLowerCase().includes('wifi')) Icon = SatelliteIcon;
-                        if (tech.toLowerCase().includes('escuela')) Icon = SchoolIcon;
-                        if (tech.toLowerCase().includes('radio')) Icon = RadioIcon;
-
-                          return (
-                             <span key={tech} className="flex items-center gap-2 rounded-[var(--radius-glass-sm)] border border-white/[0.08] bg-[rgba(11,15,25,0.9)] px-3 py-2">
-                              <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--color-accent)]" />
-                              <span className="text-xs text-[var(--text-muted)] truncate">{tech}</span>
-                            </span>
-                          );
-                      })}
-                    </div>
-                    <div className="text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Actualizado hace 2 min</div>
+                  <div className="popup-zone-name">{zone.name}</div>
+                  <div style={{ marginBottom: "16px" }}>
+                    <span className={`popup-status-badge severity-${zone.severity}`}>
+                      <span style={{ width: "6px", height: "6px", borderRadius: "9999px", backgroundColor: ACCENT, opacity: severityOpacity[zone.severity] }} />
+                      {zone.severity === 'green' ? 'SEÑAL ESTABLE' : zone.severity === 'yellow' ? 'KP ELEVADO' : zone.severity === 'orange' ? 'TORMENTA ACTIVA' : 'TORMENTA CRÍTICA'}
+                    </span>
                   </div>
+                  <div className="popup-section-label">Tecnologías afectadas:</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "16px" }}>
+                    {zone.affectedTech.map(tech => {
+                      let Icon = DroneIcon;
+                      if (tech.toLowerCase().includes('wifi')) Icon = SatelliteIcon;
+                      if (tech.toLowerCase().includes('escuela')) Icon = SchoolIcon;
+                      if (tech.toLowerCase().includes('radio')) Icon = RadioIcon;
+
+                      return (
+                        <span key={tech} className="popup-tech-chip">
+                          <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--md-sys-color-primary)]" />
+                          <span>{tech}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div className="popup-timestamp">Actualizado hace 2 min</div>
                 </Popup>
 
               </Marker>
             ))}
 
             {userLocation && (
-              <Marker position={[userLocation.lat, userLocation.lng]} icon={new L.DivIcon({ html: `<div class="relative w-6 h-6 flex items-center justify-center"><div style="width:10px;height:10px;border-radius:9999px;border:2px solid rgba(40,54,85,0.4);background:rgba(40,54,85,0.15)"></div></div>`, iconSize: [12,12], iconAnchor: [6,6] })}>
+              <Marker position={[userLocation.lat, userLocation.lng]} icon={new L.DivIcon({ html: `<div class="relative w-6 h-6 flex items-center justify-center"><div style="width:10px;height:10px;border-radius:9999px;border:2px solid rgba(168,196,232,0.4);background:rgba(168,196,232,0.15)"></div></div>`, iconSize: [12,12], iconAnchor: [6,6] })}>
                 <Popup>
-                  <div className="text-sm">
-                    <div className="font-mono text-xs uppercase tracking-wider text-[var(--text-primary)]">Tu ubicación</div>
-                    <div className="mt-1 text-xs text-[var(--text-secondary)]">{userLocation.name}</div>
-                  </div>
+                  <div className="popup-user-location">Tu ubicación</div>
+                  <div className="popup-user-location-name">{userLocation.name}</div>
                 </Popup>
               </Marker>
             )}
 
             <div className="absolute inset-0 pointer-events-none">
-              {zones.slice(0,3).map((zone,index) => {
-                const nextZone = zones[(index+1)%zones.length];
+              {zones.slice(0,3).map((zone, index) => {
                 // Simple line without problematic transform calculations
                 const isNearby = Math.abs(zone.lat - (-38.0)) < 5 && Math.abs(zone.lng - (-64.0)) < 5;
 
@@ -149,7 +144,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
                          top: `calc(${(90 - zone.lat) * 2}%)`,
                          width: '4px',
                          height: '4px',
-                           backgroundColor: "#214c4e",
+                               backgroundColor: "var(--md-sys-color-primary)",
                          opacity: 0.25,
                          borderRadius: '2px'
                        }} />
@@ -162,10 +157,10 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
       </div>
 
       {!userLocation && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-bg)]">
+        <div className="absolute inset-0 flex items-center justify-center" style={{ background: "var(--md-sys-color-background)" }}>
           <div className="text-center space-y-4">
-            <div className="h-6 w-6 rounded-full border-2 border-[var(--glass-border)]"></div>
-            <p className="text-xs uppercase tracking-[0.14em] text-[var(--text-primary)]">Detectando tu ubicación...</p>
+            <div className="h-6 w-6 rounded-full border-2" style={{ borderColor: "var(--md-sys-color-outline-variant)" }}></div>
+            <p style={{ fontFamily: "var(--font-mono-stat), sans-serif", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--md-sys-color-on-surface)" }}>Detectando tu ubicación...</p>
           </div>
         </div>
       )}
