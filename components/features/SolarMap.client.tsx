@@ -1,13 +1,17 @@
 "use client";
 
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import 'leaflet/dist/leaflet.css';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Zone } from "@/types/solar";
 import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon } from "@/components/ui/Icons";
 
 const ACCENT = "var(--md-sys-color-primary)";
+
+const getLightTileUrl = () => 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const getDarkTileUrl = () => 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+const TILE_ATTR = '&copy; <a href="https://carto.com">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 function ContextMenuBlocker() {
   const map = useMap();
@@ -20,17 +24,58 @@ function ContextMenuBlocker() {
   return null;
 }
 
+function ThemeAwareLayer() {
+  const map = useMap();
+  const mapRef = useRef(map);
+  mapRef.current = map;
+
+  const updateTileLayer = (isDark: boolean) => {
+    console.log('Updating tiles, isDark:', isDark)
+    if (!mapRef.current) return
+    
+    const url = isDark 
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+    
+    mapRef.current.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer) {
+        mapRef.current!.removeLayer(layer)
+      }
+    })
+    
+    L.tileLayer(url, {
+      attribution: '© <a href="https://carto.com">CARTO</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    }).addTo(mapRef.current)
+  }
+
+  useEffect(() => {
+    updateTileLayer(document.documentElement.getAttribute('data-theme') === 'dark')
+
+    const observer = new MutationObserver(() => {
+      updateTileLayer(document.documentElement.getAttribute('data-theme') === 'dark')
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [map])
+
+  return null
+}
+
 const severityOpacity: Record<Zone['severity'], string> = {
-  green: "0.3",
-  yellow: "0.5",
-  orange: "0.75",
+  green: "0.55",
+  yellow: "0.65",
+  orange: "0.8",
   red: "1",
 };
 
 const getZoneIcon = (severity: Zone['severity']) => {
   const opacity = severityOpacity[severity];
   const icon = new L.DivIcon({
-    html: `<div class="relative w-6 h-6 flex items-center justify-center"><div style="width:8px;height:8px;border-radius:9999px;background:${ACCENT};opacity:${opacity};border:1.5px solid rgba(255,255,255,0.3)"></div></div>`,
+    html: `<div class="relative w-6 h-6 flex items-center justify-center"><div style="width:8px;height:8px;border-radius:9999px;background:${ACCENT};opacity:${opacity};border:1.5px solid rgba(255,255,255,0.8)"></div></div>`,
     className: "",
     iconSize: [12, 12],
     iconAnchor: [6, 6],
@@ -86,22 +131,23 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             className="absolute inset-0"
           >
             <ContextMenuBlocker />
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+            <ThemeAwareLayer />
 
             {zones.map(zone => (
               <Marker key={zone.id} position={[zone.lat, zone.lng]} icon={getZoneIcon(zone.severity)}>
                 <Popup>
-                  <div className="popup-zone-name">{zone.name}</div>
+                  <div className="text-title-medium mb-3" style={{ color: "var(--md-sys-color-on-surface)" }}>
+                    {zone.name}
+                  </div>
                   <div style={{ marginBottom: "16px" }}>
                     <span className={`popup-status-badge severity-${zone.severity}`}>
                       <span style={{ width: "6px", height: "6px", borderRadius: "9999px", backgroundColor: ACCENT, opacity: severityOpacity[zone.severity] }} />
                       {zone.severity === 'green' ? 'SEÑAL ESTABLE' : zone.severity === 'yellow' ? 'KP ELEVADO' : zone.severity === 'orange' ? 'TORMENTA ACTIVA' : 'TORMENTA CRÍTICA'}
                     </span>
                   </div>
-                  <div className="popup-section-label">Tecnologías afectadas:</div>
+                  <div className="text-label-medium mb-3" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                    Tecnologías afectadas
+                  </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "16px" }}>
                     {zone.affectedTech.map(tech => {
                       let Icon = DroneIcon;
@@ -117,7 +163,9 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
                       );
                     })}
                   </div>
-                  <div className="popup-timestamp">Actualizado hace 2 min</div>
+                  <div className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+                    Actualizado hace 2 min
+                  </div>
                 </Popup>
 
               </Marker>
@@ -126,8 +174,12 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             {userLocation && (
               <Marker position={[userLocation.lat, userLocation.lng]} icon={new L.DivIcon({ html: `<div class="relative w-6 h-6 flex items-center justify-center"><div style="width:10px;height:10px;border-radius:9999px;border:2px solid rgba(168,196,232,0.4);background:rgba(168,196,232,0.15)"></div></div>`, iconSize: [12,12], iconAnchor: [6,6] })}>
                 <Popup>
-                  <div className="popup-user-location">Tu ubicación</div>
-                  <div className="popup-user-location-name">{userLocation.name}</div>
+                  <div className="text-label-medium uppercase tracking-widest" style={{ color: "var(--md-sys-color-on-surface)" }}>
+                    Tu ubicación
+                  </div>
+                  <div className="text-body-medium mt-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                    {userLocation.name}
+                  </div>
                 </Popup>
               </Marker>
             )}

@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
-import { gsap } from "gsap";
+import { useEffect, useState, useCallback } from "react";
 import TopNav from "@/components/layout/TopNav";
 import BottomNav from "@/components/layout/BottomNav";
 import SolarMap from "@/components/features/SolarMap";
@@ -11,8 +10,6 @@ export default function Home() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
-  const titleRef = useRef<HTMLDivElement>(null);
-  const titleReady = useRef(false);
 
   const [locationError, setLocationError] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
@@ -70,25 +67,12 @@ export default function Home() {
     ? "Ubicación no disponible"
     : userLocation?.name ?? "Detectando...";
 
-  useLayoutEffect(() => {
-    if (!titleRef.current || titleReady.current) return;
-    titleReady.current = true;
-
-    gsap.set(titleRef.current, { opacity: 0, y: 12 });
-    gsap.to(titleRef.current, {
-      opacity: 1,
-      y: 0,
-      duration: 0.7,
-      ease: "power3.out",
-    });
-  }, []);
-
   const openPanel = useCallback(() => setPanelOpen(true), []);
   const closePanel = useCallback(() => setPanelOpen(false), []);
 
   return (
     <div
-      className="min-h-screen overflow-hidden"
+      className="min-h-screen overflow-hidden pt-20"
       style={{ background: "var(--md-sys-color-background)" }}
     >
       {/* Map background */}
@@ -99,33 +83,8 @@ export default function Home() {
       <TopNav locationName={locationLabel} isNavOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
       <BottomNav />
 
-      {/* Hero text — below navbar, compact */}
-      <div
-        ref={titleRef}
-        className="fixed left-4 top-[64px] z-20 max-w-md pointer-events-none md:left-8 lg:left-12"
-      >
-        <p
-          className="text-kicker mb-2 drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]"
-          style={{ color: "var(--md-sys-color-outline)" }}
-        >
-          Monitoreo espacial en tiempo real
-        </p>
-        <h1
-          className="text-display-medium text-4xl md:text-5xl lg:text-6xl drop-shadow-[0_4px_20px_rgba(0,0,0,0.7)]"
-          style={{ fontFamily: "var(--font-display), serif" }}
-        >
-          FlareField
-        </h1>
-        <p
-          className="mt-3 max-w-sm text-body-medium leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
-          style={{ color: "var(--md-sys-color-on-surface-variant)" }}
-        >
-          Monitoreo espacial para operaciones críticas con una lectura limpia, precisa y en tiempo real.
-        </p>
-      </div>
-
       {/* Desktop: floating monitoring panel */}
-      <div className="hidden md:block fixed right-8 bottom-24 z-30 max-h-[calc(100vh-10rem)] overflow-y-auto pointer-events-none">
+      <div className="hidden md:block fixed right-8 bottom-12 z-30 max-h-[calc(100vh-10rem)] overflow-y-auto pointer-events-none">
         <MonitoringPanel userLocation={userLocation} />
       </div>
 
@@ -154,10 +113,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="fixed bottom-6 left-1/2 z-10 -translate-x-1/2 md:bottom-6 bottom-20 md:bottom-6">
-        <span
-          className="text-label-small"
-          style={{ color: "var(--md-sys-color-on-surface-variant)" }}
-        >
+        <span className="text-label-small text-neutral-400 dark:text-neutral-600">
           © 2026 FlareField
         </span>
       </footer>

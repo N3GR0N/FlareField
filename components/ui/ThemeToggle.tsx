@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function ThemeToggle() {
+  const [mounted, setMounted] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">(() => {
     if (typeof window === "undefined") return "dark";
     const saved = localStorage.getItem("flarefield-theme") as "dark" | "light" | null;
@@ -16,12 +17,23 @@ export default function ThemeToggle() {
     return initial;
   });
 
+  useEffect(() => { setMounted(true); }, []);
+
   const toggle = useCallback(() => {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem("flarefield-theme", next);
   }, [theme]);
+
+  if (!mounted) {
+    return (
+      <button
+        className="relative flex h-8 w-8 items-center justify-center rounded-full transition-[background] duration-200 ease-out-expo hover:bg-[var(--md-sys-color-surface-container-high)] active:scale-[0.97]"
+        aria-label="Toggle theme"
+      />
+    );
+  }
 
   return (
     <button

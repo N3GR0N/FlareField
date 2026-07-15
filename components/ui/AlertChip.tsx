@@ -7,24 +7,24 @@ interface AlertChipProps {
 
 const variantStyles = {
   stable: {
-    borderColor: "var(--md-sys-color-outline)",
-    backgroundColor: "rgba(142, 144, 153, 0.12)",
-    color: "var(--md-sys-color-on-surface-variant)",
+    borderColor: "var(--chip-stable-border)",
+    backgroundColor: "var(--chip-stable-bg)",
+    color: "var(--chip-stable-text)",
   },
   elevated: {
-    borderColor: "var(--md-sys-color-tertiary)",
-    backgroundColor: "rgba(122, 168, 163, 0.12)",
-    color: "var(--md-sys-color-tertiary)",
+    borderColor: "var(--chip-warning-border)",
+    backgroundColor: "var(--chip-warning-bg)",
+    color: "var(--chip-warning-text)",
   },
   active: {
-    borderColor: "var(--md-sys-color-secondary)",
-    backgroundColor: "rgba(155, 184, 217, 0.16)",
-    color: "var(--md-sys-color-secondary)",
+    borderColor: "var(--chip-warning-border)",
+    backgroundColor: "var(--chip-warning-bg)",
+    color: "var(--chip-warning-text)",
   },
   critical: {
-    borderColor: "var(--md-sys-color-error)",
-    backgroundColor: "rgba(255, 180, 171, 0.16)",
-    color: "var(--md-sys-color-error)",
+    borderColor: "var(--chip-critical-border)",
+    backgroundColor: "var(--chip-critical-bg)",
+    color: "var(--chip-critical-text)",
   },
 };
 

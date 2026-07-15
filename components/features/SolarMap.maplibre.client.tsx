@@ -308,7 +308,13 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         const container = containerRef.current;
         if (!container) return;
 
-        const styleUrl = process.env.NEXT_PUBLIC_MAP_STYLE || 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+        // Get theme-appropriate style URL
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const styleUrl = isDark
+          ? 'https://api.maptiler.com/maps/streets-v2-dark/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY
+          : 'https://api.maptiler.com/maps/dataviz/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY;
+        console.log('Tile URL:', styleUrl);
+        
         const camera = getCameraPreset();
 
         markerRootsRef.current.forEach((root) => root.unmount());
@@ -341,6 +347,14 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
               }
             });
           }, 150);
+
+          // Apply initial map filter based on current theme
+          const initialIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          if (containerRef.current) {
+            containerRef.current.style.filter = initialIsDark
+              ? 'saturate(0.65) hue-rotate(40deg) brightness(0.85) contrast(1.02)'
+              : 'saturate(0.75) hue-rotate(40deg) brightness(1.03) contrast(0.94)';
+          }
 
           // Disable right-click drag rotation and touch rotation — 2D only
           map.dragRotate.disable();
@@ -430,7 +444,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             userMarker.style.border = '2px solid white';
             userMarker.style.borderRadius = '50%';
             userMarker.style.zIndex = '5';
-            userMarker.style.boxShadow = '0 0 12px rgba(74, 158, 255, 0.6)';
+            userMarker.style.boxShadow = '0 0 12px rgba(201, 106, 42, 0.6)';
             userMarker.style.pointerEvents = 'auto';
             overlay.appendChild(userMarker);
           }
@@ -472,6 +486,31 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         } else {
           map.once('idle', addMarkersToOverlay);
         }
+
+        // Theme change handler
+        const handleThemeChange = () => {
+          if (!map || !map.loaded()) return;
+          console.log('OBSERVER FIRED - data-theme:', document.documentElement.getAttribute('data-theme'));
+          const newIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          console.log('UPDATING MAP STYLE to:', newIsDark ? 'dark' : 'light');
+          const newStyleUrl = newIsDark
+            ? 'https://api.maptiler.com/maps/streets-v2-dark/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY
+            : 'https://api.maptiler.com/maps/dataviz/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY;
+          
+          if (map && map.getStyle && map.getStyle()) {
+            map.setStyle(newStyleUrl);
+          }
+
+          // Update map container CSS filter for palette shift
+          if (containerRef.current) {
+            containerRef.current.style.filter = newIsDark
+              ? 'saturate(0.65) hue-rotate(40deg) brightness(0.85) contrast(1.02)'
+              : 'saturate(0.75) hue-rotate(40deg) brightness(1.03) contrast(0.94)';
+          }
+        };
+
+        const observer = new MutationObserver(handleThemeChange);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
       
       } catch {
         // maplibre not installed or failed to load — warn but don't throw
@@ -575,7 +614,8 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           right: 0,
           bottom: 0,
           width: '100%',
-          height: '100%'
+          height: '100%',
+          filter: 'saturate(0.65) hue-rotate(40deg) brightness(0.85) contrast(1.02)',
         }} 
       />
       

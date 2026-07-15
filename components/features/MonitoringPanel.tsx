@@ -243,7 +243,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
             </div>
           </div>
 
-          <div className="md-divider mb-5" />
+          <div className="md-divider my-6" />
 
           <div className="mb-4">
             <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
@@ -269,7 +269,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
                   >
                     {icon}
                   </span>
-                  <span className="text-body-small truncate" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                  <span className="text-body-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
                     {tech}
                   </span>
                 </div>
@@ -277,7 +277,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
             })}
           </div>
 
-          <div className="md-divider mt-4 mb-3" />
+          <div className="md-divider mt-6 mb-8" />
 
           <button
             onClick={() => { setRippleActive(true); setTimeout(() => setRippleActive(false), 400); }}
