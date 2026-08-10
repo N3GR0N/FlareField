@@ -46,11 +46,11 @@ export default {
         },
       },
       fontFamily: {
-        display: ['var(--font-serif)', 'Georgia', 'serif'],
-        body: ['var(--font-sans)', 'Rethink Sans', 'system-ui', 'sans-serif'],
-        label: ['var(--font-sans)', 'Rethink Sans', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        body: ['var(--font-body)', 'system-ui', 'sans-serif'],
+        label: ['var(--font-body)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'ui-monospace', 'monospace'],
-        'Mono-Stat': ['var(--font-mono-stat)', 'Space Grotesk', 'ui-monospace', 'monospace'],
+        'Mono-Stat': ['var(--font-mono-stat)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         glass: '1.25rem',

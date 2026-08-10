@@ -1,46 +1,23 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Rethink_Sans, Playfair_Display, Space_Grotesk, Cormorant_Garamond, Work_Sans, DM_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Cormorant_Garamond } from 'next/font/google';
 
-const rethinkSans = Rethink_Sans({
+const geistSans = Geist({
   subsets: ['latin'],
-  weight: ['400','500','600','700'],
   variable: '--font-sans',
   display: 'swap'
 });
 
-const playfair = Playfair_Display({
+const geistMono = Geist_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-serif',
-  display: 'swap'
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-mono-stat',
+  variable: '--font-mono',
   display: 'swap'
 });
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-display',
-  display: 'swap'
-});
-
-const workSans = Work_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-body',
-  display: 'swap'
-});
-
-const dmMono = DM_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-mono',
+  weight: ['500', '600'],
+  variable: '--font-wordmark',
   display: 'swap'
 });
 
@@ -58,7 +35,7 @@ export default function RootLayout({
     <html
       lang="es"
       data-theme="dark"
-      className={`h-full antialiased ${rethinkSans.variable} ${playfair.variable} ${spaceGrotesk.variable} ${cormorant.variable} ${workSans.variable} ${dmMono.variable}`}
+      className={`h-full antialiased ${geistSans.variable} ${geistMono.variable} ${cormorant.variable}`}
       suppressHydrationWarning
     >
       <head>

@@ -22,7 +22,7 @@ function NavLink({
           : 'text-[var(--primary-300)] dark:text-[var(--primary-700)]'
       }`}
       style={{
-        fontFamily: "'Space Grotesk', var(--font-mono-stat), sans-serif",
+        fontFamily: "var(--font-mono-stat), sans-serif",
       }}
       aria-current={isActive ? "page" : undefined}
     >
@@ -51,18 +51,25 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const isCompact = isScrolled && !isNavOpen;
+
   return (
     <div className="fixed top-0 left-0 w-full z-[100]" style={{ height: 0 }}>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2">
+      <div className="absolute top-5 left-1/2 -translate-x-1/2">
         <motion.nav
-          className="relative"
+          className="notch-nav relative"
           style={{
             minWidth: isMobile ? 'auto' : '480px',
             width: 'min-content',
-            borderRadius: '0 0 20px 20px',
-            background: 'var(--background-100)',
-            filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.15))',
-            transformOrigin: 'top center',
           }}
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -72,16 +79,27 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
             damping: 30,
           }}
         >
-          <div
+          <motion.div
             className="relative flex items-center gap-3"
-            style={{ padding: '8px 24px 10px 24px' }}
+            initial={false}
+            animate={{
+              padding: isCompact
+                ? '6px 20px 6px 20px'
+                : '8px 24px 10px 24px',
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 260,
+              damping: 28,
+              mass: 0.9,
+            }}
           >
             {/* FlareField wordmark — desktop only */}
             <Link href="/" className="max-[900px]:hidden flex items-center shrink-0">
               <span
                 className="text-[var(--primary-200)] dark:text-[var(--primary-800)]"
                 style={{
-                  fontFamily: "'Cormorant Garamond', var(--font-serif), serif",
+                  fontFamily: "var(--font-wordmark), 'Cormorant Garamond', Georgia, serif",
                   fontSize: '22px',
                   fontWeight: 600,
                   lineHeight: 1,
@@ -131,7 +149,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
                 />
               </button>
             </div>
-          </div>
+          </motion.div>
 
           {/* Mobile dropdown menu */}
           {isNavOpen && (
@@ -141,34 +159,6 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
               <NavLink href="/glossary" pathname={pathname} label="Glosario" />
             </div>
           )}
-
-          {/* Left ear — inverse corner curve via mask */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: 0,
-              right: '100%',
-              width: '28px',
-              height: '20px',
-              background: 'var(--background-100)',
-              maskImage: 'radial-gradient(14px circle at 100% 100%, transparent 14px, black 14px)',
-              WebkitMaskImage: 'radial-gradient(14px circle at 100% 100%, transparent 14px, black 14px)',
-            }}
-          />
-
-          {/* Right ear — inverse corner curve via mask */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: 0,
-              left: '100%',
-              width: '28px',
-              height: '20px',
-              background: 'var(--background-100)',
-              maskImage: 'radial-gradient(14px circle at 0% 100%, transparent 14px, black 14px)',
-              WebkitMaskImage: 'radial-gradient(14px circle at 0% 100%, transparent 14px, black 14px)',
-            }}
-          />
         </motion.nav>
       </div>
     </div>

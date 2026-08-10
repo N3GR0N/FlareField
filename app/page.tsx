@@ -84,7 +84,7 @@ export default function Home() {
       <BottomNav />
 
       {/* Desktop: floating monitoring panel */}
-      <div className="hidden md:block fixed right-8 bottom-12 z-30 max-h-[calc(100vh-10rem)] overflow-y-auto pointer-events-none">
+      <div className="hidden md:block fixed right-8 bottom-12 z-30 w-[398px] max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-clip pointer-events-none flex flex-col items-end">
         <MonitoringPanel userLocation={userLocation} />
       </div>
 
@@ -95,7 +95,7 @@ export default function Home() {
         style={{
           background: "var(--md-sys-color-primary-container)",
           color: "var(--md-sys-color-on-primary-container)",
-          boxShadow: "var(--md-sys-elevation-3)",
+          boxShadow: "var(--shadow-elevated)",
         }}
         aria-label="Abrir panel de monitoreo"
       >

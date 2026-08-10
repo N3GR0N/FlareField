@@ -46,10 +46,12 @@ export default function ZoneMarker({
       <div
         className="zone-ripple-tooltip pointer-events-none absolute bottom-[calc(100%+12px)] left-1/2 z-20 w-64 -translate-x-1/2 translate-y-2 scale-95 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 data-[open=true]:translate-y-0 data-[open=true]:scale-100 data-[open=true]:opacity-100"
         style={{
-          background: "var(--background-100)",
-          borderRadius: "var(--md-sys-shape-extra-large)",
-          border: "1px solid var(--md-sys-color-outline-variant)",
-          boxShadow: "var(--md-sys-elevation-3)",
+          background: "var(--glass-bg)",
+          backdropFilter: "var(--glass-blur)",
+          WebkitBackdropFilter: "var(--glass-blur)",
+          borderRadius: "var(--radius-md)",
+          border: "1px solid var(--glass-border)",
+          boxShadow: "var(--shadow-elevated)",
           padding: "24px",
         }}
       >
