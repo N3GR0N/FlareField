@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Menu, Bell } from "lucide-react";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 function NavLink({
@@ -128,9 +129,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
               onClick={() => setIsNavOpen(!isNavOpen)}
               aria-label="Abrir menú"
             >
-              <span className="material-symbols-outlined text-[18px] text-[var(--primary-300)] dark:text-[var(--primary-700)]">
-                menu
-              </span>
+              <Menu size={18} className="text-[var(--primary-300)] dark:text-[var(--primary-700)]" />
             </button>
 
             {/* Right side */}
@@ -140,9 +139,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
                 className="relative flex h-8 w-8 items-center justify-center rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--primary-800)] dark:hover:bg-[var(--primary-200)]"
                 aria-label="Alertas"
               >
-                <span className="material-symbols-outlined text-[18px] text-[var(--primary-300)] dark:text-[var(--primary-700)]">
-                  notifications
-                </span>
+                <Bell size={18} className="text-[var(--primary-300)] dark:text-[var(--primary-700)]" />
                 <span
                   className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full"
                   style={{ background: 'var(--md-sys-color-error)' }}

@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useCallback } from "react";
+import { X } from "lucide-react";
 
 interface SlidePanelProps {
   isOpen: boolean;
@@ -62,12 +63,7 @@ export default function SlidePanel({ isOpen, onClose, title, children }: SlidePa
             className="flex h-10 w-10 items-center justify-center rounded-full transition-[background] duration-200 hover:bg-[var(--md-sys-color-surface-container-high)] active:scale-[0.97] ml-auto"
             aria-label="Cerrar panel"
           >
-            <span
-              className="material-symbols-outlined text-[20px]"
-              style={{ color: "var(--md-sys-color-on-surface)" }}
-            >
-              close
-            </span>
+            <X size={20} style={{ color: "var(--md-sys-color-on-surface)" }} />
           </button>
         </div>
 

@@ -2,12 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BookOpen, FileText, Map } from "lucide-react";
 
 const tabs = [
   { href: "/", label: "Mapa", icon: "map" },
   { href: "/reports", label: "Reportes", icon: "description" },
   { href: "/glossary", label: "Glosario", icon: "menu_book" },
 ];
+
+const tabIcons: Record<string, typeof Map> = {
+  map: Map,
+  description: FileText,
+  menu_book: BookOpen,
+};
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -24,6 +31,7 @@ export default function BottomNav() {
       <div className="flex items-center justify-around h-16 px-2">
         {tabs.map((tab) => {
           const isActive = pathname === tab.href;
+          const TabIcon = tabIcons[tab.icon];
           return (
             <Link
               key={tab.href}
@@ -38,17 +46,16 @@ export default function BottomNav() {
                   style={{ background: "var(--md-sys-color-secondary-container)" }}
                 />
               )}
-              <span
-                className="material-symbols-outlined text-[24px] relative z-10 transition-colors duration-200"
+              <TabIcon
+                size={24}
+                fill={isActive ? "currentColor" : "none"}
+                className="relative z-10 transition-colors duration-200"
                 style={{
                   color: isActive
                     ? "var(--md-sys-color-on-surface)"
                     : "var(--md-sys-color-on-surface-variant)",
-                  fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0",
                 }}
-              >
-                {tab.icon}
-              </span>
+              />
               <span
                 className="text-[12px] font-medium relative z-10 transition-colors duration-200"
                 style={{

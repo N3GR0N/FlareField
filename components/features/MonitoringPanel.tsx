@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { ExternalLink, MonitorSmartphone, RadioTower, School, Wheat, Wifi, type LucideIcon } from "lucide-react";
 import AlertChip from "@/components/ui/AlertChip";
 import BubbleCard from "@/components/ui/BubbleCard";
 
@@ -10,11 +11,11 @@ type EventSeverity = "green" | "yellow" | "orange" | "red";
 
 const KP_CIRCUMFERENCE = 2 * Math.PI * 50;
 
-const techIcons: Record<string, string> = {
-  "drones": "agriculture",
-  "wifi": "wifi",
-  "escuelas": "school",
-  "radio": "cell_tower",
+const techIcons: Record<string, LucideIcon> = {
+  "drones": Wheat,
+  "wifi": Wifi,
+  "escuelas": School,
+  "radio": RadioTower,
 };
 
 export default function MonitoringPanel({ userLocation, showOnlyKp = false, showOnlyEvent = false }: { userLocation: { lat: number; lng: number; name: string } | null; showOnlyKp?: boolean; showOnlyEvent?: boolean }) {
@@ -253,7 +254,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
           <div className="grid grid-cols-2 gap-2">
             {solarData.affectedTech.map((tech, i) => {
               const iconKey = Object.keys(techIcons).find(k => tech.toLowerCase().includes(k));
-              const icon = iconKey ? techIcons[iconKey] : "devices";
+              const Icon = iconKey ? techIcons[iconKey] : MonitorSmartphone;
               return (
                 <div
                   key={i}
@@ -263,12 +264,11 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
                     background: "var(--md-sys-color-surface-container)",
                   }}
                 >
-                  <span
-                    className="material-symbols-outlined text-[14px] shrink-0"
+                  <Icon
+                    size={14}
+                    className="shrink-0"
                     style={{ color: "var(--md-sys-color-primary)" }}
-                  >
-                    {icon}
-                  </span>
+                  />
                   <span className="text-body-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
                     {tech}
                   </span>
@@ -301,7 +301,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
               />
             )}
             Ver Alerta Completa
-            <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+            <ExternalLink size={16} />
           </button>
         </BubbleCard>
       )}

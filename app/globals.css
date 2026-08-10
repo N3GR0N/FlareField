@@ -792,22 +792,6 @@ md-navigation-tab {
   --md-navigation-tab-inactive-label-text-color: var(--md-sys-color-on-surface-variant);
 }
 
-md-icon {
-  font-family: 'Material Symbols Outlined';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: normal;
-  text-transform: none;
-  display: inline-block;
-  white-space: nowrap;
-  word-wrap: normal;
-  direction: ltr;
-  font-feature-settings: 'liga';
-  -webkit-font-smoothing: antialiased;
-}
-
 /* ─── Divider ─── */
 .md-divider {
   height: 1px;

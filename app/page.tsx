@@ -6,6 +6,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import SolarMap from "@/components/features/SolarMap";
 import MonitoringPanel from "@/components/features/MonitoringPanel";
 import SlidePanel from "@/components/features/SlidePanel";
+import { LayoutDashboard } from "lucide-react";
 export default function Home() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -99,7 +100,7 @@ export default function Home() {
         }}
         aria-label="Abrir panel de monitoreo"
       >
-        <span className="material-symbols-outlined text-[24px]">dashboard</span>
+        <LayoutDashboard size={24} />
       </button>
 
       {/* Slide-out panel for mobile / zone details */}

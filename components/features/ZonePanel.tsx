@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ExternalLink, MonitorSmartphone, RadioTower, School, Wheat, Wifi, Zap, type LucideIcon } from "lucide-react";
 import AlertChip from "@/components/ui/AlertChip";
 import BubbleCard from "@/components/ui/BubbleCard";
 
 type SolarCondition = "SEÑAL ESTABLE" | "KP ELEVADO" | "TORMENTA ACTIVA";
 
-const techIcons: Record<string, string> = {
-  "drones": "agriculture",
-  "wifi": "wifi",
-  "escuelas": "school",
-  "radio": "cell_tower",
+const techIcons: Record<string, LucideIcon> = {
+  "drones": Wheat,
+  "wifi": Wifi,
+  "escuelas": School,
+  "radio": RadioTower,
 };
 
 export default function ZonePanel({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
@@ -66,12 +67,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
       {/* Header */}
       <BubbleCard delay={0}>
         <div className="flex items-center gap-3">
-          <span
-            className="material-symbols-outlined text-[20px]"
-            style={{ color: "var(--md-sys-color-primary)" }}
-          >
-            bolt
-          </span>
+          <Zap size={20} style={{ color: "var(--md-sys-color-primary)" }} />
           <div>
             <h2 className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
               FlareField
@@ -121,7 +117,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
         <div className="grid grid-cols-2 gap-2">
           {solarData.affectedTech.map((tech, i) => {
             const iconKey = Object.keys(techIcons).find(k => tech.toLowerCase().includes(k));
-            const icon = iconKey ? techIcons[iconKey] : "devices";
+            const Icon = iconKey ? techIcons[iconKey] : MonitorSmartphone;
             return (
               <div
                 key={i}
@@ -131,12 +127,11 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
                   background: "var(--md-sys-color-surface-container)",
                 }}
               >
-                <span
-                  className="material-symbols-outlined text-[14px] shrink-0"
+                <Icon
+                  size={14}
+                  className="shrink-0"
                   style={{ color: "var(--md-sys-color-primary)" }}
-                >
-                  {icon}
-                </span>
+                />
                 <span className="text-body-small truncate" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
                   {tech}
                 </span>
@@ -159,7 +154,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
           }}
         >
           Ver Alerta Completa
-          <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+          <ExternalLink size={16} />
         </button>
       </BubbleCard>
     </div>

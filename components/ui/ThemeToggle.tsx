@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 
 export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
@@ -35,6 +36,8 @@ export default function ThemeToggle() {
     );
   }
 
+  const ThemeIcon = theme === "dark" ? Moon : Sun;
+
   return (
     <button
       onClick={toggle}
@@ -42,15 +45,14 @@ export default function ThemeToggle() {
       aria-label={theme === "dark" ? "Cambiar a tema claro" : "Cambiar a tema oscuro"}
       title={theme === "dark" ? "Tema claro" : "Tema oscuro"}
     >
-      <span
-        className="material-symbols-outlined text-[18px] transition-transform duration-300"
+      <ThemeIcon
+        size={18}
+        className="transition-transform duration-300"
         style={{
           color: "var(--md-sys-color-on-surface)",
           transform: theme === "dark" ? "rotate(0deg)" : "rotate(180deg)",
         }}
-      >
-        {theme === "dark" ? "dark_mode" : "light_mode"}
-      </span>
+      />
     </button>
   );
 }
