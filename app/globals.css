@@ -206,6 +206,25 @@
 
     color-scheme: dark;
   }
+
+  :root, [data-theme="dark"] {
+    --bg-page: #181c22;
+    --bg-surface-1: #222831;
+    --bg-surface-2: #393E46;
+    --bg-surface-3: #484E58;
+
+    --text-primary: #F2EDE4;
+    --text-secondary: #A8A29A;
+    --text-muted: #6F6A63;
+
+    --accent-bg: #2A2620;
+    --accent-fill: #C9B98F;
+    --accent-text: #DFD0B8;
+    --accent-fill-on: #1C170E;
+
+    --border-subtle: rgba(223, 208, 184, 0.10);
+    --border-strong: rgba(223, 208, 184, 0.18);
+  }
 }
 
 @theme {
@@ -325,6 +344,8 @@
   --glass-bg-dark: rgba(24, 27, 24, 0.72);
   --glass-blur: blur(20px) saturate(180%);
   --glass-border: rgba(241, 243, 241, 0.18);
+  --glass-bg-strong: rgba(57, 62, 70, 0.82);
+  --glass-blur-strong: blur(28px) saturate(160%);
 
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -341,7 +362,7 @@
 }
 
 [data-theme="dark"] {
-  --glass-bg: var(--glass-bg-dark);
+  --glass-bg: rgba(57, 62, 70, 0.6);
 }
 
 [data-theme="light"] {
@@ -364,9 +385,9 @@
 
 /* Floating macOS-style notch navigation bar */
 .notch-nav {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-elevated);
@@ -396,9 +417,9 @@ html {
 
 /* ─── Bubble Card ─── */
 .bubble-card {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
   border-radius: var(--radius-md);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft);

@@ -46,24 +46,24 @@ export default function SlidePanel({ isOpen, onClose, title, children }: SlidePa
         <div
           className="sticky top-0 z-10 flex items-center justify-between h-14 px-4"
           style={{
-            background: "var(--md-sys-color-surface)",
-            borderBottom: "1px solid var(--md-sys-color-outline-variant)",
+            background: "var(--bg-surface-1)",
+            borderBottom: "1px solid var(--border-subtle)",
           }}
         >
           {title && (
             <h2
               className="text-title-medium"
-              style={{ color: "var(--md-sys-color-on-surface)" }}
+              style={{ color: "var(--text-primary)" }}
             >
               {title}
             </h2>
           )}
           <button
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full transition-[background] duration-200 hover:bg-[var(--md-sys-color-surface-container-high)] active:scale-[0.97] ml-auto"
+            className="flex h-10 w-10 items-center justify-center rounded-full transition-[background] duration-200 hover:bg-[var(--bg-surface-3)] active:scale-[0.97] ml-auto"
             aria-label="Cerrar panel"
           >
-            <X size={20} style={{ color: "var(--md-sys-color-on-surface)" }} />
+            <X size={20} style={{ color: "var(--text-primary)" }} />
           </button>
         </div>
 

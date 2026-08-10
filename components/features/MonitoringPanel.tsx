@@ -138,11 +138,11 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               />
-              <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+              <span className="text-label-medium" style={{ color: "var(--text-secondary)" }}>
                 Monitoreo en Vivo
               </span>
             </div>
-            <span className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+            <span className="text-label-small" style={{ color: "var(--text-muted)" }}>
               {locationName}
             </span>
           </div>
@@ -152,8 +152,8 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
               <svg viewBox="0 0 120 120" className="w-full h-full">
                 <defs>
                   <linearGradient id="kpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="var(--md-sys-color-primary)" />
-                    <stop offset="100%" stopColor="var(--md-sys-color-tertiary)" />
+                    <stop offset="0%" stopColor="var(--accent-fill)" />
+                    <stop offset="100%" stopColor="var(--accent-text)" />
                   </linearGradient>
                 </defs>
                 <circle fill="none" className="kp-gauge-track" cx="60" cy="60" r="50" />
@@ -175,35 +175,35 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
                     exit={{ opacity: 0, y: -4 }}
                     transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                     className="text-title-large"
-                    style={{ color: "var(--md-sys-color-on-surface)" }}
+                    style={{ color: "var(--text-primary)" }}
                   >
                     {solarData.kpIndex}
                   </motion.span>
                 </AnimatePresence>
-                <span className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>Kp</span>
+                <span className="text-label-small" style={{ color: "var(--text-muted)" }}>Kp</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-4">
               <div>
-                <div className="text-label-small mb-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>Estado</div>
+                <div className="text-label-small mb-1" style={{ color: "var(--text-secondary)" }}>Estado</div>
                 <AlertChip variant={severityLevel}>
                   {solarData.condition}
                 </AlertChip>
               </div>
               <div>
-                <div className="text-label-small mb-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>Actualizado</div>
-                <div className="text-body-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>{updatedTime}</div>
+                <div className="text-label-small mb-1" style={{ color: "var(--text-secondary)" }}>Actualizado</div>
+                <div className="text-body-medium" style={{ color: "var(--text-secondary)" }}>{updatedTime}</div>
               </div>
               <div>
-                <div className="text-label-small mb-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>Próximas horas</div>
+                <div className="text-label-small mb-1" style={{ color: "var(--text-secondary)" }}>Próximas horas</div>
                 <div className="flex items-center gap-1.5">
                   <motion.span
                     className="live-dot"
                     animate={{ opacity: [0.5, 1, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   />
-                  <span className="text-body-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>+3h</span>
+                  <span className="text-body-medium" style={{ color: "var(--text-secondary)" }}>+3h</span>
                 </div>
               </div>
             </div>
@@ -216,26 +216,26 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2.5">
               <span className="live-dot" />
-              <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+              <span className="text-label-medium" style={{ color: "var(--text-secondary)" }}>
                 Eventos Activos
               </span>
             </div>
-            <span className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+            <span className="text-label-small" style={{ color: "var(--text-muted)" }}>
               {eventTime}
             </span>
           </div>
 
           <div className="flex items-center justify-between gap-3 mb-5">
             <div className="min-w-0">
-              <div className="text-body-large font-semibold truncate" style={{ color: "var(--md-sys-color-on-surface)" }}>
+              <div className="text-body-large font-semibold truncate" style={{ color: "var(--text-primary)" }}>
                 {event.type}
               </div>
-              <div className="text-label-small mt-0.5 truncate" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+              <div className="text-label-small mt-0.5 truncate" style={{ color: "var(--text-secondary)" }}>
                 {event.source}
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+              <span className="text-title-medium" style={{ color: "var(--text-primary)" }}>
                 {event.class}
               </span>
               <AlertChip variant={chipVariant}>
@@ -247,7 +247,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
           <div className="md-divider my-6" />
 
           <div className="mb-4">
-            <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+            <span className="text-label-medium" style={{ color: "var(--text-secondary)" }}>
               Tecnologías Afectadas
             </span>
           </div>
@@ -260,16 +260,16 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
                   key={i}
                   className="flex items-center gap-2 rounded-2xl border px-3 py-2.5 tech-hover"
                   style={{
-                    borderColor: "var(--md-sys-color-outline-variant)",
-                    background: "var(--md-sys-color-surface-container)",
+                    borderColor: "var(--border-subtle)",
+                    background: "var(--bg-surface-2)",
                   }}
                 >
                   <Icon
                     size={14}
                     className="shrink-0"
-                    style={{ color: "var(--md-sys-color-primary)" }}
+                    style={{ color: "var(--accent-fill)" }}
                   />
-                  <span className="text-body-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                  <span className="text-body-small" style={{ color: "var(--text-secondary)" }}>
                     {tech}
                   </span>
                 </div>
@@ -284,7 +284,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
             className="relative flex h-10 w-full items-center justify-center gap-2 overflow-hidden rounded-full transition-[background,transform] duration-200 active:scale-[0.97] alert-btn"
             style={{
               background: "transparent",
-              color: "var(--md-sys-color-primary)",
+              color: "var(--accent-text)",
               fontFamily: "var(--font-mono-stat), sans-serif",
               fontSize: "11px",
               fontWeight: 600,
@@ -294,7 +294,7 @@ export default function MonitoringPanel({ userLocation, showOnlyKp = false, show
             {rippleActive && (
               <motion.span
                 className="absolute inset-0"
-                style={{ background: "var(--md-sys-color-primary-container)" }}
+                style={{ background: "var(--accent-bg)" }}
                 initial={{ scale: 0, opacity: 0.5 }}
                 animate={{ scale: 2.5, opacity: 0 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}

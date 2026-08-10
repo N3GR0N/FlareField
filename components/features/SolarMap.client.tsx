@@ -7,7 +7,7 @@ import L from "leaflet";
 import { Zone } from "@/types/solar";
 import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon } from "@/components/ui/Icons";
 
-const ACCENT = "var(--md-sys-color-primary)";
+const ACCENT = "var(--accent-fill)";
 
 const getLightTileUrl = () => 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 const getDarkTileUrl = () => 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
@@ -136,7 +136,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             {zones.map(zone => (
               <Marker key={zone.id} position={[zone.lat, zone.lng]} icon={getZoneIcon(zone.severity)}>
                 <Popup>
-                  <div className="text-title-medium mb-3" style={{ color: "var(--md-sys-color-on-surface)" }}>
+                  <div className="text-title-medium mb-3" style={{ color: "var(--text-primary)" }}>
                     {zone.name}
                   </div>
                   <div style={{ marginBottom: "16px" }}>
@@ -145,7 +145,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
                       {zone.severity === 'green' ? 'SEÑAL ESTABLE' : zone.severity === 'yellow' ? 'KP ELEVADO' : zone.severity === 'orange' ? 'TORMENTA ACTIVA' : 'TORMENTA CRÍTICA'}
                     </span>
                   </div>
-                  <div className="text-label-medium mb-3" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                  <div className="text-label-medium mb-3" style={{ color: "var(--text-secondary)" }}>
                     Tecnologías afectadas
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "16px" }}>
@@ -157,13 +157,13 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
 
                       return (
                         <span key={tech} className="popup-tech-chip">
-                          <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--md-sys-color-primary)]" />
+                          <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--accent-fill)]" />
                           <span>{tech}</span>
                         </span>
                       );
                     })}
                   </div>
-                  <div className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+                  <div className="text-label-small" style={{ color: "var(--text-muted)" }}>
                     Actualizado hace 2 min
                   </div>
                 </Popup>
@@ -174,10 +174,10 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
             {userLocation && (
               <Marker position={[userLocation.lat, userLocation.lng]} icon={new L.DivIcon({ html: `<div class="relative w-6 h-6 flex items-center justify-center"><div style="width:10px;height:10px;border-radius:9999px;border:2px solid rgba(168,196,232,0.4);background:rgba(168,196,232,0.15)"></div></div>`, iconSize: [12,12], iconAnchor: [6,6] })}>
                 <Popup>
-                  <div className="text-label-medium uppercase tracking-widest" style={{ color: "var(--md-sys-color-on-surface)" }}>
+                  <div className="text-label-medium uppercase tracking-widest" style={{ color: "var(--text-primary)" }}>
                     Tu ubicación
                   </div>
-                  <div className="text-body-medium mt-1" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                  <div className="text-body-medium mt-1" style={{ color: "var(--text-secondary)" }}>
                     {userLocation.name}
                   </div>
                 </Popup>
@@ -196,7 +196,7 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
                          top: `calc(${(90 - zone.lat) * 2}%)`,
                          width: '4px',
                          height: '4px',
-                               backgroundColor: "var(--md-sys-color-primary)",
+                               backgroundColor: "var(--accent-fill)",
                          opacity: 0.25,
                          borderRadius: '2px'
                        }} />
@@ -209,10 +209,10 @@ export default function SolarMapClient({ userLocation }: { userLocation: { lat: 
       </div>
 
       {!userLocation && (
-        <div className="absolute inset-0 flex items-center justify-center" style={{ background: "var(--md-sys-color-background)" }}>
+        <div className="absolute inset-0 flex items-center justify-center" style={{ background: "var(--bg-page)" }}>
           <div className="text-center space-y-4">
-            <div className="h-6 w-6 rounded-full border-2" style={{ borderColor: "var(--md-sys-color-outline-variant)" }}></div>
-            <p style={{ fontFamily: "var(--font-mono-stat), sans-serif", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--md-sys-color-on-surface)" }}>Detectando tu ubicación...</p>
+            <div className="h-6 w-6 rounded-full border-2" style={{ borderColor: "var(--border-subtle)" }}></div>
+            <p style={{ fontFamily: "var(--font-mono-stat), sans-serif", fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-primary)" }}>Detectando tu ubicación...</p>
           </div>
         </div>
       )}

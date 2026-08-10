@@ -67,12 +67,12 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
       {/* Header */}
       <BubbleCard delay={0}>
         <div className="flex items-center gap-3">
-          <Zap size={20} style={{ color: "var(--md-sys-color-primary)" }} />
+          <Zap size={20} style={{ color: "var(--accent-fill)" }} />
           <div>
-            <h2 className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+            <h2 className="text-title-medium" style={{ color: "var(--text-primary)" }}>
               FlareField
             </h2>
-            <p className="text-label-small" style={{ color: "var(--md-sys-color-outline)" }}>
+            <p className="text-label-small" style={{ color: "var(--text-muted)" }}>
               {locationName}
             </p>
           </div>
@@ -83,10 +83,10 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
       <BubbleCard delay={1}>
         <div className="flex items-start justify-between gap-6">
           <div className="flex-1">
-            <p className="mb-2 text-label-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+            <p className="mb-2 text-label-small" style={{ color: "var(--text-secondary)" }}>
               Kp Index
             </p>
-            <div className="text-display-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+            <div className="text-display-medium" style={{ color: "var(--text-primary)" }}>
               {solarData.kpIndex}
             </div>
           </div>
@@ -98,10 +98,10 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
         <div className="md-divider my-4" />
 
         <div className="flex items-center justify-between">
-          <p className="text-label-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+          <p className="text-label-small" style={{ color: "var(--text-secondary)" }}>
             PRÓXIMAS HORAS
           </p>
-          <span className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+          <span className="text-title-medium" style={{ color: "var(--text-primary)" }}>
             +3h
           </span>
         </div>
@@ -110,7 +110,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
       {/* Tecnologías afectadas */}
       <BubbleCard delay={2}>
         <div className="mb-4">
-          <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+          <span className="text-label-medium" style={{ color: "var(--text-secondary)" }}>
             Tecnologías Afectadas
           </span>
         </div>
@@ -123,16 +123,16 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
                 key={i}
                 className="flex items-center gap-2 rounded-2xl border px-3 py-2.5 tech-hover"
                 style={{
-                  borderColor: "var(--md-sys-color-outline-variant)",
-                  background: "var(--md-sys-color-surface-container)",
+                  borderColor: "var(--border-subtle)",
+                  background: "var(--bg-surface-2)",
                 }}
               >
                 <Icon
                   size={14}
                   className="shrink-0"
-                  style={{ color: "var(--md-sys-color-primary)" }}
+                  style={{ color: "var(--accent-fill)" }}
                 />
-                <span className="text-body-small truncate" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+                <span className="text-body-small truncate" style={{ color: "var(--text-secondary)" }}>
                   {tech}
                 </span>
               </div>
@@ -146,7 +146,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
           className="relative flex h-10 w-full items-center justify-center gap-2 overflow-hidden rounded-full transition-[background,transform] duration-200 active:scale-[0.97] alert-btn"
           style={{
             background: "transparent",
-            color: "var(--md-sys-color-primary)",
+            color: "var(--accent-text)",
             fontFamily: "var(--font-mono-stat), sans-serif",
             fontSize: "11px",
             fontWeight: 600,

@@ -57,19 +57,19 @@ export default function ZoneMarker({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-title-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+            <div className="text-title-medium" style={{ color: "var(--text-primary)" }}>
               {zoneName}
             </div>
-            <div className="mt-1 text-label-small" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+            <div className="mt-1 text-label-small" style={{ color: "var(--text-secondary)" }}>
               {severityLabel}
             </div>
           </div>
           <div
             className="mt-0.5 rounded-full border px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.22em] whitespace-nowrap"
             style={{
-              background: "var(--md-sys-color-surface-container)",
-              borderColor: "var(--md-sys-color-outline-variant)",
-              color: "var(--md-sys-color-on-surface-variant)",
+              background: "var(--bg-surface-2)",
+              borderColor: "var(--border-subtle)",
+              color: "var(--text-secondary)",
               fontFamily: "var(--font-mono-stat), sans-serif",
             }}
           >
@@ -77,15 +77,15 @@ export default function ZoneMarker({
           </div>
         </div>
         <div className="md-divider my-3" />
-        <div className="space-y-2 text-body-medium" style={{ color: "var(--md-sys-color-on-surface-variant)" }}>
+        <div className="space-y-2 text-body-medium" style={{ color: "var(--text-secondary)" }}>
           <div>
-            <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+            <span className="text-label-medium" style={{ color: "var(--text-primary)" }}>
               Cobertura:
             </span>{" "}
             {coverageLine}
           </div>
           <div>
-            <span className="text-label-medium" style={{ color: "var(--md-sys-color-on-surface)" }}>
+            <span className="text-label-medium" style={{ color: "var(--text-primary)" }}>
               Sistemas:
             </span>{" "}
             {techPreview}

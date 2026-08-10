@@ -23,8 +23,8 @@ export default function BottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
       style={{
-        background: "var(--md-sys-color-surface-container)",
-        borderTop: "1px solid var(--md-sys-color-outline-variant)",
+        background: "var(--bg-surface-2)",
+        borderTop: "1px solid var(--border-subtle)",
       }}
       aria-label="Navegación principal"
     >
@@ -43,7 +43,7 @@ export default function BottomNav() {
               {isActive && (
                 <span
                   className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-6 rounded-full"
-                  style={{ background: "var(--md-sys-color-secondary-container)" }}
+                  style={{ background: "var(--accent-bg)" }}
                 />
               )}
               <TabIcon
@@ -52,8 +52,8 @@ export default function BottomNav() {
                 className="relative z-10 transition-colors duration-200"
                 style={{
                   color: isActive
-                    ? "var(--md-sys-color-on-surface)"
-                    : "var(--md-sys-color-on-surface-variant)",
+                    ? "var(--text-primary)"
+                    : "var(--text-secondary)",
                 }}
               />
               <span
@@ -61,8 +61,8 @@ export default function BottomNav() {
                 style={{
                   fontFamily: "var(--font-mono-stat), sans-serif",
                   color: isActive
-                    ? "var(--md-sys-color-on-surface)"
-                    : "var(--md-sys-color-on-surface-variant)",
+                    ? "var(--text-primary)"
+                    : "var(--text-secondary)",
                 }}
               >
                 {tab.label}

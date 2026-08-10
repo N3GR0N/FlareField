@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, Bell } from "lucide-react";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 
 function NavLink({
   href, pathname, label
@@ -19,8 +18,8 @@ function NavLink({
       href={href}
       className={`rounded-full px-3 py-1 text-xs font-semibold tracking-wider transition-[background,color] duration-200 ${
         isActive
-          ? 'bg-[var(--primary-700)] dark:bg-[var(--primary-300)] text-[var(--primary-50)] dark:text-[var(--primary-950)]'
-          : 'text-[var(--primary-300)] dark:text-[var(--primary-700)]'
+          ? 'bg-[var(--accent-fill)] text-[var(--accent-fill-on)]'
+          : 'text-[var(--text-secondary)]'
       }`}
       style={{
         fontFamily: "var(--font-mono-stat), sans-serif",
@@ -98,7 +97,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
             {/* FlareField wordmark — desktop only */}
             <Link href="/" className="max-[900px]:hidden flex items-center shrink-0">
               <span
-                className="text-[var(--primary-200)] dark:text-[var(--primary-800)]"
+                className="text-[var(--accent-text)]"
                 style={{
                   fontFamily: "var(--font-wordmark), 'Cormorant Garamond', Georgia, serif",
                   fontSize: '22px',
@@ -111,7 +110,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
             </Link>
 
             {/* Separator — desktop only */}
-            <div className="max-[900px]:hidden w-px h-4 shrink-0 bg-[var(--primary-300)]/30 dark:bg-[var(--primary-700)]/30" />
+            <div className="max-[900px]:hidden w-px h-4 shrink-0 bg-[var(--border-strong)]" />
 
             {/* Nav links — desktop only */}
             <div className="max-[900px]:hidden flex items-center gap-1">
@@ -121,25 +120,24 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
             </div>
 
             {/* Second separator — desktop only */}
-            <div className="max-[900px]:hidden w-px h-4 shrink-0 bg-[var(--primary-300)]/30 dark:bg-[var(--primary-700)]/30" />
+            <div className="max-[900px]:hidden w-px h-4 shrink-0 bg-[var(--border-strong)]" />
 
             {/* Mobile hamburger — centered in notch */}
             <button
-              className="min-[901px]:hidden flex flex-1 items-center justify-center h-8 rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--primary-800)] dark:hover:bg-[var(--primary-200)]"
+              className="min-[901px]:hidden flex flex-1 items-center justify-center h-8 rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--bg-surface-2)]"
               onClick={() => setIsNavOpen(!isNavOpen)}
               aria-label="Abrir menú"
             >
-              <Menu size={18} className="text-[var(--primary-300)] dark:text-[var(--primary-700)]" />
+              <Menu size={18} className="text-[var(--text-secondary)]" />
             </button>
 
             {/* Right side */}
             <div className="flex items-center gap-1.5 ml-auto">
-              <ThemeToggle />
               <button
-                className="relative flex h-8 w-8 items-center justify-center rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--primary-800)] dark:hover:bg-[var(--primary-200)]"
+                className="relative flex h-8 w-8 items-center justify-center rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--bg-surface-2)]"
                 aria-label="Alertas"
               >
-                <Bell size={18} className="text-[var(--primary-300)] dark:text-[var(--primary-700)]" />
+                <Bell size={18} className="text-[var(--text-secondary)]" />
                 <span
                   className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full"
                   style={{ background: 'var(--md-sys-color-error)' }}

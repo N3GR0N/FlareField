@@ -74,7 +74,7 @@ export default function Home() {
   return (
     <div
       className="min-h-screen overflow-hidden pt-20"
-      style={{ background: "var(--md-sys-color-background)" }}
+      style={{ background: "var(--bg-page)" }}
     >
       {/* Map background */}
       <div className="fixed inset-0 z-0">
@@ -94,8 +94,8 @@ export default function Home() {
         onClick={openPanel}
         className="md:hidden fixed right-4 bottom-24 z-30 flex h-14 w-14 items-center justify-center rounded-full active:scale-[0.95]"
         style={{
-          background: "var(--md-sys-color-primary-container)",
-          color: "var(--md-sys-color-on-primary-container)",
+          background: "var(--accent-bg)",
+          color: "var(--accent-text)",
           boxShadow: "var(--shadow-elevated)",
         }}
         aria-label="Abrir panel de monitoreo"
