@@ -348,14 +348,6 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             });
           }, 150);
 
-          // Apply initial map filter based on current theme
-          const initialIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
-          if (containerRef.current) {
-            containerRef.current.style.filter = initialIsDark
-              ? 'saturate(0.65) hue-rotate(40deg) brightness(0.85) contrast(1.02)'
-              : 'saturate(0.75) hue-rotate(40deg) brightness(1.03) contrast(0.94)';
-          }
-
           // Disable right-click drag rotation and touch rotation — 2D only
           map.dragRotate.disable();
           map.touchZoomRotate.disableRotation();
@@ -500,17 +492,139 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           if (map && map.getStyle && map.getStyle()) {
             map.setStyle(newStyleUrl);
           }
-
-          // Update map container CSS filter for palette shift
-          if (containerRef.current) {
-            containerRef.current.style.filter = newIsDark
-              ? 'saturate(0.65) hue-rotate(40deg) brightness(0.85) contrast(1.02)'
-              : 'saturate(0.75) hue-rotate(40deg) brightness(1.03) contrast(0.94)';
-          }
         };
 
         const observer = new MutationObserver(handleThemeChange);
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+        // ─── Recoloreo a paleta FlareField — capas del style actual ───
+        const applyPaletteRecolor = (map: maplibregl.Map) => {
+          const leftover: { id: string; type: string }[] = [];
+
+          const paintFor = (id: string, type: string): Record<string, string> | null => {
+            const k = id.toLowerCase();
+
+            // 1. Tierra base (Background) — verde base: la mayoría del terreno es rural
+            if (type === "background") return { "background-color": "#386D5D" };
+
+            // 2. Agua
+            if (["water", "river", "lake", "ocean", "ferry", "aqueduct"].some((kw) => k.includes(kw))) {
+              if (type === "fill") return { "fill-color": "#213782" };
+              if (type === "line") return { "line-color": "#213782" };
+            }
+
+            // 3. Glaciar — solo fill
+            if (type === "fill" && k.includes("glacier")) return { "fill-color": "#668EB2" };
+
+            // 4. Bosque — solo fill
+            if (type === "fill" && ["forest", "wood"].some((kw) => k.includes(kw))) {
+              return { "fill-color": "#006A63" };
+            }
+
+            // 5. Pasto — solo fill
+            if (type === "fill" && ["meadow", "grass"].some((kw) => k.includes(kw))) {
+              return { "fill-color": "#386D5D" };
+            }
+
+            // 6. Matorral — solo fill
+            if (type === "fill" && k.includes("scrub")) return { "fill-color": "#3F7860" };
+
+            // 7. Cultivo — solo fill
+            if (type === "fill" && k.includes("crop")) return { "fill-color": "#156E62" };
+
+            // 8. Cementerio / parque — solo fill (guard contra estacionamiento)
+            if (type === "fill" && !k.includes("parking") && ["cemetery", "park"].some((kw) => k.includes(kw))) {
+              return { "fill-color": "#3C7362" };
+            }
+
+            // 9. Arena / desierto — solo fill (layer real: "Sand")
+            if (type === "fill" && k.includes("sand")) return { "fill-color": "#7C7E6F" };
+
+            // 10. Manzanas urbanas — solo fill
+            if (type === "fill" && ["residential", "pedestrian"].some((kw) => k.includes(kw))) {
+              return { "fill-color": "#2A3648" };
+            }
+
+            // 11. Estructuras grandes — solo fill
+            if (type === "fill" && ["industrial", "airport", "hospital", "school", "stadium", "heliport"].some((kw) => k.includes(kw))) {
+              return { "fill-color": "#47566B" };
+            }
+
+            // 12. Edificios
+            if (k.includes("building")) {
+              if (type === "fill-extrusion") {
+                // maplibre v2.4 no soporta fill-extrusion-roof-color — la extrusión entera hereda el valor de fill
+                return { "fill-extrusion-color": "#47566B" };
+              }
+              if (type === "fill") return { "fill-color": "#47566B" };
+              return null;
+            }
+
+            // 13. Calles principales — solo line (acento de marca, sin cambio)
+            if (type === "line" && ["major road", "highway"].some((kw) => k.includes(kw))) {
+              return { "line-color": "#DFD0B8" };
+            }
+
+            // 14. Calles menores — solo line
+            if (type === "line" && ["minor road", "path", "footway"].some((kw) => k.includes(kw))) {
+              return { "line-color": "#7285A2" };
+            }
+
+            // 14b. Infraestructura — túneles, puentes, muelles, pistas y obras
+            if (["tunnel", "bridge", "aeroway", "pier", "construction"].some((kw) => k.includes(kw))) {
+              if (type === "line") return { "line-color": "#7285A2" };
+              if (type === "fill") return { "fill-color": "#7285A2" };
+            }
+
+            // 15. Rieles — solo line (sin cambio)
+            if (type === "line" && ["rail", "cablecar", "gondola"].some((kw) => k.includes(kw))) {
+              return { "line-color": "#6B6F78" };
+            }
+
+            // 16. Bordes — solo line (sin cambio)
+            if (type === "line" && k.includes("border")) {
+              return { "line-color": "#3A3A3C" };
+            }
+
+            // 17. Labels grandes (sin cambio)
+            if (type === "symbol" && ["city labels", "capital city labels", "country labels", "state labels"].some((kw) => k.includes(kw))) {
+              return { "text-color": "#FFFFFF", "text-halo-color": "#000000" };
+            }
+
+            // 13. Highway shields — antes del fallback, para no caer en labels chicos
+            if (type === "symbol" && k.includes("highway shield")) {
+              return { "text-color": "#DFD0B8", "icon-color": "#DFD0B8" };
+            }
+
+            // 12. Labels chicos / POI — resto de symbol
+            if (type === "symbol") {
+              return { "text-color": "#8E8E93", "text-halo-color": "#000000" };
+            }
+
+            return null;
+          };
+
+          map.getStyle().layers.forEach((layer) => {
+            const paint = paintFor(layer.id, layer.type);
+            if (!paint) {
+              leftover.push({ id: layer.id, type: layer.type });
+              return;
+            }
+            Object.entries(paint).forEach(([prop, value]) => {
+              try {
+                map.setPaintProperty(layer.id, prop, value);
+              } catch (err) {
+                console.warn("RECOLOR SKIPPED — capa o propiedad inválida", { layer: layer.id, prop, value }, err);
+              }
+            });
+          });
+
+          if (leftover.length > 0) {
+            console.log("LAYERS SIN RECOLOREAR:", JSON.stringify(leftover, null, 2));
+          }
+        };
+
+        map.once("load", () => applyPaletteRecolor(map));
       
       } catch {
         // maplibre not installed or failed to load — warn but don't throw
@@ -615,7 +729,6 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           bottom: 0,
           width: '100%',
           height: '100%',
-          filter: 'saturate(0.65) hue-rotate(40deg) brightness(0.85) contrast(1.02)',
         }} 
       />
       

@@ -344,8 +344,8 @@
   --glass-bg-dark: rgba(24, 27, 24, 0.72);
   --glass-blur: blur(20px) saturate(180%);
   --glass-border: rgba(241, 243, 241, 0.18);
-  --glass-bg-strong: rgba(57, 62, 70, 0.82);
-  --glass-blur-strong: blur(28px) saturate(160%);
+  --glass-bg-strong: rgba(15, 34, 45, 0.82);
+  --glass-blur-strong: blur(28px) saturate(150%);
 
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -385,10 +385,10 @@
 
 /* Floating macOS-style notch navigation bar */
 .notch-nav {
-  background: var(--glass-bg-strong);
-  backdrop-filter: var(--glass-blur-strong);
-  -webkit-backdrop-filter: var(--glass-blur-strong);
-  border: 1px solid var(--glass-border);
+  background: rgba(15, 34, 45, 0.82);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-elevated);
   transform-origin: top center;
@@ -417,11 +417,11 @@ html {
 
 /* ─── Bubble Card ─── */
 .bubble-card {
-  background: var(--glass-bg-strong);
-  backdrop-filter: var(--glass-blur-strong);
-  -webkit-backdrop-filter: var(--glass-blur-strong);
+  background: rgba(15, 34, 45, 0.82);
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
   border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: var(--shadow-soft);
   position: relative;
   overflow: hidden;
@@ -704,11 +704,6 @@ html {
   background: transparent;
 }
 
-.nrg-map-base .maplibregl-canvas,
-.maplibre-dark-shell .maplibregl-canvas {
-  filter: brightness(0.7) contrast(1.2) saturate(0.9);
-}
-
 .nrg-map-base .maplibregl-map {
   background: transparent;
 }
@@ -941,12 +936,12 @@ md-navigation-tab {
 
 /* ─── Leaflet Popup — glass surface, matches BubbleCard aesthetic ─── */
 .leaflet-popup-content-wrapper {
-  background: var(--glass-bg) !important;
-  backdrop-filter: var(--glass-blur) !important;
-  -webkit-backdrop-filter: var(--glass-blur) !important;
-  border-radius: var(--radius-lg) !important;
-  border: 1px solid var(--glass-border) !important;
-  box-shadow: var(--shadow-elevated) !important;
+  background: rgba(15, 34, 45, 0.82) !important;
+  backdrop-filter: blur(28px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+  border-radius: var(--radius-md) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: var(--shadow-soft) !important;
   color: var(--md-sys-color-on-surface) !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -962,8 +957,8 @@ md-navigation-tab {
 }
 
 .leaflet-popup-tip {
-  background: var(--glass-bg) !important;
-  border: 1px solid var(--glass-border) !important;
+  background: rgba(15, 34, 45, 0.82) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
   box-shadow: none !important;
 }
 
