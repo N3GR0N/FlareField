@@ -40,7 +40,7 @@ export default function AlertChip({
       style={{
         ...styles,
         fontFamily: "var(--font-mono-stat), sans-serif",
-        fontSize: "10px",
+        fontSize: "12px",
         fontWeight: 600,
         letterSpacing: "0.06em",
         textTransform: "uppercase" as const,

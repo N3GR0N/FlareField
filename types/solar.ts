@@ -33,4 +33,5 @@ export interface SolarData {
   storms: GeomagneticStorm[];
   kpIndex: KpIndex | null;
   lastUpdated: string;
+  isMock?: boolean;
 }

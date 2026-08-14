@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useCallback } from "react";
+import { ReactNode, useEffect, useCallback, useRef } from "react";
 import { X } from "lucide-react";
 
 interface SlidePanelProps {
@@ -10,19 +10,52 @@ interface SlidePanelProps {
   children: ReactNode;
 }
 
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+
 export default function SlidePanel({ isOpen, onClose, title, children }: SlidePanelProps) {
+  const panelRef = useRef<HTMLElement | null>(null);
+  const previousFocusRef = useRef<Element | null>(null);
+
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape") onClose();
+    if (e.key === "Escape") {
+      onClose();
+      return;
+    }
+    if (e.key !== "Tab" || !panelRef.current) return;
+
+    const focusables = Array.from(
+      panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+    ).filter((el) => el.offsetParent !== null);
+
+    if (focusables.length === 0) return;
+
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement;
+
+    if (e.shiftKey && (active === first || active === panelRef.current)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && active === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }, [onClose]);
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
-    }
+    if (!isOpen) return;
+    previousFocusRef.current = document.activeElement;
+    const panel = panelRef.current;
+    if (panel) panel.focus();
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
+      const previous = previousFocusRef.current;
+      if (previous instanceof HTMLElement) previous.focus();
     };
   }, [isOpen, handleKeyDown]);
 
@@ -37,6 +70,8 @@ export default function SlidePanel({ isOpen, onClose, title, children }: SlidePa
 
       {/* Panel */}
       <aside
+        ref={panelRef}
+        tabIndex={-1}
         className={`slide-panel ${isOpen ? "slide-panel-open" : ""}`}
         role="dialog"
         aria-label={title || "Panel lateral"}

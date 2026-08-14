@@ -18,7 +18,10 @@ export default function ThemeToggle() {
     return initial;
   });
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   const toggle = useCallback(() => {
     const next = theme === "dark" ? "light" : "dark";

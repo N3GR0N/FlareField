@@ -9,10 +9,6 @@ import { DroneIcon, SatelliteIcon, SchoolIcon, RadioIcon } from "@/components/ui
 
 const ACCENT = "var(--accent-fill)";
 
-const getLightTileUrl = () => 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-const getDarkTileUrl = () => 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-const TILE_ATTR = '&copy; <a href="https://carto.com">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
 function ContextMenuBlocker() {
   const map = useMap();
   useEffect(() => {
@@ -27,10 +23,12 @@ function ContextMenuBlocker() {
 function ThemeAwareLayer() {
   const map = useMap();
   const mapRef = useRef(map);
-  mapRef.current = map;
+
+  useEffect(() => {
+    mapRef.current = map;
+  }, [map]);
 
   const updateTileLayer = (isDark: boolean) => {
-    console.log('Updating tiles, isDark:', isDark)
     if (!mapRef.current) return
     
     const url = isDark 

@@ -124,6 +124,7 @@ function getMockSolarData(): SolarData {
       time_tag: new Date().toISOString(),
       severity: "yellow"
     },
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
+    isMock: true
   };
 }

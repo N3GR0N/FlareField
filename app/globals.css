@@ -215,7 +215,7 @@
 
     --text-primary: #F2EDE4;
     --text-secondary: #A8A29A;
-    --text-muted: #6F6A63;
+    --text-muted: #948F88;
 
     --accent-bg: #2A2620;
     --accent-fill: #C9B98F;
@@ -342,10 +342,17 @@
 :root {
   --glass-bg-light: rgba(241, 243, 241, 0.72);
   --glass-bg-dark: rgba(24, 27, 24, 0.72);
-  --glass-blur: blur(20px) saturate(180%);
-  --glass-border: rgba(241, 243, 241, 0.18);
-  --glass-bg-strong: rgba(15, 34, 45, 0.82);
-  --glass-blur-strong: blur(28px) saturate(150%);
+  --glass-blur: blur(50px);
+  --glass-border: rgba(118, 118, 128, 0.24);
+  --glass-border-strong: rgba(223, 208, 184, 0.14);
+
+  --glass-monitor-bg: rgba(42, 38, 32, 0.72);
+  --glass-monitor-border: rgba(201, 185, 143, 0.18);
+  --glass-zone-bg: rgba(42, 38, 32, 0.72);
+
+  /* Fuente de verdad única: navbar, bubble cards y tooltip de zona. */
+  --glass-unified-bg: rgba(0, 0, 0, 0.65);
+  --glass-unified-blur: blur(24px) saturate(140%);
 
   --radius-sm: 10px;
   --radius-md: 16px;
@@ -355,7 +362,7 @@
   --shadow-elevated: 0 12px 48px rgba(12, 14, 12, 0.18);
 
   --spring-fast: cubic-bezier(0.32, 0.72, 0, 1);
-  --spring-slow: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-slow: cubic-bezier(0.16, 1, 0.3, 1);
 
   --font-system: -apple-system, BlinkMacSystemFont, "Inter",
     "Segoe UI", sans-serif;
@@ -363,10 +370,16 @@
 
 [data-theme="dark"] {
   --glass-bg: rgba(57, 62, 70, 0.6);
+  --glass-teal: rgba(0, 0, 0, 0.6);
+  --glass-monitor-bg: rgba(42, 38, 32, 0.72);
+  --glass-zone-bg: var(--glass-monitor-bg);
 }
 
 [data-theme="light"] {
   --glass-bg: var(--glass-bg-light);
+  --glass-teal: rgba(0, 0, 0, 0.6);
+  --glass-monitor-bg: rgba(42, 38, 32, 0.72);
+  --glass-zone-bg: var(--glass-monitor-bg);
 }
 
 /* │─ Glass Surfaces ─────────────── */
@@ -385,10 +398,10 @@
 
 /* Floating macOS-style notch navigation bar */
 .notch-nav {
-  background: rgba(15, 34, 45, 0.82);
-  backdrop-filter: blur(28px) saturate(150%);
-  -webkit-backdrop-filter: blur(28px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: var(--glass-unified-bg);
+  backdrop-filter: var(--glass-unified-blur);
+  -webkit-backdrop-filter: var(--glass-unified-blur);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-elevated);
   transform-origin: top center;
@@ -417,12 +430,12 @@ html {
 
 /* ─── Bubble Card ─── */
 .bubble-card {
-  background: rgba(15, 34, 45, 0.82);
-  backdrop-filter: blur(28px) saturate(150%);
-  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  background-color: var(--glass-unified-bg);
+  backdrop-filter: var(--glass-unified-blur);
+  -webkit-backdrop-filter: var(--glass-unified-blur);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-elevated);
   position: relative;
   overflow: hidden;
   transition: box-shadow 200ms var(--md-sys-motion-easing-standard),
@@ -631,8 +644,8 @@ html {
 /* ─── Kp Gauge ─── */
 .kp-gauge {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 104px;
+  height: 104px;
   flex-shrink: 0;
 }
 
@@ -816,7 +829,9 @@ md-navigation-tab {
   margin: 0;
 }
 
-/* ─── Zone Area Markers ─── */
+/* ─── Zone Area Markers ───
+   Indicador táctico de monitoreo:
+   halo radial + anillo de precisión + núcleo central, pulso CSS suave. */
 .zone-ripple-marker {
   --zone-area-size: 60px;
   position: relative;
@@ -826,7 +841,8 @@ md-navigation-tab {
   isolation: isolate;
 }
 
-.zone-ripple-area {
+/* Anillo de precisión (riel exterior) — trazo fino con luz contenida */
+.zone-ripple-ring {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -834,53 +850,174 @@ md-navigation-tab {
   height: 100%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--zone-c-default), 0.60) 0%, rgba(var(--zone-c-default), 0.35) 40%, rgba(var(--zone-c-default), 0.10) 70%, transparent 100%);
-  box-shadow: 0 0 16px 4px rgba(var(--zone-c-default), 0.3);
+  border: 1px solid rgba(var(--zone-c-default), 0.45);
+  box-shadow:
+    0 0 0 4px rgba(var(--zone-c-default), 0.10),
+    inset 0 0 16px rgba(var(--zone-c-default), 0.12),
+    0 0 22px rgba(var(--zone-c-default), 0.22);
   pointer-events: none;
-  border: 1.5px solid rgba(var(--zone-c-default), 0.8);
+  transition: border-color 300ms var(--md-sys-motion-easing-standard),
+              box-shadow 300ms var(--md-sys-motion-easing-standard);
 }
 
-.zone-ripple-area[data-severity="red"] {
-  background: radial-gradient(circle, rgba(var(--zone-c-red), 0.60) 0%, rgba(var(--zone-c-red), 0.35) 40%, rgba(var(--zone-c-red), 0.10) 70%, transparent 100%);
-  box-shadow: 0 0 20px 6px rgba(var(--zone-c-red), 0.4);
-  border: 1.5px solid rgba(var(--zone-c-red), 0.8);
+/* Halo radial — pulso técnico muy suave (cubic-bezier) */
+.zone-ripple-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 82%;
+  height: 82%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--zone-c-default), 0.30) 0%, rgba(var(--zone-c-default), 0.14) 45%, transparent 72%);
+  pointer-events: none;
+  animation: zoneHaloPulse 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.zone-ripple-area[data-severity="orange"] {
-  background: radial-gradient(circle, rgba(var(--zone-c-orange), 0.60) 0%, rgba(var(--zone-c-orange), 0.35) 40%, rgba(var(--zone-c-orange), 0.10) 70%, transparent 100%);
-  box-shadow: 0 0 18px 5px rgba(var(--zone-c-orange), 0.35);
-  border: 1.5px solid rgba(var(--zone-c-orange), 0.8);
+/* Núcleo central — punto pivote con borde de luz */
+.zone-ripple-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(var(--zone-c-default), 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 10px 2px rgba(var(--zone-c-default), 0.5);
+  pointer-events: none;
+  transition: box-shadow 300ms var(--md-sys-motion-easing-standard);
 }
 
-.zone-ripple-area[data-severity="yellow"] {
-  background: radial-gradient(circle, rgba(var(--zone-c-yellow), 0.55) 0%, rgba(var(--zone-c-yellow), 0.30) 40%, rgba(var(--zone-c-yellow), 0.08) 70%, transparent 100%);
-  box-shadow: 0 0 14px 4px rgba(var(--zone-c-yellow), 0.3);
-  border: 1.5px solid rgba(var(--zone-c-yellow), 0.8);
+@keyframes zoneHaloPulse {
+  0%, 100% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(1.07);
+  }
 }
 
-.zone-ripple-area[data-severity="green"] {
-  background: radial-gradient(circle, rgba(var(--zone-c-green), 0.55) 0%, rgba(var(--zone-c-green), 0.30) 40%, rgba(var(--zone-c-green), 0.08) 70%, transparent 100%);
-  box-shadow: 0 0 12px 3px rgba(var(--zone-c-green), 0.25);
-  border: 1.5px solid rgba(var(--zone-c-green), 0.8);
+/* Severidad ALTA → crítico (rojo del sistema de alertas) */
+.zone-ripple-marker[data-severity="alta"] .zone-ripple-ring {
+  border-color: rgba(var(--zone-c-red), 0.5);
+  box-shadow:
+    0 0 0 4px rgba(var(--zone-c-red), 0.10),
+    inset 0 0 16px rgba(var(--zone-c-red), 0.12),
+    0 0 24px rgba(var(--zone-c-red), 0.28);
 }
 
-.zone-ripple-marker:hover .zone-ripple-area,
-.zone-ripple-marker:focus-visible .zone-ripple-area {
-  transform: translate(-50%, -50%) scale(1.12);
+.zone-ripple-marker[data-severity="alta"] .zone-ripple-area {
+  background: radial-gradient(circle, rgba(var(--zone-c-red), 0.30) 0%, rgba(var(--zone-c-red), 0.14) 45%, transparent 72%);
 }
 
-.zone-ripple-marker[data-severity="red"]:hover .zone-ripple-area,
-.zone-ripple-marker[data-severity="red"]:focus-visible .zone-ripple-area {
-  box-shadow: 0 0 28px 8px rgba(var(--zone-c-red), 0.35);
+.zone-ripple-marker[data-severity="alta"] .zone-ripple-core {
+  background: rgba(var(--zone-c-red), 0.95);
+  box-shadow: 0 0 10px 2px rgba(var(--zone-c-red), 0.5);
 }
 
-.zone-ripple-marker[data-severity="orange"]:hover .zone-ripple-area,
-.zone-ripple-marker[data-severity="orange"]:focus-visible .zone-ripple-area {
-  box-shadow: 0 0 24px 6px rgba(var(--zone-c-orange), 0.30);
+/* Severidad MEDIA → advertencia (ámbar del sistema de alertas) */
+.zone-ripple-marker[data-severity="media"] .zone-ripple-ring {
+  border-color: rgba(var(--zone-c-yellow), 0.45);
+  box-shadow:
+    0 0 0 4px rgba(var(--zone-c-yellow), 0.10),
+    inset 0 0 16px rgba(var(--zone-c-yellow), 0.12),
+    0 0 20px rgba(var(--zone-c-yellow), 0.22);
 }
 
-.zone-ripple-marker[data-open="true"] .zone-ripple-area {
-  transform: translate(-50%, -50%) scale(1.15);
+.zone-ripple-marker[data-severity="media"] .zone-ripple-area {
+  background: radial-gradient(circle, rgba(var(--zone-c-yellow), 0.28) 0%, rgba(var(--zone-c-yellow), 0.12) 45%, transparent 72%);
+}
+
+.zone-ripple-marker[data-severity="media"] .zone-ripple-core {
+  background: rgba(var(--zone-c-yellow), 0.95);
+  box-shadow: 0 0 10px 2px rgba(var(--zone-c-yellow), 0.45);
+}
+
+/* Severidad BAJA → estable (verde del sistema de alertas) */
+.zone-ripple-marker[data-severity="baja"] .zone-ripple-ring {
+  border-color: rgba(var(--zone-c-green), 0.45);
+  box-shadow:
+    0 0 0 4px rgba(var(--zone-c-green), 0.08),
+    inset 0 0 16px rgba(var(--zone-c-green), 0.10),
+    0 0 18px rgba(var(--zone-c-green), 0.18);
+}
+
+.zone-ripple-marker[data-severity="baja"] .zone-ripple-area {
+  background: radial-gradient(circle, rgba(var(--zone-c-green), 0.24) 0%, rgba(var(--zone-c-green), 0.10) 45%, transparent 72%);
+}
+
+.zone-ripple-marker[data-severity="baja"] .zone-ripple-core {
+  background: rgba(var(--zone-c-green), 0.95);
+  box-shadow: 0 0 10px 2px rgba(var(--zone-c-green), 0.4);
+}
+
+/* Hover / foco — intensidad luminosa contenida, sin deformación */
+.zone-ripple-marker:hover .zone-ripple-ring,
+.zone-ripple-marker:focus-visible .zone-ripple-ring,
+.zone-ripple-marker[data-open="true"] .zone-ripple-ring {
+  border-color: rgba(var(--zone-c-default), 0.7);
+  box-shadow:
+    0 0 0 5px rgba(var(--zone-c-default), 0.14),
+    inset 0 0 18px rgba(var(--zone-c-default), 0.18),
+    0 0 30px rgba(var(--zone-c-default), 0.38);
+}
+
+.zone-ripple-marker[data-severity="baja"]:hover .zone-ripple-ring,
+.zone-ripple-marker[data-severity="baja"]:focus-visible .zone-ripple-ring,
+.zone-ripple-marker[data-severity="baja"][data-open="true"] .zone-ripple-ring {
+  border-color: rgba(var(--zone-c-green), 0.65);
+  box-shadow:
+    0 0 0 5px rgba(var(--zone-c-green), 0.12),
+    inset 0 0 18px rgba(var(--zone-c-green), 0.16),
+    0 0 26px rgba(var(--zone-c-green), 0.32);
+}
+
+.zone-ripple-marker[data-severity="alta"]:hover .zone-ripple-ring,
+.zone-ripple-marker[data-severity="alta"]:focus-visible .zone-ripple-ring,
+.zone-ripple-marker[data-severity="alta"][data-open="true"] .zone-ripple-ring {
+  border-color: rgba(var(--zone-c-red), 0.75);
+  box-shadow:
+    0 0 0 5px rgba(var(--zone-c-red), 0.14),
+    inset 0 0 18px rgba(var(--zone-c-red), 0.18),
+    0 0 32px rgba(var(--zone-c-red), 0.42);
+}
+
+.zone-ripple-marker[data-severity="media"]:hover .zone-ripple-ring,
+.zone-ripple-marker[data-severity="media"]:focus-visible .zone-ripple-ring,
+.zone-ripple-marker[data-severity="media"][data-open="true"] .zone-ripple-ring {
+  border-color: rgba(var(--zone-c-yellow), 0.7);
+  box-shadow:
+    0 0 0 5px rgba(var(--zone-c-yellow), 0.14),
+    inset 0 0 18px rgba(var(--zone-c-yellow), 0.18),
+    0 0 28px rgba(var(--zone-c-yellow), 0.36);
+}
+
+.zone-ripple-marker:hover .zone-ripple-core,
+.zone-ripple-marker:focus-visible .zone-ripple-core,
+.zone-ripple-marker[data-open="true"] .zone-ripple-core {
+  box-shadow: 0 0 14px 3px rgba(var(--zone-c-default), 0.65);
+}
+
+.zone-ripple-marker[data-severity="alta"]:hover .zone-ripple-core,
+.zone-ripple-marker[data-severity="alta"]:focus-visible .zone-ripple-core,
+.zone-ripple-marker[data-severity="alta"][data-open="true"] .zone-ripple-core {
+  box-shadow: 0 0 14px 3px rgba(var(--zone-c-red), 0.65);
+}
+
+.zone-ripple-marker[data-severity="media"]:hover .zone-ripple-core,
+.zone-ripple-marker[data-severity="media"]:focus-visible .zone-ripple-core,
+.zone-ripple-marker[data-severity="media"][data-open="true"] .zone-ripple-core {
+  box-shadow: 0 0 14px 3px rgba(var(--zone-c-yellow), 0.6);
+}
+
+.zone-ripple-marker[data-severity="baja"]:hover .zone-ripple-core,
+.zone-ripple-marker[data-severity="baja"]:focus-visible .zone-ripple-core,
+.zone-ripple-marker[data-severity="baja"][data-open="true"] .zone-ripple-core {
+  box-shadow: 0 0 14px 3px rgba(var(--zone-c-green), 0.55);
 }
 
 .zone-ripple-tooltip {
@@ -936,11 +1073,11 @@ md-navigation-tab {
 
 /* ─── Leaflet Popup — glass surface, matches BubbleCard aesthetic ─── */
 .leaflet-popup-content-wrapper {
-  background: rgba(15, 34, 45, 0.82) !important;
-  backdrop-filter: blur(28px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(28px) saturate(150%) !important;
+  background: var(--glass-zone-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
   border-radius: var(--radius-md) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid var(--glass-monitor-border) !important;
   box-shadow: var(--shadow-soft) !important;
   color: var(--md-sys-color-on-surface) !important;
   padding: 0 !important;
@@ -957,8 +1094,8 @@ md-navigation-tab {
 }
 
 .leaflet-popup-tip {
-  background: rgba(15, 34, 45, 0.82) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: var(--glass-zone-bg) !important;
+  border: 1px solid var(--glass-monitor-border) !important;
   box-shadow: none !important;
 }
 
@@ -972,7 +1109,7 @@ md-navigation-tab {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  border-radius: var(--md-sys-shape-corner-full) !important;
+  border-radius: var(--md-sys-shape-full) !important;
   transition: background-color 0.15s ease !important;
 }
 
@@ -986,7 +1123,7 @@ md-navigation-tab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border-radius: var(--md-sys-shape-corner-full);
+  border-radius: var(--md-sys-shape-full);
   border: 1px solid var(--md-sys-color-outline-variant);
   background: var(--md-sys-color-surface-container);
   padding: 4px 12px;

@@ -7,10 +7,17 @@ import SolarMap from "@/components/features/SolarMap";
 import MonitoringPanel from "@/components/features/MonitoringPanel";
 import SlidePanel from "@/components/features/SlidePanel";
 import { LayoutDashboard } from "lucide-react";
+import {
+  CONDITION_LABELS,
+  SEVERITY_DOT_COLORS,
+  severityFromKp,
+  useSolarData,
+} from "@/hooks/useSolarData";
 export default function Home() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  const { data, loading } = useSolarData();
 
   const [locationError, setLocationError] = useState<string | null>(() => {
     if (typeof window === "undefined") return null;
@@ -60,10 +67,6 @@ export default function Home() {
     return () => { cancelled = true; };
   }, []);
 
-  if (locationError) {
-    console.warn(locationError);
-  }
-
   const locationLabel = locationError
     ? "Ubicación no disponible"
     : userLocation?.name ?? "Detectando...";
@@ -85,22 +88,43 @@ export default function Home() {
       <BottomNav />
 
       {/* Desktop: floating monitoring panel */}
-      <div className="hidden md:block fixed right-8 bottom-12 z-30 w-[398px] max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-clip pointer-events-none flex flex-col items-end">
+      <div className="hidden md:block fixed right-8 bottom-12 z-30 w-[348px] max-h-[calc(100vh-10rem)] overflow-y-auto overflow-x-clip pointer-events-none flex flex-col items-end">
         <MonitoringPanel userLocation={userLocation} />
       </div>
 
-      {/* Mobile: floating open-panel button */}
+      {/* Mobile: floating status pill — resumen de una línea + abre el panel */}
       <button
         onClick={openPanel}
-        className="md:hidden fixed right-4 bottom-24 z-30 flex h-14 w-14 items-center justify-center rounded-full active:scale-[0.95]"
+        className="md:hidden fixed right-4 bottom-24 z-30 flex h-12 max-w-[85vw] items-center gap-2.5 rounded-full px-4 transition-transform active:scale-[0.97]"
         style={{
-          background: "var(--accent-bg)",
-          color: "var(--accent-text)",
+          background: "var(--glass-teal)",
+          backdropFilter: "var(--glass-blur)",
+          WebkitBackdropFilter: "var(--glass-blur)",
+          border: "1px solid var(--glass-border)",
           boxShadow: "var(--shadow-elevated)",
         }}
         aria-label="Abrir panel de monitoreo"
       >
-        <LayoutDashboard size={24} />
+        <span
+          className="h-2 w-2 shrink-0 rounded-full"
+          style={{
+            background: SEVERITY_DOT_COLORS[severityFromKp(data?.kpIndex?.kp)],
+            boxShadow: `0 0 8px ${SEVERITY_DOT_COLORS[severityFromKp(data?.kpIndex?.kp)]}`,
+          }}
+        />
+        <span
+          className="text-label-medium whitespace-nowrap"
+          style={{ color: "var(--text-primary)", fontFamily: "var(--font-mono-stat), sans-serif" }}
+        >
+          Kp {data?.kpIndex?.kp ?? "—"}
+        </span>
+        <span
+          className="text-label-small truncate"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          {loading ? "Cargando…" : CONDITION_LABELS[severityFromKp(data?.kpIndex?.kp)]}
+        </span>
+        <LayoutDashboard size={16} className="shrink-0" style={{ color: "var(--accent-text)" }} />
       </button>
 
       {/* Slide-out panel for mobile / zone details */}
@@ -113,7 +137,7 @@ export default function Home() {
       </SlidePanel>
 
       {/* Footer */}
-      <footer className="fixed bottom-6 left-1/2 z-10 -translate-x-1/2 md:bottom-6 bottom-20 md:bottom-6">
+      <footer className="fixed bottom-20 md:bottom-6 left-1/2 z-10 -translate-x-1/2">
         <span className="text-label-small text-neutral-400 dark:text-neutral-600">
           © 2026 FlareField
         </span>

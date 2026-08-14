@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ExternalLink, MonitorSmartphone, RadioTower, School, Wheat, Wifi, Zap, type LucideIcon } from "lucide-react";
 import AlertChip from "@/components/ui/AlertChip";
 import BubbleCard from "@/components/ui/BubbleCard";
-
-type SolarCondition = "SEÑAL ESTABLE" | "KP ELEVADO" | "TORMENTA ACTIVA";
+import {
+  CONDITION_LABELS,
+  isDemoData,
+  severityFromKp,
+  useSolarData,
+  type SeverityLevel,
+} from "@/hooks/useSolarData";
 
 const techIcons: Record<string, LucideIcon> = {
   "drones": Wheat,
@@ -14,53 +18,68 @@ const techIcons: Record<string, LucideIcon> = {
   "radio": RadioTower,
 };
 
+const TECH_LIST = [
+  "Drones de fumigación",
+  "WiFi satelital",
+  "Internet en escuelas rurales",
+  "Comunicaciones de radio",
+];
+
+const CHIP_VARIANT: Record<SeverityLevel, "stable" | "elevated" | "active" | "critical"> = {
+  stable: "stable",
+  elevated: "elevated",
+  active: "active",
+  critical: "critical",
+};
+
 export default function ZonePanel({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
-  const [solarData, setSolarData] = useState<{
-    condition: SolarCondition;
-    kpIndex: number;
-    lastUpdated: string;
-    affectedTech: string[];
-  }>({
-    condition: "SEÑAL ESTABLE",
-    kpIndex: 0,
-    lastUpdated: new Date().toISOString(),
-    affectedTech: ["Drones de fumigación", "WiFi satelital", "Internet en escuelas rurales", "Comunicaciones de radio"],
-  });
+  const { data, loading, error, refetch } = useSolarData();
   const locationName = userLocation?.name ?? "tu zona";
 
-  useEffect(() => {
-    const fetchSolarData = async () => {
-      try {
-        const mockCondition: SolarCondition = Math.random() > 0.7
-          ? (Math.random() > 0.5 ? "TORMENTA ACTIVA" : "KP ELEVADO")
-          : "SEÑAL ESTABLE";
-        const mockKp = mockCondition === "SEÑAL ESTABLE" ? Math.floor(Math.random() * 3) :
-                      mockCondition === "KP ELEVADO" ? 4 + Math.floor(Math.random() * 2) :
-                      6 + Math.floor(Math.random() * 3);
+  const demo = isDemoData(data);
+  const severity = severityFromKp(data?.kpIndex?.kp);
+  const condition = CONDITION_LABELS[severity];
 
-        setSolarData({
-          condition: mockCondition,
-          kpIndex: mockKp,
-          lastUpdated: new Date().toISOString(),
-          affectedTech: [
-            "Drones de fumigación",
-            "WiFi satelital",
-            "Internet en escuelas rurales",
-            "Comunicaciones de radio"
-          ]
-        });
-      } catch (error) {
-        console.error("Error fetching solar data:", error);
-      }
-    };
+  if (loading && !data) {
+    return (
+      <div className="space-y-5">
+        <BubbleCard delay={0}>
+          <div className="animate-pulse space-y-5">
+            <div className="h-4 w-28 rounded-full bg-[var(--bg-surface-2)]" />
+            <div className="h-20 w-20 rounded-full bg-[var(--bg-surface-2)]" />
+          </div>
+        </BubbleCard>
+      </div>
+    );
+  }
 
-    fetchSolarData();
-    const interval = setInterval(fetchSolarData, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const severityLevel = solarData.condition === "TORMENTA ACTIVA" ? "critical" :
-    solarData.condition === "KP ELEVADO" ? "elevated" : "stable";
+  if (error && !data) {
+    return (
+      <div className="space-y-5">
+        <BubbleCard delay={0}>
+          <div className="flex flex-col items-center gap-4 py-6 text-center">
+            <p className="text-label-medium" style={{ color: "var(--text-secondary)" }}>
+              No se pudo conectar con los servicios de monitoreo
+            </p>
+            <button
+              onClick={refetch}
+              className="flex h-10 items-center justify-center rounded-full px-5 transition-transform active:scale-[0.97]"
+              style={{
+                background: "var(--accent-fill)",
+                color: "var(--text-on-accent)",
+                fontFamily: "var(--font-mono-stat), sans-serif",
+                fontSize: "11px",
+                fontWeight: 600,
+                letterSpacing: "0.06em",
+              }}
+            >
+              Reintentar
+            </button>
+          </div>
+        </BubbleCard>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -73,7 +92,7 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
               FlareField
             </h2>
             <p className="text-label-small" style={{ color: "var(--text-muted)" }}>
-              {locationName}
+              {locationName}{demo ? " · Datos de demostración" : ""}
             </p>
           </div>
         </div>
@@ -87,11 +106,11 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
               Kp Index
             </p>
             <div className="text-display-medium" style={{ color: "var(--text-primary)" }}>
-              {solarData.kpIndex}
+              {data?.kpIndex?.kp ?? "—"}
             </div>
           </div>
-          <AlertChip variant={severityLevel}>
-            {solarData.condition}
+          <AlertChip variant={CHIP_VARIANT[severity]}>
+            {condition}
           </AlertChip>
         </div>
 
@@ -111,11 +130,11 @@ export default function ZonePanel({ userLocation }: { userLocation: { lat: numbe
       <BubbleCard delay={2}>
         <div className="mb-4">
           <span className="text-label-medium" style={{ color: "var(--text-secondary)" }}>
-            Tecnologías Afectadas
+            {severity === "stable" ? "Tecnologías Monitoreadas" : "Tecnologías Afectadas"}
           </span>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          {solarData.affectedTech.map((tech, i) => {
+          {TECH_LIST.map((tech, i) => {
             const iconKey = Object.keys(techIcons).find(k => tech.toLowerCase().includes(k));
             const Icon = iconKey ? techIcons[iconKey] : MonitorSmartphone;
             return (

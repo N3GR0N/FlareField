@@ -16,7 +16,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className={`rounded-full px-3 py-1 text-xs font-semibold tracking-wider transition-[background,color] duration-200 ${
+      className={`inline-flex items-center rounded-full px-3 min-h-11 text-xs font-semibold tracking-wider transition-[background,color] duration-200 ${
         isActive
           ? 'bg-[var(--accent-fill)] text-[var(--accent-fill-on)]'
           : 'text-[var(--text-secondary)]'
@@ -31,13 +31,75 @@ function NavLink({
   );
 }
 
+const NAV_LINKS = [
+  { href: "/", label: "Mapa" },
+  { href: "/reports", label: "Reportes" },
+  { href: "/glossary", label: "Glosario" },
+];
+
+function DesktopNav({ pathname }: { pathname: string }) {
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
+
+  const activeHref =
+    NAV_LINKS.find((link) =>
+      link.href === "/" ? pathname === "/" : pathname.startsWith(link.href),
+    )?.href ?? null;
+
+  const pillHref = hoveredHref ?? activeHref;
+
+  return (
+    <div
+      className="max-[900px]:hidden flex items-center gap-1"
+      onMouseLeave={() => setHoveredHref(null)}
+    >
+      {NAV_LINKS.map((link) => {
+        const isActive = link.href === activeHref;
+        const isPillTarget = pillHref === link.href;
+
+        return (
+          <div
+            key={link.href}
+            className="relative"
+            onMouseEnter={() => setHoveredHref(link.href)}
+          >
+            {isPillTarget && (
+              <motion.div
+                layoutId="nav-pill"
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: "rgba(255, 255, 255, 0.16)",
+                }}
+                transition={{ type: "spring", stiffness: 350, damping: 30 }}
+              />
+            )}
+            <Link
+              href={link.href}
+              className={`relative z-10 inline-flex items-center rounded-full px-3 min-h-11 text-xs font-semibold tracking-wider transition-[color] duration-200 ${
+                isPillTarget
+                  ? "text-[var(--text-primary)]"
+                  : "text-[var(--text-secondary)]"
+              }`}
+              style={{
+                fontFamily: "var(--font-mono-stat), sans-serif",
+              }}
+              aria-current={isActive ? "page" : undefined}
+            >
+              {link.label}
+            </Link>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 interface TopNavProps {
   locationName?: string;
   isNavOpen?: boolean;
   setIsNavOpen?: (open: boolean) => void;
 }
 
-export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNavOpen: setIsNavOpenProp }: TopNavProps) {
+export default function TopNav({ isNavOpen: isNavOpenProp, setIsNavOpen: setIsNavOpenProp }: TopNavProps) {
   const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [localNavOpen, setLocalNavOpen] = useState(false);
@@ -51,20 +113,9 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const isCompact = isScrolled && !isNavOpen;
-
   return (
     <div className="fixed top-0 left-0 w-full z-[100]" style={{ height: 0 }}>
-      <div className="absolute top-5 left-1/2 -translate-x-1/2">
+      <div className="absolute top-5 left-0 right-0 flex justify-center">
         <motion.nav
           className="notch-nav relative"
           style={{
@@ -82,11 +133,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
           <motion.div
             className="relative flex items-center gap-3"
             initial={false}
-            animate={{
-              padding: isCompact
-                ? '6px 20px 6px 20px'
-                : '8px 24px 10px 24px',
-            }}
+            animate={{ padding: '6px 20px 6px 20px' }}
             transition={{
               type: "spring",
               stiffness: 260,
@@ -97,7 +144,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
             {/* FlareField wordmark — desktop only */}
             <Link href="/" className="max-[900px]:hidden flex items-center shrink-0">
               <span
-                className="text-[var(--accent-text)]"
+                className="text-[var(--text-secondary)]"
                 style={{
                   fontFamily: "var(--font-wordmark), 'Cormorant Garamond', Georgia, serif",
                   fontSize: '22px',
@@ -113,18 +160,14 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
             <div className="max-[900px]:hidden w-px h-4 shrink-0 bg-[var(--border-strong)]" />
 
             {/* Nav links — desktop only */}
-            <div className="max-[900px]:hidden flex items-center gap-1">
-              <NavLink href="/" pathname={pathname} label="Mapa" />
-              <NavLink href="/reports" pathname={pathname} label="Reportes" />
-              <NavLink href="/glossary" pathname={pathname} label="Glosario" />
-            </div>
+            <DesktopNav pathname={pathname} />
 
             {/* Second separator — desktop only */}
             <div className="max-[900px]:hidden w-px h-4 shrink-0 bg-[var(--border-strong)]" />
 
             {/* Mobile hamburger — centered in notch */}
             <button
-              className="min-[901px]:hidden flex flex-1 items-center justify-center h-8 rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--bg-surface-2)]"
+              className="min-[901px]:hidden flex flex-1 items-center justify-center h-11 rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--bg-surface-2)]"
               onClick={() => setIsNavOpen(!isNavOpen)}
               aria-label="Abrir menú"
             >
@@ -134,7 +177,7 @@ export default function TopNav({ locationName, isNavOpen: isNavOpenProp, setIsNa
             {/* Right side */}
             <div className="flex items-center gap-1.5 ml-auto">
               <button
-                className="relative flex h-8 w-8 items-center justify-center rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--bg-surface-2)]"
+                className="relative flex h-11 w-11 items-center justify-center rounded-full transition-[background] duration-200 active:scale-[0.97] hover:bg-[var(--bg-surface-2)]"
                 aria-label="Alertas"
               >
                 <Bell size={18} className="text-[var(--text-secondary)]" />

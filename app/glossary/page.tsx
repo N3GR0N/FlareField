@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect, useCallback, useRef, useLayoutEffect, useSyncExternalStore } from "react";
+import { useState, useEffect, useCallback, useRef, useLayoutEffect, useMemo, useSyncExternalStore } from "react";
 import Link from "next/link";
 import TopNav from "@/components/layout/TopNav";
 import BottomNav from "@/components/layout/BottomNav";
@@ -32,64 +32,64 @@ interface LabelPos {
 
 const glossaryData: GlossaryEntry[] = [
   {
-    id: "kp", number: "01", title: "Índice Kp",
-    body: "Escala del 0 al 9 que mide la actividad geomagnética global. Cuanto mayor el número, mayor la perturbación del campo magnético terrestre. Kp 0–3 es normal. Kp 4–5 puede interferir con GPS. Kp 6 o más, no volar drones.",
-    example: "Un Kp de 7 puede hacer que tu drone pierda señal GPS sin aviso previo.",
-    summary: "Escala de 0 a 9 que mide la perturbación del campo magnético.",
+    id: "kp", number: "01", title: "Ãndice Kp",
+    body: "Escala del 0 al 9 que mide la actividad geomagnÃ©tica global. Cuanto mayor el nÃºmero, mayor la perturbaciÃ³n del campo magnÃ©tico terrestre. Kp 0â€“3 es normal. Kp 4â€“5 puede interferir con GPS. Kp 6 o mÃ¡s, no volar drones.",
+    example: "Un Kp de 7 puede hacer que tu drone pierda seÃ±al GPS sin aviso previo.",
+    summary: "Escala de 0 a 9 que mide la perturbaciÃ³n del campo magnÃ©tico.",
   },
   {
-    id: "storm", number: "02", title: "Tormenta Geomagnética",
-    body: "Perturbación del campo magnético terrestre causada por viento solar. Se mide en escala G1 a G5. Afecta GPS, comunicaciones de radio y satélite, especialmente en altas latitudes.",
+    id: "storm", number: "02", title: "Tormenta GeomagnÃ©tica",
+    body: "PerturbaciÃ³n del campo magnÃ©tico terrestre causada por viento solar. Se mide en escala G1 a G5. Afecta GPS, comunicaciones de radio y satÃ©lite, especialmente en altas latitudes.",
     example: "Una tormenta G3 puede cortar internet satelital en escuelas rurales por horas.",
-    summary: "Perturbación del campo magnético causada por viento solar.",
+    summary: "PerturbaciÃ³n del campo magnÃ©tico causada por viento solar.",
   },
   {
     id: "flare", number: "03", title: "Llamarada Solar",
-    body: "Explosión de energía en la superficie del sol. Se clasifica por intensidad: C (leve), M (moderada), X (severa). Las clase X pueden afectar todas las tecnologías simultáneamente.",
-    example: "Una llamarada X2 apagó redes satelitales en zonas rurales en 2024.",
-    summary: "Explosión de energía en la superficie del sol.",
+    body: "ExplosiÃ³n de energÃ­a en la superficie del sol. Se clasifica por intensidad: C (leve), M (moderada), X (severa). Las clase X pueden afectar todas las tecnologÃ­as simultÃ¡neamente.",
+    example: "Una llamarada X2 apagÃ³ redes satelitales en zonas rurales en 2024.",
+    summary: "ExplosiÃ³n de energÃ­a en la superficie del sol.",
   },
   {
     id: "nasa", number: "04", title: "NASA DONKI API",
-    body: "Base de datos oficial de la NASA con eventos espaciales en tiempo real. Es la fuente más confiable y actualizada del mundo para este tipo de datos.",
+    body: "Base de datos oficial de la NASA con eventos espaciales en tiempo real. Es la fuente mÃ¡s confiable y actualizada del mundo para este tipo de datos.",
     example: "Todos los eventos que ves en FlareField vienen directamente de los servidores de la NASA.",
     summary: "Base de datos oficial de la NASA con eventos espaciales en tiempo real.",
   },
   {
-    id: "drones", number: "05", title: "Drones de Fumigación",
-    body: "Pérdida de señal GPS, deriva de posición, desconexión del operador. El drone puede desviarse de la zona de trabajo o no regresar al punto de inicio.",
-    example: "Una tormenta G3 puede hacer que un drone pierda referencia GPS y se desvíe del campo.",
-    summary: "Pérdida de GPS y deriva de posición durante eventos solares.",
+    id: "drones", number: "05", title: "Drones de FumigaciÃ³n",
+    body: "PÃ©rdida de seÃ±al GPS, deriva de posiciÃ³n, desconexiÃ³n del operador. El drone puede desviarse de la zona de trabajo o no regresar al punto de inicio.",
+    example: "Una tormenta G3 puede hacer que un drone pierda referencia GPS y se desvÃ­e del campo.",
+    summary: "PÃ©rdida de GPS y deriva de posiciÃ³n durante eventos solares.",
   },
   {
     id: "wifi", number: "06", title: "WiFi Satelital Rural",
-    body: "Latencia alta, cortes intermitentes, pérdida total de señal. Riesgo: pérdida de comunicación en zonas sin alternativa de conectividad.",
-    example: "Descargá materiales importantes antes de una tormenta prevista.",
-    summary: "Latencia alta y cortes intermitentes de señal.",
+    body: "Latencia alta, cortes intermitentes, pÃ©rdida total de seÃ±al. Riesgo: pÃ©rdida de comunicaciÃ³n en zonas sin alternativa de conectividad.",
+    example: "DescargÃ¡ materiales importantes antes de una tormenta prevista.",
+    summary: "Latencia alta y cortes intermitentes de seÃ±al.",
   },
   {
     id: "schools", number: "07", title: "Internet en Escuelas Rurales",
-    body: "Igual que WiFi satelital, pero impacta clases en línea y sistemas administrativos. Las escuelas rurales dependen de internet satelital para conectividad.",
-    example: "Planificá clases offline como backup durante alertas naranjas o rojas.",
-    summary: "Impacta clases en línea y sistemas administrativos.",
+    body: "Igual que WiFi satelital, pero impacta clases en lÃ­nea y sistemas administrativos. Las escuelas rurales dependen de internet satelital para conectividad.",
+    example: "PlanificÃ¡ clases offline como backup durante alertas naranjas o rojas.",
+    summary: "Impacta clases en lÃ­nea y sistemas administrativos.",
   },
   {
     id: "radio", number: "08", title: "Comunicaciones de Radio",
-    body: "Interferencia en frecuencias HF, degradación de señal VHF/UHF. Las frecuencias HF son las más vulnerables a perturbaciones ionosféricas.",
-    example: "Establecé horarios de check-in más frecuentes durante alertas.",
+    body: "Interferencia en frecuencias HF, degradaciÃ³n de seÃ±al VHF/UHF. Las frecuencias HF son las mÃ¡s vulnerables a perturbaciones ionosfÃ©ricas.",
+    example: "EstablecÃ© horarios de check-in mÃ¡s frecuentes durante alertas.",
     summary: "Interferencia en frecuencias HF, VHF y UHF.",
   },
 ];
 
 const annotations: Annotation[] = [
-  { id: "kp",        label: "Escala de 0 a 9. Cuanto más\nalto, peor para tus equipos.",  cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.10 },
-  { id: "status",    label: "El estado actual de tu zona:\nestable, elevado o crítico.",     cardId: "storm",  elX: "left",  labelSide: "left",  labelYPct: -0.25 },
-  { id: "gauge",     label: "Muestra qué tan activo está el\ncampo magnético ahora mismo.", cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.46 },
+  { id: "kp",        label: "Escala de 0 a 9. Cuanto mÃ¡s\nalto, peor para tus equipos.",  cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.10 },
+  { id: "status",    label: "El estado actual de tu zona:\nestable, elevado o crÃ­tico.",     cardId: "storm",  elX: "left",  labelSide: "left",  labelYPct: -0.25 },
+  { id: "gauge",     label: "Muestra quÃ© tan activo estÃ¡ el\ncampo magnÃ©tico ahora mismo.", cardId: "kp",     elX: "left",  labelSide: "left",  labelYPct: 0.46 },
   { id: "hours",     label: "Ventana de tiempo en que el\nefecto va a durar.",               cardId: "storm",  elX: "left",  labelSide: "left",  labelYPct: 0.82 },
   { id: "eventname", label: "El nombre del evento\ndetectado por la NASA.",                  cardId: "flare",  elX: "right", labelSide: "right", labelYPct: 0.02 },
-  { id: "intensity", label: "La intensidad del evento.\nG y X son las más peligrosas.",      cardId: "flare",  elX: "right", labelSide: "right", labelYPct: 0.28 },
+  { id: "intensity", label: "La intensidad del evento.\nG y X son las mÃ¡s peligrosas.",      cardId: "flare",  elX: "right", labelSide: "right", labelYPct: 0.28 },
   { id: "source",    label: "Fuente oficial: base de datos\nespacial de la NASA en tiempo real.", cardId: "nasa", elX: "right", labelSide: "right", labelYPct: 0.52 },
-  { id: "tech",      label: "Qué equipos van a tener\nproblemas en tu campo.",              cardId: "drones", elX: "right", labelSide: "right", labelYPct: 0.90 },
+  { id: "tech",      label: "QuÃ© equipos van a tener\nproblemas en tu campo.",              cardId: "drones", elX: "right", labelSide: "right", labelYPct: 0.90 },
 ];
 
 function DiagramCard({
@@ -108,6 +108,8 @@ function DiagramCard({
   const isFlare = highlightedId === "eventname" || highlightedId === "intensity";
   const isNasa = highlightedId === "source";
 
+  const { gauge, kp, status, hours, eventname, intensity, source, tech } = refs;
+
   const glow = "shadow-[0_0_20px_-3px_var(--accent-bg)] border-[var(--accent-fill)]/25";
   const noGlow = "border-[var(--border-subtle)]/50";
   const elGlow = "bg-[var(--accent-fill)]/8 ring-1 ring-[var(--accent-fill)]/15";
@@ -115,7 +117,7 @@ function DiagramCard({
 
   return (
     <div className="flex flex-col md:flex-row gap-5 justify-center">
-      {/* ─── Monitoreo en Vivo ─── */}
+      {/* â”€â”€â”€ Monitoreo en Vivo â”€â”€â”€ */}
       <div className={`w-full md:w-[280px] p-5 glass-card-light transition-all duration-300 ${isKp || isStorm ? glow : noGlow}`}>
         <div className="flex items-center gap-2 mb-4">
           <span className="inline-block h-[6px] w-[6px] rounded-full bg-[var(--accent-fill)] animate-pulse" />
@@ -123,7 +125,7 @@ function DiagramCard({
         </div>
         <div className="flex items-center gap-4">
           <div
-            ref={refs.gauge}
+            ref={gauge}
             className={`relative w-[90px] h-[90px] shrink-0 rounded-xl transition-all duration-200 cursor-pointer ${highlightedId === "gauge" ? elGlow : elNoGlow}`}
             onMouseEnter={() => onElementEnter("gauge")}
             onMouseLeave={onElementLeave}
@@ -133,7 +135,7 @@ function DiagramCard({
               <circle fill="none" cx="60" cy="60" r="50" stroke="var(--accent-fill)" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 50} strokeDashoffset={2 * Math.PI * 50 * 0.44} />
             </svg>
             <div
-              ref={refs.kp}
+              ref={kp}
               className={`absolute inset-0 flex flex-col items-center justify-center rounded-xl transition-all duration-200 cursor-pointer ${highlightedId === "kp" ? elGlow : elNoGlow}`}
               onMouseEnter={() => onElementEnter("kp")}
               onMouseLeave={onElementLeave}
@@ -146,7 +148,7 @@ function DiagramCard({
             <div>
               <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Estado</div>
               <span
-                ref={refs.status}
+                ref={status}
                 className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] border-[var(--border-strong)]/30 bg-[var(--bg-surface-2)] text-[var(--text-secondary)] transition-all duration-200 cursor-pointer ${highlightedId === "status" ? "bg-[var(--accent-bg)] border-[var(--accent-fill)]/25 text-[var(--accent-text)] ring-1 ring-[var(--accent-fill)]/10" : ""}`}
                 style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
                 onMouseEnter={() => onElementEnter("status")}
@@ -156,12 +158,12 @@ function DiagramCard({
               </span>
             </div>
             <div
-              ref={refs.hours}
+              ref={hours}
               className={`rounded-lg px-2 py-1 -mx-2 transition-all duration-200 cursor-pointer ${highlightedId === "hours" ? elGlow : elNoGlow}`}
               onMouseEnter={() => onElementEnter("hours")}
               onMouseLeave={onElementLeave}
             >
-              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Próximas horas</div>
+              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>PrÃ³ximas horas</div>
               <div className="flex items-center gap-1.5">
                 <span className="inline-block h-[5px] w-[5px] rounded-full bg-[var(--accent-fill)] animate-pulse" />
                 <span className="text-[13px] text-[var(--text-secondary)]" style={{ fontFamily: "var(--font-body), sans-serif" }}>+3h</span>
@@ -171,7 +173,7 @@ function DiagramCard({
         </div>
       </div>
 
-      {/* ─── Eventos Activos ─── */}
+      {/* â”€â”€â”€ Eventos Activos â”€â”€â”€ */}
       <div className={`w-full md:w-[280px] p-5 glass-card-light transition-all duration-300 ${isFlare || isNasa ? glow : noGlow}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -182,7 +184,7 @@ function DiagramCard({
         <div className="flex items-center justify-between gap-3 mb-3">
           <div className="min-w-0">
             <div
-              ref={refs.eventname}
+              ref={eventname}
               className={`text-[14px] font-semibold text-[var(--text-primary)] truncate rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "eventname" ? elGlow : elNoGlow}`}
               style={{ fontFamily: "var(--font-body), sans-serif" }}
               onMouseEnter={() => onElementEnter("eventname")}
@@ -191,7 +193,7 @@ function DiagramCard({
               Tormenta Solar
             </div>
             <div
-              ref={refs.source}
+              ref={source}
               className={`text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mt-0.5 rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "source" ? "bg-[var(--accent-bg)]/10 text-[var(--accent-fill)] ring-1 ring-[var(--accent-fill)]/15" : ""}`}
               style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
               onMouseEnter={() => onElementEnter("source")}
@@ -202,7 +204,7 @@ function DiagramCard({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span
-              ref={refs.intensity}
+              ref={intensity}
               className={`text-[20px] font-bold tracking-tight text-[var(--text-primary)] rounded px-1 transition-all duration-200 cursor-pointer ${highlightedId === "intensity" ? elGlow : elNoGlow}`}
               style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
               onMouseEnter={() => onElementEnter("intensity")}
@@ -217,12 +219,12 @@ function DiagramCard({
         </div>
         <div className="h-px bg-[var(--border-subtle)]/40 mb-3" />
         <div
-          ref={refs.tech}
+          ref={tech}
           className={`rounded-lg p-1 -m-1 transition-all duration-200 cursor-pointer ${highlightedId === "tech" ? elGlow : elNoGlow}`}
           onMouseEnter={() => onElementEnter("tech")}
           onMouseLeave={onElementLeave}
         >
-          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-2" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Tecnologías Afectadas</div>
+          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-2" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>TecnologÃ­as Afectadas</div>
           <div className="grid grid-cols-2 gap-2">
             {[
               { icon: "M12 7a5 5 0 100 10 5 5 0 000-10zM4 4l4 4M20 4l-4 4M4 20l4-4M20 20l-4-4", label: "Drones" },
@@ -349,15 +351,15 @@ export default function GlossaryPage() {
   const labelSource = useRef<HTMLDivElement | null>(null);
   const labelTech = useRef<HTMLDivElement | null>(null);
 
-  const elRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
+  const elementRefs = useMemo<Record<string, React.RefObject<HTMLDivElement | null>>>(() => ({
     kp: elKp, gauge: elGauge, status: elStatus, hours: elHours,
     eventname: elEventname, intensity: elIntensity, source: elSource, tech: elTech,
-  };
+  }), [elKp, elGauge, elStatus, elHours, elEventname, elIntensity, elSource, elTech]);
 
-  const labelRefs: Record<string, React.RefObject<HTMLDivElement | null>> = {
+  const annotationRefs = useMemo<Record<string, React.RefObject<HTMLDivElement | null>>>(() => ({
     kp: labelKp, gauge: labelGauge, status: labelStatus, hours: labelHours,
     eventname: labelEventname, intensity: labelIntensity, source: labelSource, tech: labelTech,
-  };
+  }), [labelKp, labelGauge, labelStatus, labelHours, labelEventname, labelIntensity, labelSource, labelTech]);
 
   const handleAnnotationEnter = useCallback((id: string) => setHighlightedId(id), []);
   const handleAnnotationLeave = useCallback(() => setHighlightedId(null), []);
@@ -379,8 +381,8 @@ export default function GlossaryPage() {
   // Hero entrance animation
   useEffect(() => {
     if (reducedMotion) {
-      setHeroVisible(true);
-      return;
+      const id = requestAnimationFrame(() => setHeroVisible(true));
+      return () => cancelAnimationFrame(id);
     }
     const timer = setTimeout(() => setHeroVisible(true), 100);
     return () => clearTimeout(timer);
@@ -393,7 +395,8 @@ export default function GlossaryPage() {
       return () => clearTimeout(timer);
     }
     if (reducedMotion && isDiagramVisible) {
-      setArrowsDrawn(true);
+      const id = requestAnimationFrame(() => setArrowsDrawn(true));
+      return () => cancelAnimationFrame(id);
     }
   }, [isDiagramVisible, reducedMotion]);
 
@@ -405,7 +408,7 @@ export default function GlossaryPage() {
       const y = window.scrollY;
       const max = docH - winH;
       setScrollProgress(max > 0 ? (y / max) * 100 : 0);
-      // title fade: fully visible 0–150, fade out 150–300
+      // title fade: fully visible 0â€“150, fade out 150â€“300
       if (y <= 150) setTitleOpacity(1);
       else if (y >= 300) setTitleOpacity(0);
       else setTitleOpacity(1 - (y - 150) / 150);
@@ -427,7 +430,7 @@ export default function GlossaryPage() {
 
       const elPos: Record<string, { cx: number; cy: number; elLeft: number; elRight: number }> = {};
       for (const ann of annotations) {
-        const el = elRefs[ann.id]?.current;
+        const el = elementRefs[ann.id]?.current;
         if (el) {
           const r = el.getBoundingClientRect();
           elPos[ann.id] = {
@@ -442,7 +445,7 @@ export default function GlossaryPage() {
 
       const lblPos: Record<string, LabelPos> = {};
       for (const ann of annotations) {
-        const lbl = labelRefs[ann.id]?.current;
+        const lbl = annotationRefs[ann.id]?.current;
         if (lbl) {
           const r = lbl.getBoundingClientRect();
           lblPos[ann.id] = {
@@ -471,7 +474,7 @@ export default function GlossaryPage() {
       window.removeEventListener("resize", measure);
       cancelAnimationFrame(raf);
     };
-  }, [isMobile, isDiagramVisible]);
+  }, [isMobile, isDiagramVisible, elementRefs, annotationRefs]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -503,7 +506,7 @@ export default function GlossaryPage() {
     ? annotations.find((a) => a.id === highlightedId)?.cardId ?? null
     : null;
 
-  // Compute arrow paths — all coordinates from DOM measurement
+  // Compute arrow paths â€” all coordinates from DOM measurement
   const arrowPaths = annotations.map((ann) => {
     const startPos = positions[ann.id];
     const lblPos = labelPositions[ann.id];
@@ -621,7 +624,7 @@ export default function GlossaryPage() {
 
   return (
     <>
-      {/* ─── Scroll Progress Bar ─── */}
+      {/* â”€â”€â”€ Scroll Progress Bar â”€â”€â”€ */}
       <div
         style={{
           position: "fixed",
@@ -635,7 +638,7 @@ export default function GlossaryPage() {
         }}
       />
 
-      {/* ─── FlareField Hero Title (fixed top-left, matching map page) ─── */}
+      {/* â”€â”€â”€ FlareField Hero Title (fixed top-left, matching map page) â”€â”€â”€ */}
       <div
         className="pointer-events-none max-w-xl md:left-8 lg:left-12"
         style={{ position: "fixed", top: 0, left: "0.5rem", zIndex: 50, opacity: titleOpacity, pointerEvents: titleOpacity === 0 ? "none" : undefined }}
@@ -665,7 +668,7 @@ export default function GlossaryPage() {
       </div>
 
       <div className="relative min-h-screen" style={{ background: "var(--bg-page)", color: "var(--text-primary)" }}>
-      {/* ─── Background Texture ─── */}
+      {/* â”€â”€â”€ Background Texture â”€â”€â”€ */}
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
         {/* Dot grid pattern */}
         <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle, var(--border-subtle) 0.8px, transparent 0.8px)", backgroundSize: "24px 24px", opacity: 0.3 }} />
@@ -679,7 +682,7 @@ export default function GlossaryPage() {
       <BottomNav />
 
       <main className="mx-auto max-w-6xl px-6 sm:px-8 lg:px-12">
-        {/* ─── Hero ─── */}
+        {/* â”€â”€â”€ Hero â”€â”€â”€ */}
         <section className="pt-[100px] pb-20 text-center">
           <h2
             className="text-6xl sm:text-7xl md:text-[96px] font-light text-[var(--text-primary)] tracking-tight mb-6"
@@ -701,7 +704,7 @@ export default function GlossaryPage() {
               transition: reducedMotion ? "none" : "opacity 0.6s ease-out 0.25s, transform 0.6s ease-out 0.25s",
             }}
           >
-            Entendé qué afecta tu tecnología y cuándo actuar.
+            EntendÃ© quÃ© afecta tu tecnologÃ­a y cuÃ¡ndo actuar.
           </p>
           {/* Decorative rule */}
           <div
@@ -713,11 +716,11 @@ export default function GlossaryPage() {
           />
         </section>
 
-        {/* ─── Mobile: Simple list ─── */}
+        {/* â”€â”€â”€ Mobile: Simple list â”€â”€â”€ */}
         {isMobile && (
           <section className="pb-16">
             <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--text-secondary)] mb-6 text-center" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
-              Qué estás viendo en el mapa
+              QuÃ© estÃ¡s viendo en el mapa
             </p>
             <div className="space-y-3">
               {glossaryData.map((entry) => (
@@ -733,7 +736,7 @@ export default function GlossaryPage() {
           </section>
         )}
 
-        {/* ─── Annotated Diagram (tablet+) ─── */}
+        {/* â”€â”€â”€ Annotated Diagram (tablet+) â”€â”€â”€ */}
         {!isMobile && (
           <section
             id="diagram-section"
@@ -748,7 +751,7 @@ export default function GlossaryPage() {
               }}
             >
               <span className="inline-block w-5 h-px bg-[var(--border-subtle)]/60" />
-              Qué estás viendo en el mapa
+              QuÃ© estÃ¡s viendo en el mapa
               <span className="inline-block w-5 h-px bg-[var(--border-subtle)]/60" />
             </p>
 
@@ -764,7 +767,7 @@ export default function GlossaryPage() {
                 }}
                 aria-hidden="true"
               />
-              {/* SVG overlay — coordinates = DOM pixels relative to this container */}
+              {/* SVG overlay â€” coordinates = DOM pixels relative to this container */}
               {containerSize.w > 0 && (
                 <svg
                   ref={svgRef}
@@ -821,7 +824,7 @@ export default function GlossaryPage() {
               {annotations.filter((a) => a.labelSide === "left").map((ann, idx) => (
                 <div
                   key={`lbl-${ann.id}`}
-                  ref={labelRefs[ann.id]}
+                  ref={annotationRefs[ann.id]}
                   className="absolute left-0 w-[150px] text-right cursor-pointer"
                   style={{
                     top: `${ann.labelYPct * 100}%`,
@@ -850,7 +853,7 @@ export default function GlossaryPage() {
               {annotations.filter((a) => a.labelSide === "right").map((ann, idx) => (
                 <div
                   key={`lbl-${ann.id}`}
-                  ref={labelRefs[ann.id]}
+                  ref={annotationRefs[ann.id]}
                   className="absolute right-0 w-[150px] cursor-pointer"
                   style={{
                     top: `${ann.labelYPct * 100}%`,
@@ -875,18 +878,18 @@ export default function GlossaryPage() {
                 </div>
               ))}
 
-              {/* Cards in normal flow — measured via refs */}
+              {/* Cards in normal flow â€” measured via refs */}
               <DiagramCard
                 highlightedId={highlightedId}
                 onElementEnter={handleElementEnter}
                 onElementLeave={handleElementLeave}
-                refs={elRefs}
+                refs={elementRefs}
               />
             </div>
           </section>
         )}
 
-        {/* ─── Glossary Cards ─── */}
+        {/* â”€â”€â”€ Glossary Cards â”€â”€â”€ */}
         <section className="pb-24">
           <p
             className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--text-secondary)] mb-8 flex items-center justify-center gap-3"
@@ -897,7 +900,7 @@ export default function GlossaryPage() {
             }}
           >
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--border-subtle)]/60" />
-            Términos clave
+            TÃ©rminos clave
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--border-subtle)]/60" />
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -916,10 +919,10 @@ export default function GlossaryPage() {
           </div>
         </section>
 
-        {/* ─── Footer ─── */}
+        {/* â”€â”€â”€ Footer â”€â”€â”€ */}
         <footer className="text-center py-12 border-t border-[var(--border-subtle)]/40">
           <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--text-secondary)] mb-6" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
-            © 2026 FlareField
+            Â© 2026 FlareField
           </p>
           <Link href="/" className="inline-flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-150" style={{ fontFamily: "var(--font-body), sans-serif" }}>
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

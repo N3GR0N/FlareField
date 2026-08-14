@@ -1,28 +1,38 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import type { Map as MapLibreMap } from "maplibre-gl";
 import { createRoot, type Root as ReactRoot } from "react-dom/client";
-import { gsap } from "gsap";
 import { Zone } from "@/types/solar";
-import ZoneMarker from "@/components/ui/ZoneMarker";
+import ZoneMarker, { type ZoneMarkerSeverity } from "@/components/ui/ZoneMarker";
+import { useSolarData } from "@/hooks/useSolarData";
+import { LocateFixed } from "lucide-react";
 
 type Severity = Zone["severity"];
 type MapLibreModule = typeof import("maplibre-gl");
 type MapLibreImport = MapLibreModule & { default?: MapLibreModule };
-
-const SEVERITY_RANK: Record<Severity, number> = {
-  green: 0,
-  yellow: 1,
-  orange: 2,
-  red: 3
-};
 
 const SEVERITY_AREA_SIZE: Record<Severity, number> = {
   green: 30,
   yellow: 40,
   orange: 60,
   red: 90
+};
+
+type Band = 0 | 1 | 2;
+
+const bandForLat = (lat: number): Band => {
+  const absLat = Math.abs(lat);
+  if (absLat >= 55) return 2;
+  if (absLat >= 35) return 1;
+  return 0;
+};
+
+const severityForBand = (band: Band, kp: number): Severity => {
+  if (kp <= 3) return "green";
+  if (kp <= 5) return band >= 2 ? "yellow" : "green";
+  if (kp <= 7) return band === 2 ? "orange" : band === 1 ? "yellow" : "green";
+  return band === 2 ? "red" : band === 1 ? "orange" : "yellow";
 };
 
 type CapitalZone = Zone & {
@@ -39,6 +49,8 @@ type RegionMeta = {
   spreadLng: number;
   countryNames: string[];
 };
+
+type MarkerDef = { el: HTMLElement; root: ReactRoot; zone: Zone };
 
 const CAPITAL_ZONES: CapitalZone[] = [
   // América del Norte
@@ -169,74 +181,12 @@ const buildRegionMeta = (zones: CapitalZone[]): Record<string, RegionMeta> => {
   return meta;
 };
 
-const createSeededRandom = (seed: string) => {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i += 1) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i);
-    hash |= 0;
-  }
-  let state = Math.abs(hash) + 1;
-  return () => {
-    state = (state * 48271) % 2147483647;
-    return (state - 1) / 2147483646;
-  };
-};
-
-type BlobEllipse = { cx: number; cy: number; rx: number; ry: number; opacity: number };
-type FlowPath = { d: string; strokeWidth: number; opacity: number; className: string };
-
-const getBlobEllipses = (width: number, height: number, seed: string): BlobEllipse[] => {
-  const rand = createSeededRandom(seed);
-  const baseRx = width * 0.42;
-  const baseRy = height * 0.28;
-
-  const ellipses: BlobEllipse[] = [];
-  for (let i = 0; i < 5; i += 1) { // Generate more ellipses
-    ellipses.push({
-      cx: width * (0.4 + (rand() - 0.5) * 0.3), // More varied positions
-      cy: height * (0.5 + (rand() - 0.5) * 0.3),
-      rx: baseRx * (0.7 + rand() * 0.5), // More varied sizes
-      ry: baseRy * (0.7 + rand() * 0.5),
-      opacity: 0.1 + rand() * 0.2 // Varied opacity
-    });
-  }
-  return ellipses;
-};
-
-const getFlowPaths = (width: number, height: number): FlowPath[] => {
-  const x1 = width * 0.08;
-  const x2 = width * 0.42;
-  const x3 = width * 0.7;
-  const x4 = width * 0.94;
-
-  return [
-    {
-      d: `M ${x1} ${height * 0.56} Q ${x2} ${height * 0.28} ${x3} ${height * 0.46} T ${x4} ${height * 0.54}`,
-      strokeWidth: 2.4,
-      opacity: 0.9,
-      className: "flow-path-1"
-    },
-    {
-      d: `M ${x1} ${height * 0.68} Q ${x2} ${height * 0.52} ${x3} ${height * 0.58} T ${x4} ${height * 0.64}`,
-      strokeWidth: 2.0,
-      opacity: 0.65,
-      className: "flow-path-2"
-    },
-    {
-      d: `M ${x1} ${height * 0.42} Q ${x2} ${height * 0.2} ${x3} ${height * 0.36} T ${x4} ${height * 0.4}`,
-      strokeWidth: 1.6,
-      opacity: 0.45,
-      className: "flow-path-3"
-    }
-  ];
-};
-
 const REGION_META = buildRegionMeta(CAPITAL_ZONES);
 
-const combineRegions = (zones: CapitalZone[]): Zone[] => {
+const getWorldZones = (kp: number): Zone[] => {
   const grouped = new Map<string, { id: string; name: string; zones: CapitalZone[] }>();
 
-  zones.forEach((zone) => {
+  CAPITAL_ZONES.forEach((zone) => {
     const entry = grouped.get(zone.regionId) || {
       id: zone.regionId,
       name: zone.regionName,
@@ -247,52 +197,114 @@ const combineRegions = (zones: CapitalZone[]): Zone[] => {
   });
 
   return Array.from(grouped.values()).map((region) => {
-    let severity: Severity = "green";
-    region.zones.forEach((zone) => {
-      if (SEVERITY_RANK[zone.severity] > SEVERITY_RANK[severity]) {
-        severity = zone.severity;
-      }
-    });
+    const band = region.zones.reduce<Band>((max, zone) => Math.max(max, bandForLat(zone.lat)) as Band, 0);
 
     const lat = region.zones.reduce((sum, zone) => sum + zone.lat, 0) / region.zones.length;
     const lng = region.zones.reduce((sum, zone) => sum + zone.lng, 0) / region.zones.length;
     const affectedTech = Array.from(new Set(region.zones.flatMap((zone) => zone.affectedTech))).slice(0, 6);
-    const name = region.name;
 
     return {
       id: region.id,
-      name,
+      name: region.name,
       lat,
       lng,
-      severity,
+      severity: severityForBand(band, kp),
       affectedTech
     };
   });
 };
 
-const WORLD_ZONES: Zone[] = combineRegions(CAPITAL_ZONES);
+const DEFAULT_CENTER = { lat: -38.0, lng: -63.5 };
 
-const DEFAULT_CENTER = { lat: 15.0, lng: 50.0 };
+const LEGEND_ITEMS = [
+  { label: "ESTABLE", color: "rgba(var(--zone-c-green), 0.95)" },
+  { label: "ELEVADO", color: "rgba(var(--zone-c-yellow), 0.95)" },
+  { label: "ACTIVA", color: "rgba(var(--zone-c-orange), 0.95)" },
+  { label: "CRÍTICA", color: "rgba(var(--zone-c-red), 0.95)" },
+];
 
 function getCameraPreset() {
   if (typeof window === "undefined") {
-    return { zoom: 2.2, pitch: 0, bearing: 0 };
+    return { zoom: 3.2, pitch: 0, bearing: 0 };
   }
 
   const isWideViewport = window.matchMedia("(min-width: 1280px)").matches;
 
   return isWideViewport
-    ? { zoom: 2.5, pitch: 0, bearing: 0 }
-    : { zoom: 2.2, pitch: 0, bearing: 0 };
+    ? { zoom: 3.4, pitch: 0, bearing: 0 }
+    : { zoom: 3.0, pitch: 0, bearing: 0 };
 }
 
 export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat: number; lng: number; name: string } | null }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
-  const markerRootsRef = useRef<ReactRoot[]>([]);
+  const markerDefsRef = useRef<MarkerDef[]>([]);
+  const kpRef = useRef(0);
+  const { data } = useSolarData();
+
+  const renderMarker = useCallback((def: MarkerDef) => {
+    const severity = severityForBand(bandForLat(def.zone.lat), kpRef.current);
+    const markerSeverity: ZoneMarkerSeverity = severity === "green"
+      ? "baja"
+      : severity === "yellow"
+        ? "media"
+        : "alta";
+    const severityLabel = severity === "red"
+      ? "TORMENTA CRÍTICA"
+      : severity === "orange"
+        ? "TORMENTA ACTIVA"
+        : severity === "yellow"
+          ? "KP ELEVADO"
+          : "SEÑAL ESTABLE";
+    const regionMeta = REGION_META[def.zone.id];
+    const countryNames = regionMeta?.countryNames ?? [];
+    const countryPreview = countryNames.slice(0, 3).join(", ");
+    const remainingCount = Math.max(countryNames.length - 3, 0);
+    const coverageLine = countryPreview
+      ? `${countryPreview}${remainingCount > 0 ? ` +${remainingCount}` : ""}`
+      : "Cobertura regional";
+    const techPreview = def.zone.affectedTech.slice(0, 2).join(" • ");
+
+    def.el.setAttribute("data-severity", markerSeverity);
+    def.root.render(
+      <ZoneMarker
+        severity={markerSeverity}
+        zoneName={def.zone.name}
+        severityLabel={severityLabel}
+        coverageLine={coverageLine}
+        techPreview={techPreview}
+        size={SEVERITY_AREA_SIZE[severity]}
+      />
+    );
+  }, []);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const kp = data?.kpIndex?.kp ?? 0;
+    if (kp === kpRef.current) return;
+    kpRef.current = kp;
+    markerDefsRef.current.forEach(renderMarker);
+  }, [data?.kpIndex?.kp, renderMarker]);
+
+  const handleLocate = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (userLocation) {
+      map.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 5.2, duration: 1600 });
+      return;
+    }
+    if (!("geolocation" in navigator)) return;
+    navigator.geolocation.getCurrentPosition((position) => {
+      map.flyTo({
+        center: [position.coords.longitude, position.coords.latitude],
+        zoom: 5.2,
+        duration: 1600,
+      });
+    }, undefined, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  }, [userLocation]);
+
+  useEffect(() => {
+    const mountContainer = containerRef.current;
+    if (!mountContainer) return;
 
     let cancelled = false;
     const preventContextMenu = (e: Event) => e.preventDefault();
@@ -305,7 +317,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         ]);
         if (cancelled) return;
         const maplibregl = ((mod as MapLibreImport).default ?? mod) as MapLibreModule;
-        const container = containerRef.current;
+        const container = containerRef.current ?? mountContainer;
         if (!container) return;
 
         // Get theme-appropriate style URL
@@ -313,12 +325,11 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         const styleUrl = isDark
           ? 'https://api.maptiler.com/maps/streets-v2-dark/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY
           : 'https://api.maptiler.com/maps/dataviz/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY;
-        console.log('Tile URL:', styleUrl);
-        
+
         const camera = getCameraPreset();
 
-        markerRootsRef.current.forEach((root) => root.unmount());
-        markerRootsRef.current = [];
+        markerDefsRef.current.forEach((def) => def.root.unmount());
+        markerDefsRef.current = [];
 
         const map = new maplibregl.Map({
           container,
@@ -334,7 +345,9 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           renderWorldCopies: true
         });
 
-        map.addControl(new maplibregl.NavigationControl({ showCompass: false, showZoom: false }), 'top-right');
+                if (userLocation) {
+          map.flyTo({ center: [userLocation.lng, userLocation.lat], zoom: 5.2, duration: 1600 });
+        }
 
         map.on('load', () => {
           // Force resize after a small delay to ensure dimensions are correct
@@ -367,33 +380,21 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           if (!overlay) return;
 
           // Clear any existing markers
+          markerDefsRef.current.forEach((def) => def.root.unmount());
+          markerDefsRef.current = [];
           overlay.innerHTML = '';
 
-          // Create zone markers
-          WORLD_ZONES.forEach((zone) => {
+          // Create zone markers with the unified severity model
+          const zones = getWorldZones(kpRef.current);
+
+          zones.forEach((zone) => {
             const markerEl = document.createElement('div');
             markerEl.className = 'maplibre-ripple-zone';
             markerEl.setAttribute('data-zone', zone.name);
-            markerEl.setAttribute('data-severity', zone.severity);
+            markerEl.setAttribute('data-severity', 'baja');
             markerEl.setAttribute('data-lng', String(zone.lng));
             markerEl.setAttribute('data-lat', String(zone.lat));
             markerEl.setAttribute('data-hover', 'false');
-            const markerSeverity = zone.severity === "orange" || zone.severity === "red" ? "alta" : "media";
-            const severityLabel = zone.severity === "red"
-              ? "TORNADO SOLAR"
-              : zone.severity === "orange"
-                ? "TORMENTA ACTIVA"
-                : zone.severity === "yellow"
-                  ? "KP ELEVADO"
-                  : "SEÑAL ESTABLE";
-            const regionMeta = REGION_META[zone.id];
-            const countryNames = regionMeta?.countryNames ?? [];
-            const countryPreview = countryNames.slice(0, 3).join(", ");
-            const remainingCount = Math.max(countryNames.length - 3, 0);
-            const coverageLine = countryPreview
-              ? `${countryPreview}${remainingCount > 0 ? ` +${remainingCount}` : ""}`
-              : "Cobertura regional";
-            const techPreview = zone.affectedTech.slice(0, 2).join(" • ");
 
             markerEl.style.position = 'absolute';
             markerEl.style.left = '0';
@@ -405,17 +406,9 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
             markerEl.style.pointerEvents = 'auto';
 
             const root = createRoot(markerEl);
-            root.render(
-              <ZoneMarker
-                severity={markerSeverity}
-                zoneName={zone.name}
-                severityLabel={severityLabel}
-                coverageLine={coverageLine}
-                techPreview={techPreview}
-                size={SEVERITY_AREA_SIZE[zone.severity]}
-              />
-            );
-            markerRootsRef.current.push(root);
+            const def: MarkerDef = { el: markerEl, root, zone };
+            markerDefsRef.current.push(def);
+            renderMarker(def);
 
             overlay.appendChild(markerEl);
           });
@@ -482,9 +475,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         // Theme change handler
         const handleThemeChange = () => {
           if (!map || !map.loaded()) return;
-          console.log('OBSERVER FIRED - data-theme:', document.documentElement.getAttribute('data-theme'));
           const newIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
-          console.log('UPDATING MAP STYLE to:', newIsDark ? 'dark' : 'light');
           const newStyleUrl = newIsDark
             ? 'https://api.maptiler.com/maps/streets-v2-dark/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY
             : 'https://api.maptiler.com/maps/dataviz/style.json?key=' + process.env.NEXT_PUBLIC_MAPTILER_API_KEY;
@@ -499,7 +490,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
 
         // ─── Recoloreo a paleta FlareField — capas del style actual ───
         const applyPaletteRecolor = (map: maplibregl.Map) => {
-          const leftover: { id: string; type: string }[] = [];
+          const leftover: string[] = [];
 
           const paintFor = (id: string, type: string): Record<string, string> | null => {
             const k = id.toLowerCase();
@@ -537,8 +528,10 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
               return { "fill-color": "#3C7362" };
             }
 
-            // 9. Arena / desierto — solo fill (layer real: "Sand")
-            if (type === "fill" && k.includes("sand")) return { "fill-color": "#7C7E6F" };
+            // 9. Arena / desierto — solo fill (capa real: "Sand") — tono arena neutro y cálido
+            if (type === "fill" && ["sand", "desert", "dune"].some((kw) => k.includes(kw))) {
+              return { "fill-color": "#D2BC93" };
+            }
 
             // 10. Manzanas urbanas — solo fill
             if (type === "fill" && ["residential", "pedestrian"].some((kw) => k.includes(kw))) {
@@ -565,9 +558,9 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
               return { "line-color": "#DFD0B8" };
             }
 
-            // 14. Calles menores — solo line
-            if (type === "line" && ["minor road", "path", "footway"].some((kw) => k.includes(kw))) {
-              return { "line-color": "#7285A2" };
+            // 14. Calles secundarias y rurales — solo line (mismo tono cartográfico que avenidas y rutas principales)
+            if (type === "line" && ["minor road", "secondary road", "street", "service", "residential road", "path", "footway"].some((kw) => k.includes(kw))) {
+              return { "line-color": "#DFD0B8" };
             }
 
             // 14b. Infraestructura — túneles, puentes, muelles, pistas y obras
@@ -591,6 +584,11 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
               return { "text-color": "#FFFFFF", "text-halo-color": "#000000" };
             }
 
+            // 17b. Labels de pueblos y localidades pequeñas — mismo color y contraste que países y ciudades principales
+            if (type === "symbol" && ["town", "village", "settlement", "suburb", "neighbourhood", "neighborhood", "locality"].some((kw) => k.includes(kw))) {
+              return { "text-color": "#FFFFFF", "text-halo-color": "#000000" };
+            }
+
             // 13. Highway shields — antes del fallback, para no caer en labels chicos
             if (type === "symbol" && k.includes("highway shield")) {
               return { "text-color": "#DFD0B8", "icon-color": "#DFD0B8" };
@@ -607,7 +605,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           map.getStyle().layers.forEach((layer) => {
             const paint = paintFor(layer.id, layer.type);
             if (!paint) {
-              leftover.push({ id: layer.id, type: layer.type });
+              leftover.push(layer.id);
               return;
             }
             Object.entries(paint).forEach(([prop, value]) => {
@@ -620,7 +618,7 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           });
 
           if (leftover.length > 0) {
-            console.log("LAYERS SIN RECOLOREAR:", JSON.stringify(leftover, null, 2));
+            console.info("Layers sin recolor:", leftover.join(", "));
           }
         };
 
@@ -628,94 +626,28 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
       
       } catch {
         // maplibre not installed or failed to load — warn but don't throw
-        // console.warn('MapLibre not loaded:', err);
       }
     })();
 
     return () => {
       cancelled = true;
-      if (containerRef.current) {
-        containerRef.current.removeEventListener('contextmenu', preventContextMenu);
-      }
+      mountContainer.removeEventListener('contextmenu', preventContextMenu);
       if (mapRef.current) {
         const overlay = document.querySelector('.maplibre-markers-overlay');
         overlay?.replaceChildren();
       }
-      markerRootsRef.current.forEach((root) => {
+      markerDefsRef.current.forEach((def) => {
         queueMicrotask(() => {
-          root.unmount();
+          def.root.unmount();
         });
       });
-      markerRootsRef.current = [];
+      markerDefsRef.current = [];
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
     };
-  }, [containerRef, userLocation]);
-
-  // GSAP pulse animation for zone area markers
-  const gsapCtxRef = useRef<gsap.Context | null>(null);
-
-  useEffect(() => {
-    const overlay = document.querySelector('.maplibre-markers-overlay');
-    if (!overlay) return;
-
-    const observer = new MutationObserver(() => {
-      const areas = overlay.querySelectorAll('.zone-ripple-area');
-      if (areas.length === 0) return;
-      observer.disconnect();
-
-      gsapCtxRef.current?.kill();
-      gsapCtxRef.current = gsap.context(() => {
-        areas.forEach((el) => {
-          gsap.fromTo(el,
-            { scale: 1, opacity: 0.5 },
-            {
-              scale: 1.15,
-              opacity: 0.8,
-              duration: 2.5,
-              ease: "sine.inOut",
-              repeat: -1,
-              yoyo: true,
-              delay: gsap.utils.random(0, 1.5),
-            }
-          );
-        });
-      }, overlay);
-    });
-
-    observer.observe(overlay, { childList: true, subtree: true });
-
-    // Check if zones already exist
-    const existing = overlay.querySelectorAll('.zone-ripple-area');
-    if (existing.length > 0) {
-      observer.disconnect();
-      gsapCtxRef.current?.kill();
-      gsapCtxRef.current = gsap.context(() => {
-        existing.forEach((el) => {
-          gsap.fromTo(el,
-            { scale: 1, opacity: 0.5 },
-            {
-              scale: 1.15,
-              opacity: 0.8,
-              duration: 2.5,
-              ease: "sine.inOut",
-              repeat: -1,
-              yoyo: true,
-              delay: gsap.utils.random(0, 1.5),
-            }
-          );
-        });
-      }, overlay);
-    }
-
-    return () => {
-      observer.disconnect();
-      gsapCtxRef.current?.kill();
-      gsapCtxRef.current = null;
-    };
-  }, []);
+  }, [containerRef, userLocation, renderMarker]);
 
   return (
     <div className="relative w-full h-full overflow-hidden maplibre-dark-shell">
@@ -748,8 +680,47 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
         }}
       />
 
+      {/* Ir a mi ubicación */}
+      <button
+        onClick={handleLocate}
+        className="absolute right-3 bottom-3 z-10 flex h-10 w-10 items-center justify-center rounded-full transition-transform active:scale-[0.95]"
+        style={{
+          background: "var(--glass-teal)",
+          backdropFilter: "var(--glass-blur)",
+          WebkitBackdropFilter: "var(--glass-blur)",
+          border: "1px solid var(--glass-border)",
+          boxShadow: "var(--shadow-elevated)",
+          color: "var(--text-primary)",
+        }}
+        aria-label="Ir a mi ubicación"
+      >
+        <LocateFixed size={16} />
+      </button>
 
-      
+      {/* Leyenda de severidad */}
+      <div
+        className="pointer-events-none absolute bottom-20 md:bottom-4 left-4 z-10 flex items-center gap-4 rounded-2xl px-4 py-2.5"
+        style={{
+          background: "var(--glass-teal)",
+          backdropFilter: "var(--glass-blur)",
+          WebkitBackdropFilter: "var(--glass-blur)",
+          border: "1px solid var(--glass-border)",
+          boxShadow: "var(--shadow-elevated)",
+        }}
+      >
+        {LEGEND_ITEMS.map((item) => (
+          <span key={item.label} className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full" style={{ background: item.color }} />
+            <span
+              className="text-[12px] font-medium tracking-wide"
+              style={{ color: "var(--text-secondary)", fontFamily: "var(--font-mono-stat), sans-serif" }}
+            >
+              {item.label}
+            </span>
+          </span>
+        ))}
+      </div>
+
     </div>
   );
 }
