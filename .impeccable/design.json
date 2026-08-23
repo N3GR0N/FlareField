@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-23T00:00:00-03:00",
+  "title": "Design System: FlareField",
+  "extensions": {
+    "colorMeta": {
+      "desert-gold": {
+        "role": "primary",
+        "displayName": "Desert Gold",
+        "canonical": "#C9B98F",
+        "tonalRamp": ["oklch(15% 0.021 92)", "oklch(25% 0.032 92)", "oklch(35% 0.042 92)", "oklch(45% 0.053 92)", "oklch(56% 0.063 92)", "oklch(68% 0.07 92)", "oklch(81% 0.063 92)", "oklch(95% 0.042 92)"]
+      },
+      "espresso": {
+        "role": "secondary",
+        "displayName": "Espresso",
+        "canonical": "#2A2620",
+        "tonalRamp": ["oklch(15% 0.006 75)", "oklch(23% 0.009 75)", "oklch(33% 0.012 75)", "oklch(45% 0.015 75)", "oklch(56% 0.018 75)", "oklch(68% 0.02 75)", "oklch(81% 0.018 75)", "oklch(95% 0.012 75)"]
+      },
+      "champagne": {
+        "role": "secondary",
+        "displayName": "Champagne",
+        "canonical": "#DFD0B8",
+        "tonalRamp": ["oklch(15% 0.015 88)", "oklch(25% 0.023 88)", "oklch(35% 0.03 88)", "oklch(45% 0.038 88)", "oklch(56% 0.045 88)", "oklch(68% 0.05 88)", "oklch(81% 0.05 88)", "oklch(95% 0.04 88)"]
+      },
+      "ink-on-gold": {
+        "role": "on-primary",
+        "displayName": "Ink on Gold",
+        "canonical": "#1C170E",
+        "tonalRamp": ["oklch(15% 0.009 80)", "oklch(25% 0.014 80)", "oklch(35% 0.018 80)", "oklch(45% 0.023 80)", "oklch(56% 0.027 80)", "oklch(68% 0.03 80)", "oklch(81% 0.027 80)", "oklch(95% 0.018 80)"]
+      },
+      "midnight": {
+        "role": "neutral",
+        "displayName": "Midnight",
+        "canonical": "#181C22",
+        "tonalRamp": ["oklch(15% 0.006 250)", "oklch(25% 0.009 250)", "oklch(35% 0.012 250)", "oklch(45% 0.015 250)", "oklch(56% 0.018 250)", "oklch(68% 0.02 250)", "oklch(81% 0.018 250)", "oklch(95% 0.012 250)"]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#222831",
+        "tonalRamp": ["oklch(15% 0.009 235)", "oklch(25% 0.014 235)", "oklch(35% 0.018 235)", "oklch(45% 0.023 235)", "oklch(56% 0.027 235)", "oklch(68% 0.03 235)", "oklch(81% 0.027 235)", "oklch(95% 0.018 235)"]
+      },
+      "space-gray": {
+        "role": "neutral",
+        "displayName": "Space Gray",
+        "canonical": "#393E46",
+        "tonalRamp": ["oklch(15% 0.008 240)", "oklch(25% 0.011 240)", "oklch(35% 0.015 240)", "oklch(45% 0.019 240)", "oklch(56% 0.023 240)", "oklch(68% 0.025 240)", "oklch(81% 0.023 240)", "oklch(95% 0.015 240)"]
+      },
+      "titanium": {
+        "role": "neutral",
+        "displayName": "Titanium",
+        "canonical": "#484E58",
+        "tonalRamp": ["oklch(15% 0.008 245)", "oklch(25% 0.011 245)", "oklch(35% 0.015 245)", "oklch(45% 0.019 245)", "oklch(56% 0.023 245)", "oklch(68% 0.025 245)", "oklch(81% 0.023 245)", "oklch(95% 0.015 245)"]
+      },
+      "starlight": {
+        "role": "neutral",
+        "displayName": "Starlight",
+        "canonical": "#F2EDE4",
+        "tonalRamp": ["oklch(15% 0.005 85)", "oklch(25% 0.007 85)", "oklch(35% 0.009 85)", "oklch(45% 0.011 85)", "oklch(56% 0.013 85)", "oklch(68% 0.015 85)", "oklch(81% 0.015 85)", "oklch(95% 0.015 85)"]
+      },
+      "silver-fog": {
+        "role": "neutral",
+        "displayName": "Silver Fog",
+        "canonical": "#A8A29A",
+        "tonalRamp": ["oklch(15% 0.004 75)", "oklch(25% 0.006 75)", "oklch(35% 0.007 75)", "oklch(45% 0.009 75)", "oklch(56% 0.011 75)", "oklch(68% 0.012 75)", "oklch(81% 0.012 75)", "oklch(95% 0.009 75)"]
+      },
+      "aluminum": {
+        "role": "neutral",
+        "displayName": "Aluminum",
+        "canonical": "#948F88",
+        "tonalRamp": ["oklch(15% 0.003 70)", "oklch(25% 0.005 70)", "oklch(35% 0.006 70)", "oklch(45% 0.008 70)", "oklch(56% 0.009 70)", "oklch(68% 0.01 70)", "oklch(81% 0.01 70)", "oklch(95% 0.007 70)"]
+      }
+    },
+    "typographyMeta": {
+      "wordmark": { "displayName": "Wordmark", "purpose": "Exclusivamente el nombre de marca FlareField. Cormorant Garamond nunca entra a la UI." },
+      "display": { "displayName": "Display", "purpose": "Titulo de pagina, uno por vista. Geist light hasta 96px." },
+      "body": { "displayName": "Body", "purpose": "Prosa de glosario y descripciones. Geist 15px/1.7, maximo ~70ch." },
+      "label": { "displayName": "Label / Kicker", "purpose": "Micro-etiqueta monoespaciada en mayusculas sobre datos. Firma del sistema." }
+    },
+    "shadows": [
+      { "name": "soft", "value": "0 8px 32px rgba(12,14,12,0.12)", "purpose": "Reposo de superficies secundarias." },
+      { "name": "elevated", "value": "0 12px 48px rgba(12,14,12,0.18)", "purpose": "Nav flotante, tarjetas de mapa, toda superficie que flota sobre contenido." }
+    ],
+    "motion": [
+      { "name": "ease-emphasized-decelerate", "value": "cubic-bezier(0.05, 0.7, 0.1, 1)", "purpose": "Entradas y reveals al scroll (bubble-enter, glossary reveal)." },
+      { "name": "ease-standard", "value": "cubic-bezier(0.2, 0, 0, 1)", "purpose": "Transiciones de estado (hover, color)." },
+      { "name": "duration-bubble-enter", "value": "700ms", "purpose": "Entrada escalonada de tarjetas con delays de 80ms." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "nav-collapse", "value": "900px", "purpose": "Umbral propio: la notch-nav colapsa a hamburger debajo de este ancho." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Nav Pill Active",
+      "kind": "nav",
+      "refersTo": "nav-pill-active",
+      "description": "Link activo de la notch-nav: pildora Desert Gold con texto Ink on Gold.",
+      "html": "<button class=\"ds-nav-pill-active\">INICIO</button>",
+      "css": ".ds-nav-pill-active { background: var(--accent-fill, #C9B98F); color: var(--accent-fill-on, #1C170E); border: none; border-radius: 9999px; height: 44px; padding: 0 20px; font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: transform 200ms var(--ease-standard, cubic-bezier(0.2,0,0,1)); } .ds-nav-pill-active:hover { filter: brightness(1.05); } .ds-nav-pill-active:active { transform: scale(0.97); } .ds-nav-pill-active:focus-visible { outline: 2px solid var(--accent-text, #DFD0B8); outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav Link Rest",
+      "kind": "nav",
+      "refersTo": "nav-pill-active",
+      "description": "Link en reposo de la notch-nav: pildora transparente, highlight deslizante al hover.",
+      "html": "<button class=\"ds-nav-link\">GLOSARIO</button>",
+      "css": ".ds-nav-link { background: transparent; color: var(--text-secondary, #A8A29A); border: none; border-radius: 9999px; height: 44px; padding: 0 20px; font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 300ms var(--ease-standard, cubic-bezier(0.2,0,0,1)), color 300ms var(--ease-standard, cubic-bezier(0.2,0,0,1)); } .ds-nav-link:hover { background: rgba(255,255,255,0.16); color: var(--text-primary, #F2EDE4); } .ds-nav-link:focus-visible { outline: 2px solid var(--accent-text, #DFD0B8); outline-offset: 2px; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "status-chip",
+      "description": "Chip de estado en reposo: pill Space Gray con borde calido.",
+      "html": "<span class=\"ds-status-chip\">KP ELEVADO</span>",
+      "css": ".ds-status-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--bg-surface-2, #393E46); color: var(--text-secondary, #A8A29A); border: 1px solid var(--border-strong, rgba(223,208,184,0.18)); border-radius: 9999px; padding: 5px 10px; font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1; }"
+    },
+    {
+      "name": "Accent Status Chip",
+      "kind": "chip",
+      "refersTo": "status-chip",
+      "description": "Chip de estado destacado: borde Desert Gold sobre Espresso, texto Desert Gold. Senal de tormenta activa.",
+      "html": "<span class=\"ds-accent-chip\">TORMENTA ACTIVA</span>",
+      "css": ".ds-accent-chip { display: inline-flex; align-items: center; gap: 6px; background: color-mix(in srgb, var(--accent-bg, #2A2620) 20%, transparent); color: var(--accent-fill, #C9B98F); border: 1px solid rgba(201,185,143,0.3); border-radius: 9999px; padding: 5px 10px; font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1; }"
+    },
+    {
+      "name": "Map Bubble Card",
+      "kind": "card",
+      "refersTo": "card-glass",
+      "description": "Tarjeta flotante del mapa: vidrio esmerilado unificado, radius 16px, sombra Elevated.",
+      "html": "<div class=\"ds-bubble-card\"><span class=\"ds-bubble-kicker\">MONITOREO EN VIVO</span><div class=\"ds-bubble-title\">Kp 5.3</div><p class=\"ds-bubble-body\">Tormenta geomagnetica menor en curso.</p></div>",
+      "css": ".ds-bubble-card { background: var(--glass-unified-bg, rgba(0,0,0,0.65)); -webkit-backdrop-filter: var(--glass-unified-blur, blur(24px) saturate(140%)); backdrop-filter: var(--glass-unified-blur, blur(24px) saturate(140%)); border: 1px solid var(--border-subtle, rgba(223,208,184,0.1)); border-radius: var(--radius-md, 16px); box-shadow: var(--shadow-elevated, 0 12px 48px rgba(12,14,12,0.18)); padding: 24px; max-width: 280px; overflow: hidden; transition: transform 300ms var(--ease-emphasized-decelerate, cubic-bezier(0.05,0.7,0.1,1)); } @media (hover: hover) { .ds-bubble-card:hover { transform: scale(1.02); } } .ds-bubble-kicker { display: block; font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted, #948F88); margin-bottom: 8px; } .ds-bubble-title { font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 24px; font-weight: 600; color: var(--accent-fill, #C9B98F); margin-bottom: 8px; } .ds-bubble-body { font-family: var(--font-sans, 'Geist', system-ui, sans-serif); font-size: 13px; line-height: 1.6; color: var(--text-secondary, #A8A29A); margin: 0; }"
+    },
+    {
+      "name": "Glossary Card",
+      "kind": "card",
+      "refersTo": "glossary-card",
+      "description": "Tarjeta de contenido del glosario: mismo vidrio unificado, radius 22px, se eleva al hover.",
+      "html": "<div class=\"ds-glossary-card\"><span class=\"ds-glossary-kicker\">QUE ES EL KP</span><h3 class=\"ds-glossary-title\">Indice Kp</h3><p class=\"ds-glossary-body\">Mide la perturbacion del campo magnetico terrestre en escala de 0 a 9.</p></div>",
+      "css": ".ds-glossary-card { background: var(--glass-unified-bg, rgba(0,0,0,0.65)); -webkit-backdrop-filter: var(--glass-unified-blur, blur(24px) saturate(140%)); backdrop-filter: var(--glass-unified-blur, blur(24px) saturate(140%)); border: 1px solid var(--border-subtle, rgba(223,208,184,0.1)); border-radius: var(--radius-lg, 22px); box-shadow: var(--shadow-soft, 0 8px 32px rgba(12,14,12,0.12)); padding: 24px; transition: transform 300ms var(--ease-emphasized-decelerate, cubic-bezier(0.05,0.7,0.1,1)), box-shadow 300ms var(--ease-standard, cubic-bezier(0.2,0,0,1)); } .ds-glossary-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-elevated, 0 12px 48px rgba(12,14,12,0.18)); } .ds-glossary-kicker { display: block; font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted, #948F88); margin-bottom: 12px; } .ds-glossary-title { font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 15px; font-weight: 600; color: var(--text-primary, #F2EDE4); margin: 0 0 8px; } .ds-glossary-body { font-family: var(--font-sans, 'Geist', system-ui, sans-serif); font-size: 15px; line-height: 1.7; letter-spacing: 0.016em; color: var(--text-secondary, #A8A29A); margin: 0; }"
+    },
+    {
+      "name": "Icon Button",
+      "kind": "button",
+      "refersTo": null,
+      "description": "Boton iconografico tactil de 44px (campana, menu): trazo Lucide, fondo solo en hover.",
+      "html": "<button class=\"ds-icon-button\" aria-label=\"Alertas\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"/><path d=\"M10.3 21a1.94 1.94 0 0 0 3.4 0\"/></svg></button>",
+      "css": ".ds-icon-button { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 9999px; background: transparent; color: var(--text-secondary, #A8A29A); cursor: pointer; transition: background 200ms var(--ease-standard, cubic-bezier(0.2,0,0,1)), color 200ms var(--ease-standard, cubic-bezier(0.2,0,0,1)), transform 200ms var(--ease-standard, cubic-bezier(0.2,0,0,1)); } .ds-icon-button:hover { background: var(--bg-surface-2, #393E46); color: var(--text-primary, #F2EDE4); } .ds-icon-button:active { transform: scale(0.97); } .ds-icon-button:focus-visible { outline: 2px solid var(--accent-text, #DFD0B8); outline-offset: 2px; }"
+    },
+    {
+      "name": "Kp Gauge",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Componente firma: anillo SVG con arco Desert Gold y lectura central monoespaciada.",
+      "html": "<div class=\"ds-kp-gauge\"><svg width=\"104\" height=\"104\" viewBox=\"0 0 104 104\"><circle cx=\"52\" cy=\"52\" r=\"44\" fill=\"none\" stroke=\"var(--border-subtle, rgba(223,208,184,0.1))\" stroke-width=\"6\"/><circle class=\"ds-kp-arc\" cx=\"52\" cy=\"52\" r=\"44\" fill=\"none\" stroke=\"var(--accent-fill, #C9B98F)\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-dasharray=\"171.4 276.5\" transform=\"rotate(-90 52 52)\"/></svg><div class=\"ds-kp-readout\"><span class=\"ds-kp-value\">5.3</span><span class=\"ds-kp-label\">INDICE KP</span></div></div>",
+      "css": ".ds-kp-gauge { position: relative; width: 104px; height: 104px; } .ds-kp-arc { transition: stroke-dasharray 700ms var(--ease-emphasized-decelerate, cubic-bezier(0.05,0.7,0.1,1)); } .ds-kp-readout { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; } .ds-kp-value { font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 28px; font-weight: 700; color: var(--text-primary, #F2EDE4); line-height: 1; } .ds-kp-label { font-family: var(--font-mono-stat, 'Geist Mono', ui-monospace, monospace); font-size: 8px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted, #948F88); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Instrumento de Campo",
+    "overview": "FlareField se ve como un instrumento de medicion construido para usarse afuera: carcasa nocturna (midnight), modulos de vidrio esmerilado flotando sobre la pagina plana, y lecturas doradas como grabados en laton. Todo lo que brilla es un dato; no hay ornamento que no sea informacion. La densidad es baja y deliberada — una persona parada en un lote, con el sol de frente, necesita leer el estado en segundos.\n\nEl sistema es dark-only: no existe modo claro ni esta previsto. El vidrio (backdrop-filter con saturacion) es el material estructural del sistema — barra de navegacion, tarjetas y tooltips del mapa comparten exactamente la misma receta — y las sombras existen solo como vocabulario de dos niveles, nunca como decoracion. La tipografia lleva la voz tecnica: monoespaciada para toda lectura de dato, sans humanista para prosa, y una unica serif reservada por completo a la marca.",
+    "keyCharacteristics": [
+      "Dark-only carbon azulado con acento oro viejo usado con rareza disciplinada.",
+      "Glass unificado: una sola receta de fondo+blur para toda superficie flotante.",
+      "Micro-etiquetas monoespaciadas en mayusculas como firma del sistema.",
+      "Iconografia de trazo (Lucide, stroke 1.5) — sin emoji, sin glyphs sueltos.",
+      "Movimiento contenido: springs de entrada y reveals al scroll, nada elastico-decorativo."
+    ],
+    "rules": [
+      { "name": "The Brass Rarity Rule", "body": "Desert Gold cubre ≤10% de cualquier pantalla. Si dudás si algo debe ser dorado, no lo sea: el oro señala estado activo o dato crítico, jamás decora.", "section": "colors" },
+      { "name": "The Warm Border Rule", "body": "Todo borde es Linen Veil (alpha de #DFD0B8). Un borde gris neutro o negro rompe la temperatura del sistema.", "section": "colors" },
+      { "name": "The One Serif Rule", "body": "Cormorant Garamond aparece exclusivamente en el wordmark \"FlareField\" (600, line-height 1). Jamás en headings, cuerpo ni UI: si una serif entra a la interfaz, el sistema quedó roto.", "section": "typography" },
+      { "name": "The Unified Glass Rule", "body": "Existe UNA receta de vidrio: rgba(0,0,0,0.65) + blur(24px) saturate(140%) (vars --glass-unified-*). Navbar, tarjetas de mapa, glosario y tooltip de zona la comparten. Cualquier superficie flotante nueva la usa; prohibido derivar recetas propias de blur o tinte.", "section": "elevation" },
+      { "name": "The Two-Shadow Rule", "body": "Solo Soft y Elevated existen. Una sombra nueva necesita antes eliminar una vieja.", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** usar las vars `--glass-unified-bg` / `--glass-unified-blur` para toda superficie flotante nueva (navbar, cards, tooltips, paneles).",
+      "**Do** usar `.text-kicker` para toda micro-etiqueta; los trackings ad-hoc (`tracking-[0.15em]`…) están fuera del sistema.",
+      "**Do** tomar colores solo de tokens (`var(--accent-fill)`, `var(--bg-surface-2)`…); hex directo en JSX quedó desterrado.",
+      "**Do** respetar `prefers-reduced-motion` en toda animación nueva y mantener el presupuesto de peso (conexiones rurales lentas).",
+      "**Do** dibujar iconos como SVG de trazo consistente (Lucide o path propio equivalente)."
+    ],
+    "donts": [
+      "**Don't** introducir modo claro: el sistema es dark-only por decisión.",
+      "**Don't** agregar glows externos, gradientes radiales decorativos, dot-grids ni blobs de blur: se removieron por decisión de sistema (2026-08-23) y no vuelven.",
+      "**Don't** usar Cormorant Garamond fuera del wordmark \"FlareField\".",
+      "**Don't** truncar títulos con `truncate` para resolver falta de espacio: se reacomoda la composición (bug corregido en glosario).",
+      "**Don't** crear sombras fuera del vocabulario Soft/Elevated ni recetas alternativas de glass."
+    ]
+  }
+}
