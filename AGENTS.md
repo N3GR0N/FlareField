@@ -22,16 +22,8 @@ No test, typecheck, format, codegen, or pre-commit scripts exist.
 - **API proxy** at `app/api/solar/route.ts` — fetches NASA DONKI (FLR, GST) and NOAA Kp index. Uses `DEMO_KEY` (rate-limited). Set `NASA_API_KEY` env var for production.
 - **Env pattern**: `.env.example` is the template. Duplicate to `.env.local` (gitignored) for actual values.
 - **`@/*` alias** maps to project root (`./`), not `src/`.
-- **Tailwind v4** via `@tailwindcss/postcss` (PostCSS plugin). Custom dark theme with gold primary (`#C9A227`). Uses v4 opacity modifier syntax (`bg-background/50`).
-- **Fonts**: Rethink Sans (body), Playfair Display (headings), Space Grotesk (mono/stat).
-
-# Known issues (Feb 2026 state)
-
-The app currently does NOT build successfully. Fix these before adding features:
-
-1. **`SolarMap.client.tsx:212`** — Tailwind `/50` opacity modifier in JSX `className` is parsed as division. Escape or refactor.
-2. **`ZonePanel.tsx` imports `AlertChip` as named export** — `AlertChip` is a `default` export. Change to `import AlertChip from "@/components/ui/AlertChip"`.
-3. **`ZonePanel.tsx` imports `{ MetricCard }` from `@/components/ui/MetricCard`** — `MetricCard` is a `default` export there. Change to `import MetricCard from "@/components/ui/MetricCard"`. There is also a named `MetricCard` in `GlassCard.tsx` — do NOT import from there for the single-card usage in `ZonePanel`.
+- **Tailwind v4** via `@tailwindcss/postcss` (PostCSS plugin). Custom dark theme with gold accent (`--accent-fill: #C9B98F`, see `app/globals.css`). Uses v4 opacity modifier syntax (`bg-background/50`).
+- **Fonts**: Geist Sans (body + display), Geist Mono (mono/stats), Cormorant Garamond (wordmark only) — set via `next/font` on `<html>` (`app/layout.tsx`), aliased to `--font-body`, `--font-display`, `--font-mono-stat`, `--font-wordmark`.
 
 # Style conventions
 

@@ -386,14 +386,15 @@
 /* Panels/cards/popups styled as frosted glass.
    NOTE: light/dark glass-bg variants are mapped via [data-theme] above. */
 
-/* Used for the glossary page (diagram cards + glossary cards) */
+/* Used for the glossary page (diagram cards + glossary cards).
+   Same unified glass tokens as .notch-nav / .bubble-card. */
 .glass-card-light {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background-color: var(--glass-unified-bg);
+  backdrop-filter: var(--glass-unified-blur);
+  -webkit-backdrop-filter: var(--glass-unified-blur);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--shadow-elevated);
 }
 
 /* Floating macOS-style notch navigation bar */

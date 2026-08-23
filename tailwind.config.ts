@@ -53,8 +53,6 @@ export default {
         'Mono-Stat': ['var(--font-mono-stat)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
-        glass: '1.25rem',
-        btn: '0.5rem',
         chip: '9999px',
       },
       scale: {

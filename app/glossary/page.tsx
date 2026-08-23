@@ -103,25 +103,18 @@ function DiagramCard({
   onElementLeave: () => void;
   refs: Record<string, React.RefObject<HTMLDivElement | null>>;
 }) {
-  const isKp = highlightedId === "kp" || highlightedId === "gauge";
-  const isStorm = highlightedId === "status" || highlightedId === "hours";
-  const isFlare = highlightedId === "eventname" || highlightedId === "intensity";
-  const isNasa = highlightedId === "source";
-
   const { gauge, kp, status, hours, eventname, intensity, source, tech } = refs;
 
-  const glow = "shadow-[0_0_20px_-3px_var(--accent-bg)] border-[var(--accent-fill)]/25";
-  const noGlow = "border-[var(--border-subtle)]/50";
   const elGlow = "bg-[var(--accent-fill)]/8 ring-1 ring-[var(--accent-fill)]/15";
   const elNoGlow = "";
 
   return (
     <div className="flex flex-col md:flex-row gap-5 justify-center">
       {/* â”€â”€â”€ Monitoreo en Vivo â”€â”€â”€ */}
-      <div className={`w-full md:w-[280px] p-5 glass-card-light transition-all duration-300 ${isKp || isStorm ? glow : noGlow}`}>
+      <div className="w-full md:w-[280px] p-5 glass-card-light">
         <div className="flex items-center gap-2 mb-4">
           <span className="inline-block h-[6px] w-[6px] rounded-full bg-[var(--accent-fill)] animate-pulse" />
-          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Monitoreo en Vivo</span>
+          <span className="text-kicker" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Monitoreo en Vivo</span>
         </div>
         <div className="flex items-center gap-4">
           <div
@@ -141,16 +134,23 @@ function DiagramCard({
               onMouseLeave={onElementLeave}
             >
               <span className="text-[28px] font-bold tracking-tight text-[var(--text-primary)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>4</span>
-              <span className="text-[9px] uppercase tracking-[0.2em] text-[var(--text-secondary)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Kp</span>
+              <span className="text-kicker" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Kp</span>
             </div>
           </div>
           <div className="flex flex-col gap-3 flex-1 min-w-0">
             <div>
-              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Estado</div>
+              <div className="text-kicker mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Estado</div>
               <span
                 ref={status}
-                className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] border-[var(--border-strong)]/30 bg-[var(--bg-surface-2)] text-[var(--text-secondary)] transition-all duration-200 cursor-pointer ${highlightedId === "status" ? "bg-[var(--accent-bg)] border-[var(--accent-fill)]/25 text-[var(--accent-text)] ring-1 ring-[var(--accent-fill)]/10" : ""}`}
-                style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
+                className={`inline-flex items-center rounded-full border px-2.5 py-1 border-[var(--border-strong)]/30 bg-[var(--bg-surface-2)] transition-all duration-200 cursor-pointer ${highlightedId === "status" ? "bg-[var(--accent-bg)] border-[var(--accent-fill)]/25 ring-1 ring-[var(--accent-fill)]/10" : ""}`}
+                style={{
+                  fontFamily: "var(--font-mono-stat), sans-serif",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase" as const,
+                  color: highlightedId === "status" ? "var(--accent-text)" : "var(--text-secondary)",
+                }}
                 onMouseEnter={() => onElementEnter("status")}
                 onMouseLeave={onElementLeave}
               >
@@ -163,7 +163,7 @@ function DiagramCard({
               onMouseEnter={() => onElementEnter("hours")}
               onMouseLeave={onElementLeave}
             >
-              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>PrÃ³ximas horas</div>
+              <div className="text-kicker mb-1" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>PrÃ³ximas horas</div>
               <div className="flex items-center gap-1.5">
                 <span className="inline-block h-[5px] w-[5px] rounded-full bg-[var(--accent-fill)] animate-pulse" />
                 <span className="text-[13px] text-[var(--text-secondary)]" style={{ fontFamily: "var(--font-body), sans-serif" }}>+3h</span>
@@ -174,11 +174,11 @@ function DiagramCard({
       </div>
 
       {/* â”€â”€â”€ Eventos Activos â”€â”€â”€ */}
-      <div className={`w-full md:w-[280px] p-5 glass-card-light transition-all duration-300 ${isFlare || isNasa ? glow : noGlow}`}>
+      <div className="w-full md:w-[280px] p-5 glass-card-light">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <span className="inline-block h-[6px] w-[6px] rounded-full bg-[var(--accent-fill)] animate-pulse" />
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Eventos Activos</span>
+            <span className="text-kicker" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>Eventos Activos</span>
           </div>
         </div>
         <div className="flex items-center justify-between gap-3 mb-3">
@@ -194,8 +194,11 @@ function DiagramCard({
             </div>
             <div
               ref={source}
-              className={`text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mt-0.5 rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "source" ? "bg-[var(--accent-bg)]/10 text-[var(--accent-fill)] ring-1 ring-[var(--accent-fill)]/15" : ""}`}
-              style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}
+              className={`text-kicker mt-0.5 rounded px-1 -mx-1 transition-all duration-200 cursor-pointer ${highlightedId === "source" ? "bg-[var(--accent-bg)]/10 ring-1 ring-[var(--accent-fill)]/15" : ""}`}
+              style={{
+                fontFamily: "var(--font-mono-stat), sans-serif",
+                color: highlightedId === "source" ? "var(--accent-fill)" : undefined,
+              }}
               onMouseEnter={() => onElementEnter("source")}
               onMouseLeave={onElementLeave}
             >
@@ -212,7 +215,17 @@ function DiagramCard({
             >
               G3
             </span>
-            <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] border-[var(--accent-fill)]/30 bg-[var(--accent-bg)]/20 text-[var(--accent-fill)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+            <span
+              className="inline-flex items-center rounded-full border px-2.5 py-1 border-[var(--accent-fill)]/30 bg-[var(--accent-bg)]/20"
+              style={{
+                fontFamily: "var(--font-mono-stat), sans-serif",
+                fontSize: "10px",
+                fontWeight: 600,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase" as const,
+                color: "var(--accent-fill)",
+              }}
+            >
               TORMENTA ACTIVA
             </span>
           </div>
@@ -224,7 +237,7 @@ function DiagramCard({
           onMouseEnter={() => onElementEnter("tech")}
           onMouseLeave={onElementLeave}
         >
-          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[var(--text-secondary)] mb-2" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>TecnologÃ­as Afectadas</div>
+          <div className="text-kicker mb-2" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>TecnologÃ­as Afectadas</div>
           <div className="grid grid-cols-2 gap-2">
             {[
               { icon: "M12 7a5 5 0 100 10 5 5 0 000-10zM4 4l4 4M20 4l-4 4M4 20l4-4M20 20l-4-4", label: "Drones" },
@@ -232,7 +245,7 @@ function DiagramCard({
               { icon: "M12 3l9 5-9 5-9-5 9-5zM3 10v7a2 2 0 002 2h14", label: "Escuela" },
               { icon: "M12 15a3 3 0 100-6 3 3 0 000 6zM4.93 4.93l14.14 14.14", label: "Radio" },
             ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-2 border border-[var(--border-subtle)]/40 rounded-xl px-3 py-2 bg-[var(--bg-surface-2)]/40">
+              <div key={label} className="flex items-center gap-2 border border-[var(--border-subtle)]/40 rounded-2xl px-3 py-2 bg-[var(--bg-surface-2)]/40">
                 <svg className="h-[14px] w-[14px] shrink-0 text-[var(--text-secondary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d={icon} />
                 </svg>
@@ -258,24 +271,21 @@ function GlossaryCard({
     <div
       onMouseEnter={() => { setIsHovered(true); onMouseEnter(); }}
       onMouseLeave={() => { setIsHovered(false); onMouseLeave(); }}
-      className="glass-card-light p-8 cursor-default"
+      className="glass-card-light p-6 cursor-default"
         style={{
           opacity: isVisible ? 1 : 0,
           transform: isVisible
             ? (isHovered ? "translateY(-3px)" : "translateY(0)")
             : "translateY(16px)",
-          transition: reducedMotion ? "none" : "opacity 0.5s ease-out, transform 0.4s ease-out, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease",
+          transition: reducedMotion ? "none" : "opacity 0.5s ease-out, transform 0.4s ease-out, background-color 0.3s ease, border-color 0.3s ease",
           backgroundColor: isHighlighted ? "var(--bg-surface-3)" : (isHovered ? "var(--bg-surface-2)" : undefined),
           borderColor: isHighlighted ? "var(--accent-bg)" : (isHovered ? "var(--border-subtle)" : undefined),
-          boxShadow: isHighlighted
-            ? "0 0 30px -5px var(--accent-bg), 0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 var(--bg-surface-3), inset 0 0 8px 4px var(--bg-surface-3)"
-            : (isHovered ? "0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 var(--bg-surface-3), inset 0 0 8px 4px var(--bg-surface-3)" : undefined),
         }}
     >
       <span
         className="block text-[11px] mb-4"
         style={{
-          fontFamily: "var(--font-mono), monospace",
+          fontFamily: "var(--font-mono-stat), sans-serif",
           color: isHovered ? "var(--accent-fill)" : "var(--text-secondary)",
           transition: reducedMotion ? "none" : "color 0.3s ease",
         }}
@@ -285,18 +295,8 @@ function GlossaryCard({
       <h3 className="text-[15px] font-semibold text-[var(--text-primary)] mb-4" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
         {entry.title}
       </h3>
-      {/* Divider with sweep animation */}
-      <div className="relative h-px mb-4 overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: isHovered
-              ? "linear-gradient(90deg, var(--accent-fill) 0%, var(--border-subtle) 100%)"
-              : "var(--border-subtle)",
-            transition: reducedMotion ? "none" : "background 0.4s ease",
-          }}
-        />
-      </div>
+      {/* Separator */}
+      <div className="h-px mb-4" style={{ background: "var(--border-subtle)" }} />
       <p className="text-[15px] leading-[1.8] text-[var(--text-primary)] mb-4" style={{ fontFamily: "var(--font-body), sans-serif" }}>
         {entry.body}
       </p>
@@ -644,9 +644,8 @@ export default function GlossaryPage() {
         style={{ position: "fixed", top: 0, left: "0.5rem", zIndex: 50, opacity: titleOpacity, pointerEvents: titleOpacity === 0 ? "none" : undefined }}
       >
         <p
-          className="text-glass-kicker mb-3"
+          className="text-kicker mb-3"
           style={{
-            color: "var(--text-secondary)",
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? "translateY(0)" : "translateY(12px)",
             transition: reducedMotion ? "none" : "opacity 0.6s ease-out 0.1s, transform 0.6s ease-out 0.1s",
@@ -655,8 +654,11 @@ export default function GlossaryPage() {
           Monitoreo espacial en tiempo real
         </p>
         <h1
-          className="text-glass-hero text-5xl md:text-6xl lg:text-7xl"
+          className="text-5xl md:text-6xl lg:text-7xl"
           style={{
+            fontFamily: "var(--font-wordmark), 'Cormorant Garamond', Georgia, serif",
+            fontWeight: 600,
+            lineHeight: 1,
             color: "var(--text-primary)",
             opacity: heroVisible ? 1 : 0,
             transform: heroVisible ? "translateY(0)" : "translateY(16px)",
@@ -668,16 +670,6 @@ export default function GlossaryPage() {
       </div>
 
       <div className="relative min-h-screen" style={{ background: "var(--bg-page)", color: "var(--text-primary)" }}>
-      {/* â”€â”€â”€ Background Texture â”€â”€â”€ */}
-      <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
-        {/* Dot grid pattern */}
-        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle, var(--border-subtle) 0.8px, transparent 0.8px)", backgroundSize: "24px 24px", opacity: 0.3 }} />
-        {/* Warm blurred organic shapes */}
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full" style={{ background: "radial-gradient(circle, var(--accent-bg) 0%, transparent 70%)", opacity: 0.15, filter: "blur(80px)" }} />
-        <div className="absolute top-1/3 -right-24 w-[400px] h-[400px] rounded-full" style={{ background: "radial-gradient(circle, var(--accent-bg) 0%, transparent 70%)", opacity: 0.12, filter: "blur(100px)" }} />
-        <div className="absolute bottom-20 left-1/4 w-[350px] h-[350px] rounded-full" style={{ background: "radial-gradient(circle, var(--accent-bg) 0%, transparent 70%)", opacity: 0.15, filter: "blur(90px)" }} />
-      </div>
-
       <TopNav isNavOpen={isNavOpen} setIsNavOpen={setIsNavOpen} />
       <BottomNav />
 
@@ -687,7 +679,7 @@ export default function GlossaryPage() {
           <h2
             className="text-6xl sm:text-7xl md:text-[96px] font-light text-[var(--text-primary)] tracking-tight mb-6"
             style={{
-              fontFamily: "var(--font-display), Georgia, serif",
+              fontFamily: "var(--font-display), sans-serif",
               opacity: heroVisible ? 1 : 0,
               transform: heroVisible ? "translateY(0)" : "translateY(16px)",
               transition: reducedMotion ? "none" : "opacity 0.7s ease-out 0.1s, transform 0.7s ease-out 0.1s",
@@ -706,26 +698,18 @@ export default function GlossaryPage() {
           >
             EntendÃ© quÃ© afecta tu tecnologÃ­a y cuÃ¡ndo actuar.
           </p>
-          {/* Decorative rule */}
-          <div
-            className="mx-auto mt-8 h-px bg-[var(--border-subtle)]/50"
-            style={{
-              width: heroVisible ? "120px" : "0px",
-              transition: reducedMotion ? "none" : "width 0.8s ease-out 0.4s",
-            }}
-          />
         </section>
 
         {/* â”€â”€â”€ Mobile: Simple list â”€â”€â”€ */}
         {isMobile && (
           <section className="pb-16">
-            <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--text-secondary)] mb-6 text-center" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+            <p className="text-kicker mb-6 text-center" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
               QuÃ© estÃ¡s viendo en el mapa
             </p>
             <div className="space-y-3">
               {glossaryData.map((entry) => (
                 <div key={entry.id} className="flex items-start gap-3 py-3 border-b border-[var(--border-subtle)]/30 last:border-0">
-                  <span className="text-[11px] text-[var(--text-secondary)] mt-0.5 shrink-0" style={{ fontFamily: "var(--font-mono), monospace" }}>{entry.number}</span>
+                  <span className="text-[11px] text-[var(--text-secondary)] mt-0.5 shrink-0" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>{entry.number}</span>
                   <div className="min-w-0">
                     <div className="text-[14px] font-semibold text-[var(--text-primary)]" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>{entry.title}</div>
                     <p className="text-[13px] text-[var(--text-secondary)] mt-0.5" style={{ fontFamily: "var(--font-body), sans-serif" }}>{entry.summary}</p>
@@ -743,30 +727,17 @@ export default function GlossaryPage() {
             className={`pb-24 transition-all duration-700 ease-out ${isDiagramVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
             <p
-              className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--text-secondary)] mb-12 flex items-center justify-center gap-3"
+              className="text-center text-kicker mb-12"
               style={{
                 fontFamily: "var(--font-mono-stat), sans-serif",
                 opacity: isDiagramVisible ? 1 : 0,
                 transition: reducedMotion ? "none" : "opacity 0.6s ease-out",
               }}
             >
-              <span className="inline-block w-5 h-px bg-[var(--border-subtle)]/60" />
               QuÃ© estÃ¡s viendo en el mapa
-              <span className="inline-block w-5 h-px bg-[var(--border-subtle)]/60" />
             </p>
 
             <div ref={containerRef} className="relative px-[170px]">
-              {/* Soft warm glow behind cards */}
-              <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full pointer-events-none"
-                style={{
-                  background: "radial-gradient(ellipse, var(--accent-bg) 0%, transparent 70%)",
-                  opacity: isDiagramVisible ? 0.15 : 0,
-                  filter: "blur(60px)",
-                  transition: reducedMotion ? "none" : "opacity 1s ease-out",
-                }}
-                aria-hidden="true"
-              />
               {/* SVG overlay â€” coordinates = DOM pixels relative to this container */}
               {containerSize.w > 0 && (
                 <svg
@@ -892,16 +863,14 @@ export default function GlossaryPage() {
         {/* â”€â”€â”€ Glossary Cards â”€â”€â”€ */}
         <section className="pb-24">
           <p
-            className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--text-secondary)] mb-8 flex items-center justify-center gap-3"
+            className="text-center text-kicker mb-8"
             style={{
               fontFamily: "var(--font-mono-stat), sans-serif",
               opacity: visibleCards.size > 0 ? 1 : 0,
               transition: reducedMotion ? "none" : "opacity 0.6s ease-out",
             }}
           >
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--border-subtle)]/60" />
             TÃ©rminos clave
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--border-subtle)]/60" />
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {glossaryData.map((entry) => (
@@ -921,7 +890,7 @@ export default function GlossaryPage() {
 
         {/* â”€â”€â”€ Footer â”€â”€â”€ */}
         <footer className="text-center py-12 border-t border-[var(--border-subtle)]/40">
-          <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-[var(--text-secondary)] mb-6" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
+          <p className="text-kicker mb-6" style={{ fontFamily: "var(--font-mono-stat), sans-serif" }}>
             Â© 2026 FlareField
           </p>
           <Link href="/" className="inline-flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-150" style={{ fontFamily: "var(--font-body), sans-serif" }}>
