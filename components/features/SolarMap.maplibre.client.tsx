@@ -495,8 +495,8 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
           const paintFor = (id: string, type: string): Record<string, string> | null => {
             const k = id.toLowerCase();
 
-            // 1. Tierra base (Background) — verde base: la mayoría del terreno es rural
-            if (type === "background") return { "background-color": "#386D5D" };
+            // 1. Tierra base (Background) — tono neutro "tierra genérica" (ni verde ni desierto)
+            if (type === "background") return { "background-color": "#4A5240" };
 
             // 2. Agua
             if (["water", "river", "lake", "ocean", "ferry", "aqueduct"].some((kw) => k.includes(kw))) {
@@ -528,9 +528,9 @@ export default function SolarMapMapLibre({ userLocation }: { userLocation: { lat
               return { "fill-color": "#3C7362" };
             }
 
-            // 9. Arena / desierto — solo fill (capa real: "Sand") — tono arena neutro y cálido
+            // 9. Arena / desierto — solo fill (capa real: "Sand") — tono oliva árido neutro, funciona en desiertos de baja y alta altura (Sahara, Arabia, Atacama)
             if (type === "fill" && ["sand", "desert", "dune"].some((kw) => k.includes(kw))) {
-              return { "fill-color": "#D2BC93" };
+              return { "fill-color": "#72745F" };
             }
 
             // 10. Manzanas urbanas — solo fill
